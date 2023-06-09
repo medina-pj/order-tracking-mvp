@@ -1,95 +1,59 @@
-import Image from 'next/image'
-import styles from './page.module.css'
+'use client';
+
+import { useState } from 'react';
+import { v4 as uuid } from 'uuid';
+import { db } from '../config/firebase';
+import { collection, getDocs, query, addDoc } from 'firebase/firestore';
 
 export default function Home() {
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
+
+  const addCategories = async () => {
+    if (!name || !description) return;
+
+    const categoryPayload = {
+      _id: uuid(),
+      name,
+      description,
+      createdAt: Date.now(),
+      isArchived: false,
+    };
+
+    const createCategory = await addDoc(collection(db, 'categories'), categoryPayload);
+
+    setName('');
+    setDescription('');
+    console.log(createCategory);
+  };
+
+  const fetchCategories = async () => {
+    const ref = collection(db, 'categories');
+    const q = query(ref);
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.docs.length === 0) {
+      console.log('EMPTY');
+    }
+
+    const account = querySnapshot.docs.map(doc => ({
+      ...doc.data(),
+      id: doc.id,
+    }));
+
+    console.log({ categories: account });
+  };
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore the Next.js 13 playground.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
+    <div>
+      <input placeholder='Name' value={name} onChange={e => setName(e.target.value)} />
+      <input
+        placeholder='Description'
+        value={description}
+        onChange={e => setDescription(e.target.value)}
+      />
+      <button onClick={fetchCategories}>Category Pages</button>
+      <button onClick={addCategories}>Save Category</button>
+    </div>
+  );
 }
