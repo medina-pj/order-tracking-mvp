@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Friday June 9th 2023
  * Last Modified by: PJ Medina - <paulo@healthnow.ph>
- * Last Modified time: June 10th 2023, 5:33:04 pm
+ * Last Modified time: June 10th 2023, 7:44:02 pm
  * ---------------------------------------------
  */
 
@@ -16,7 +16,7 @@ const constants = {
   FIREBASE_APP_ID: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
   DB_CATEGORIES: 'categories',
   DB_PRODUCTS: 'products',
-  DB_TRANSACTIONS: 'transactions',
+  DB_ORDERS: 'orders',
 };
 
 export default constants;

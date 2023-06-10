@@ -5,7 +5,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulo@healthnow.ph>
- * Last Modified time: June 10th 2023, 6:09:52 pm
+ * Last Modified time: June 10th 2023, 9:57:46 pm
  * ---------------------------------------------
  */
 
@@ -96,6 +96,7 @@ export default function Home() {
         <thead>
           <tr>
             <th>#</th>
+            <th>Product Code</th>
             <th>Name</th>
             <th>Category</th>
             <th>Price</th>
@@ -108,6 +109,7 @@ export default function Home() {
           {documents.map((doc: any, i: number) => (
             <tr key={doc.id}>
               <td>{i + 1}</td>
+              <td>{doc.productCode}</td>
               <td>{doc.name}</td>
               <td>{doc.category}</td>
               <td>{doc.price}</td>

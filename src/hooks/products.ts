@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulo@healthnow.ph>
- * Last Modified time: June 10th 2023, 5:50:38 pm
+ * Last Modified time: June 10th 2023, 9:55:37 pm
  * ---------------------------------------------
  */
 
@@ -16,6 +16,7 @@ import { collection, query, onSnapshot, where, addDoc, doc, setDoc } from 'fireb
 import { db } from '../config/firebase';
 import { ProductSchema } from '../types/schema';
 import constants from '../utils/constants';
+import generateNanoId from '@/utils/generateNanoId';
 
 export interface ISaveProduct {
   name: string;
@@ -31,6 +32,7 @@ export interface IUpdateProduct extends ISaveProduct {
 }
 
 export interface IProduct extends ISaveProduct, IUpdateProduct {
+  productCode: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -48,10 +50,9 @@ const useProduct = () => {
       let results: IProduct[] = [];
 
       for (const doc of snapshot.docs) {
-        //FIXME: fetch single category
-
         results.push({
           id: doc.id,
+          productCode: doc.data().productCode,
           name: doc.data().name,
           price: doc.data().price,
           categoryId: doc.data().categoryId,
@@ -74,6 +75,7 @@ const useProduct = () => {
       setError(null);
 
       const productPayload: ProductSchema = {
+        productCode: generateNanoId(5),
         name: payload.name,
         price: payload.price,
         categoryId: payload.categoryId,
