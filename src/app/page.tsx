@@ -1,5 +1,14 @@
 'use client';
 
+/*
+ * ---------------------------------------------
+ * Author: PJ Medina
+ * Date:   Saturday June 10th 2023
+ * Last Modified by: PJ Medina - <paulo@healthnow.ph>
+ * Last Modified time: June 10th 2023, 6:19:30 pm
+ * ---------------------------------------------
+ */
+
 import { useState } from 'react';
 import useCategory from '@/hooks/categories';
 
@@ -37,14 +46,20 @@ export default function Home() {
     }
   };
 
+  console.log({
+    categories: documents,
+  });
+
   return (
     <div>
       <input placeholder='Name' value={name} onChange={e => setName(e.target.value)} />
+      <br />
       <input
         placeholder='Description'
         value={description}
         onChange={e => setDescription(e.target.value)}
       />
+      <br />
       <button onClick={createCategory}>Save Category</button>
       <br />
       <br />

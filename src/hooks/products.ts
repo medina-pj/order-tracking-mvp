@@ -1,9 +1,9 @@
 /*
  * ---------------------------------------------
  * Author: PJ Medina
- * Date:   Friday June 9th 2023
+ * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulo@healthnow.ph>
- * Last Modified time: June 10th 2023, 5:46:37 pm
+ * Last Modified time: June 10th 2023, 5:50:38 pm
  * ---------------------------------------------
  */
 
@@ -14,40 +14,50 @@ moment.tz.setDefault('Asia/Manila');
 import { collection, query, onSnapshot, where, addDoc, doc, setDoc } from 'firebase/firestore';
 
 import { db } from '../config/firebase';
-import { CategorySchema } from '../types/schema';
-import constants from '@/utils/constants';
+import { ProductSchema } from '../types/schema';
+import constants from '../utils/constants';
 
-export interface ISaveCategory {
+export interface ISaveProduct {
   name: string;
+  price: number;
+  categoryId: string;
   description?: string;
+  note?: string;
 }
 
-export interface IUpdateCategory extends ISaveCategory {
+export interface IUpdateProduct extends ISaveProduct {
   id: string;
+  isAvailable: boolean;
 }
 
-export interface ICategory extends ISaveCategory, IUpdateCategory {
+export interface IProduct extends ISaveProduct, IUpdateProduct {
   createdAt: string;
   updatedAt: string;
 }
 
-const useCategory = () => {
+const useProduct = () => {
   const [error, setError] = useState<any>(null);
-  const [documents, setDocuments] = useState<ICategory[]>([]);
+  const [documents, setDocuments] = useState<IProduct[]>([]);
 
   useEffect(() => {
-    let ref = collection(db, constants.DB_CATEGORIES);
+    let ref = collection(db, constants.DB_PRODUCTS);
     let qry = query(ref, where('isArchived', '==', false));
 
     //will invoke everytime database is updated in the cloud
     const unsub = onSnapshot(qry, async snapshot => {
-      let results: ICategory[] = [];
+      let results: IProduct[] = [];
 
       for (const doc of snapshot.docs) {
+        //FIXME: fetch single category
+
         results.push({
           id: doc.id,
-          name: doc.data()?.name,
-          description: doc.data()?.description,
+          name: doc.data().name,
+          price: doc.data().price,
+          categoryId: doc.data().categoryId,
+          description: doc.data().description,
+          note: doc.data().note,
+          isAvailable: doc.data().isAvailable,
           createdAt: moment(doc.data()?.createdAt).format('MMM DD, YYYY hh:mma'),
           updatedAt: moment(doc.data()?.updatedAt).format('MMM DD, YYYY hh:mma'),
         });
@@ -59,19 +69,23 @@ const useCategory = () => {
     return () => unsub();
   }, []);
 
-  const createDoc = async (payload: ISaveCategory): Promise<void> => {
+  const createDoc = async (payload: ISaveProduct): Promise<void> => {
     try {
       setError(null);
 
-      const categoryPayload: CategorySchema = {
+      const productPayload: ProductSchema = {
         name: payload.name,
+        price: payload.price,
+        categoryId: payload.categoryId,
         description: payload?.description || '',
+        note: payload?.note || '',
+        isAvailable: true,
         createdAt: moment().toDate().getTime(),
         updatedAt: moment().toDate().getTime(),
         isArchived: false,
       };
 
-      await addDoc(collection(db, constants.DB_CATEGORIES), categoryPayload);
+      await addDoc(collection(db, constants.DB_PRODUCTS), productPayload);
 
       return;
     } catch (error: any) {
@@ -85,7 +99,7 @@ const useCategory = () => {
     try {
       setError(null);
 
-      const docRef = doc(db, 'categories', id);
+      const docRef = doc(db, constants.DB_PRODUCTS, id);
 
       await setDoc(
         docRef,
@@ -104,17 +118,20 @@ const useCategory = () => {
     }
   };
 
-  const updateDoc = async (payload: IUpdateCategory): Promise<void> => {
+  const updateDoc = async (payload: IUpdateProduct): Promise<void> => {
     try {
       setError(null);
 
-      const docRef = doc(db, constants.DB_CATEGORIES, payload.id);
+      const docRef = doc(db, constants.DB_PRODUCTS, payload.id);
 
       await setDoc(
         docRef,
         {
           name: payload.name,
+          price: payload.price,
+          categoryId: payload.categoryId,
           description: payload.description,
+          note: payload.note,
           updatedAt: moment().toDate().getTime(),
         },
         { merge: true }
@@ -131,4 +148,4 @@ const useCategory = () => {
   return { error, documents, createDoc, deleteDoc, updateDoc };
 };
 
-export default useCategory;
+export default useProduct;
