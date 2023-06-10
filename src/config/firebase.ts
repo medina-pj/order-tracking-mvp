@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Friday June 9th 2023
  * Last Modified by: PJ Medina - <paulo@healthnow.ph>
- * Last Modified time: June 9th 2023, 9:58:59 pm
+ * Last Modified time: June 10th 2023, 9:36:44 am
  * ---------------------------------------------
  */
 
@@ -21,8 +21,6 @@ const firebaseConfig = {
   messagingSenderId: constants.FIREBASE_MESSAGING_SENDER_ID,
   appId: constants.FIREBASE_APP_ID,
 };
-
-console.log(firebaseConfig);
 
 // init firebase
 const app = initializeApp(firebaseConfig);

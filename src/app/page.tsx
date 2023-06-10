@@ -1,47 +1,40 @@
 'use client';
 
 import { useState } from 'react';
-import { v4 as uuid } from 'uuid';
-import { db } from '../config/firebase';
-import { collection, getDocs, query, addDoc } from 'firebase/firestore';
+import useCategory from '@/hooks/categories';
 
 export default function Home() {
+  const { error, documents, createDoc, deleteDoc } = useCategory();
+
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
 
-  const addCategories = async () => {
-    if (!name || !description) return;
+  const createCategory = async () => {
+    if (!name || !description) {
+      alert('Name & Description is required.');
+      return;
+    }
 
-    const categoryPayload = {
-      _id: uuid(),
-      name,
-      description,
-      createdAt: Date.now(),
-      isArchived: false,
-    };
+    await createDoc({ name, description });
 
-    const createCategory = await addDoc(collection(db, 'categories'), categoryPayload);
+    if (error) {
+      alert('Error occured.');
+      return;
+    }
 
     setName('');
     setDescription('');
-    console.log(createCategory);
   };
 
-  const fetchCategories = async () => {
-    const ref = collection(db, 'categories');
-    const q = query(ref);
-    const querySnapshot = await getDocs(q);
+  const deleteCategory = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this record?')) return;
 
-    if (querySnapshot.docs.length === 0) {
-      console.log('EMPTY');
+    await deleteDoc(id);
+
+    if (error) {
+      alert('Error occured.');
+      return;
     }
-
-    const account = querySnapshot.docs.map(doc => ({
-      ...doc.data(),
-      id: doc.id,
-    }));
-
-    console.log({ categories: account });
   };
 
   return (
@@ -52,8 +45,31 @@ export default function Home() {
         value={description}
         onChange={e => setDescription(e.target.value)}
       />
-      <button onClick={fetchCategories}>Category Pages</button>
-      <button onClick={addCategories}>Save Category</button>
+      <button onClick={createCategory}>Save Category</button>
+      <br />
+      <br />
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {documents.map((doc: any, i: number) => (
+            <tr key={doc.id}>
+              <td>{i + 1}</td>
+              <td>{doc.name}</td>
+              <td>{doc?.description}</td>
+              <td>
+                <button onClick={() => deleteCategory(doc.id)}>Delete</button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
