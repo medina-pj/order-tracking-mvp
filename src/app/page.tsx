@@ -40,12 +40,6 @@ export default function Home() {
       {documents.map((order: any, i: number) => (
         <OrderCard key={i} orderDetails={order} />
       ))}
-      {documents.map((order: any, i: number) => (
-        <OrderCard key={i} orderDetails={order} />
-      ))}
-      {documents.map((order: any, i: number) => (
-        <OrderCard key={i} orderDetails={order} />
-      ))}
     </Container>
   );
 }

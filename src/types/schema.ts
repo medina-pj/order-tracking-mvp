@@ -54,6 +54,7 @@ export type OrderSchema = {
   customerNotes: string;
   items: OrderItemsSchema[];
   history: OrderHistorySchema[];
+  table: string;
   type: 'dine_in' | 'take_out' | 'ordered_online';
   status: 'received' | 'declined' | 'processing' | 'served' | 'completed';
   orderPaid: boolean;
@@ -61,6 +62,14 @@ export type OrderSchema = {
   data: {
     onlineOrderPlatform?: string;
   };
+  createdAt?: number;
+  updatedAt?: number;
+  isArchived?: boolean;
+};
+
+export type TableSchema = {
+  id?: string;
+  name: string;
   createdAt?: number;
   updatedAt?: number;
   isArchived?: boolean;

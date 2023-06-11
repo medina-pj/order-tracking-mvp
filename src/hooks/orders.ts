@@ -13,7 +13,15 @@ import { v4 as uuid } from 'uuid';
 import moment from 'moment-timezone';
 moment.tz.setDefault('Asia/Manila');
 
-import { collection, query, onSnapshot, where, addDoc, doc, setDoc } from 'firebase/firestore';
+import {
+  collection,
+  query,
+  onSnapshot,
+  where,
+  addDoc,
+  doc,
+  setDoc,
+} from 'firebase/firestore';
 
 import { db } from '../config/firebase';
 import { OrderItemsSchema, OrderSchema, ProductSchema } from '../types/schema';
@@ -36,6 +44,7 @@ export interface ICreateOrder {
     }
   ];
   onlineOrderPlatform?: string;
+  table: string;
 }
 
 export interface IOrder extends ICreateOrder {
@@ -57,7 +66,7 @@ const useOrder = () => {
     let qry = query(ref, where('isArchived', '==', false));
 
     //will invoke everytime database is updated in the cloud
-    const unsub = onSnapshot(qry, async snapshot => {
+    const unsub = onSnapshot(qry, async (snapshot) => {
       let results: IOrder[] = [];
 
       for (const doc of snapshot.docs) {
@@ -67,14 +76,19 @@ const useOrder = () => {
           notes: doc.data().notes,
           customerNotes: doc.data().customerNotes,
           items: doc.data().items,
+          table: doc.data().table,
           history: doc.data().history,
           type: doc.data().type,
           status: doc.data().status,
           orderPaid: doc.data().orderPaid,
           discount: doc.data().discount,
           data: doc.data().data,
-          createdAt: moment(doc.data()?.createdAt).format('MMM DD, YYYY hh:mma'),
-          updatedAt: moment(doc.data()?.updatedAt).format('MMM DD, YYYY hh:mma'),
+          createdAt: moment(doc.data()?.createdAt).format(
+            'MMM DD, YYYY hh:mma'
+          ),
+          updatedAt: moment(doc.data()?.updatedAt).format(
+            'MMM DD, YYYY hh:mma'
+          ),
         });
       }
 
@@ -88,12 +102,14 @@ const useOrder = () => {
     try {
       setError(null);
 
-      const formattedItems: OrderItemsSchema[] = payload.items.map((item: any) => ({
-        ...item,
-        id: uuid(),
-        createdAt: moment().toDate().getTime(),
-        updatedAt: moment().toDate().getTime(),
-      }));
+      const formattedItems: OrderItemsSchema[] = payload.items.map(
+        (item: any) => ({
+          ...item,
+          id: uuid(),
+          createdAt: moment().toDate().getTime(),
+          updatedAt: moment().toDate().getTime(),
+        })
+      );
 
       const orderPayload: OrderSchema = {
         orderId: generateNanoId(),
@@ -120,6 +136,7 @@ const useOrder = () => {
         createdAt: moment().toDate().getTime(),
         updatedAt: moment().toDate().getTime(),
         isArchived: false,
+        table: payload.table,
       };
 
       await addDoc(collection(db, constants.DB_ORDERS), orderPayload);

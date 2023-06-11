@@ -12,10 +12,12 @@
 import { useState } from 'react';
 import useProduct from '@/hooks/products';
 import useOrder, { ICreateOrder } from '@/hooks/orders';
+import useTable from '@/hooks/tables';
 
 export default function Home() {
   const { error, createOrder } = useOrder();
   const { documents: products } = useProduct();
+  const { documents: tables } = useTable();
 
   const [type, setType] = useState('');
   const [onlineOrderPlatform, setOnlineOrderPlatform] = useState('');
@@ -27,6 +29,7 @@ export default function Home() {
   const [productCode, setProductCode] = useState('');
   const [price, setPrice] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [table, setTable] = useState('');
 
   const [items, setItems] = useState<any[]>([]);
 
@@ -44,6 +47,7 @@ export default function Home() {
       discount,
       items,
       onlineOrderPlatform,
+      table,
     };
 
     await createOrder(payload as ICreateOrder);
@@ -87,17 +91,27 @@ export default function Home() {
       quantity,
     };
 
-    setItems(prevState => [...prevState, item]);
+    setItems((prevState) => [...prevState, item]);
   };
 
   const removeCartItem = (index: number) => {
     if (!confirm('Are you sure you want to remove this item?')) return;
-    setItems(prevItems => prevItems.filter((_, i) => i !== index));
+    setItems((prevItems) => prevItems.filter((_, i) => i !== index));
   };
 
   return (
     <div>
-      <select value={type} onChange={e => setType(e.target.value)}>
+      <select value={table} onChange={(e) => setTable(e.target.value)}>
+        <option value={''}>Select Table</option>
+        {tables.map((table) => (
+          <option key={table.id} value={table.id}>
+            {table.name}
+          </option>
+        ))}
+      </select>
+      <br />
+
+      <select value={type} onChange={(e) => setType(e.target.value)}>
         <option value={''}>Select Type</option>
         <option value={'dine_in'}>Dine-In</option>
         <option value={'take_out'}>Take-Out</option>
@@ -110,19 +124,23 @@ export default function Home() {
           <input
             placeholder='Online Platform'
             value={onlineOrderPlatform}
-            onChange={e => setOnlineOrderPlatform(e.target.value)}
+            onChange={(e) => setOnlineOrderPlatform(e.target.value)}
           />
           <br />
         </>
       )}
 
-      <input placeholder='Note' value={notes} onChange={e => setNotes(e.target.value)} />
+      <input
+        placeholder='Note'
+        value={notes}
+        onChange={(e) => setNotes(e.target.value)}
+      />
       <br />
 
       <input
         placeholder={`Customer's Note`}
         value={customerNotes}
-        onChange={e => setCustomerNotes(e.target.value)}
+        onChange={(e) => setCustomerNotes(e.target.value)}
       />
       <br />
 
@@ -130,7 +148,7 @@ export default function Home() {
         type='number'
         placeholder='Discount'
         value={discount}
-        onChange={e => setDiscount(Number(e.target.value))}
+        onChange={(e) => setDiscount(Number(e.target.value))}
       />
       <br />
 
@@ -138,16 +156,18 @@ export default function Home() {
         type='checkbox'
         placeholder='Order Paid'
         checked={orderPaid}
-        onChange={e => setOrderPaid(e.target.checked)}
+        onChange={(e) => setOrderPaid(e.target.checked)}
       />
       <br />
 
       <br />
       <select
         value={product}
-        onChange={e => {
+        onChange={(e) => {
           if (e.target.value) {
-            const productDetails = products.find((product: any) => product.id === e.target.value);
+            const productDetails = products.find(
+              (product: any) => product.id === e.target.value
+            );
 
             setPrice(productDetails?.price || 0);
             setProductCode(productDetails?.productCode || 'Invalid');
@@ -177,7 +197,7 @@ export default function Home() {
         type='number'
         placeholder='Price'
         value={price}
-        onChange={e => setPrice(Number(e.target.value))}
+        onChange={(e) => setPrice(Number(e.target.value))}
       />
       <br />
 
@@ -185,7 +205,7 @@ export default function Home() {
         type='number'
         placeholder='Quantity'
         value={quantity}
-        onChange={e => setQuantity(Number(e.target.value))}
+        onChange={(e) => setQuantity(Number(e.target.value))}
       />
       <br />
       <button onClick={addCartItem}>Add Item</button>
