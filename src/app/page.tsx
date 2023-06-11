@@ -5,12 +5,26 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulo@healthnow.ph>
- * Last Modified time: June 10th 2023, 6:19:30 pm
+ * Last Modified time: June 11th 2023, 11:20:58 am
  * ---------------------------------------------
  */
 
 import { useState } from 'react';
 import useCategory from '@/hooks/categories';
+import {
+  Container,
+  IconButton,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+} from '@mui/material';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+
+import InputField from '@/components/TextField';
+import Button from '@/components/Button';
 
 export default function Home() {
   const { error, documents, createDoc, deleteDoc } = useCategory();
@@ -51,40 +65,39 @@ export default function Home() {
   });
 
   return (
-    <div>
-      <input placeholder='Name' value={name} onChange={e => setName(e.target.value)} />
-      <br />
-      <input
-        placeholder='Description'
-        value={description}
-        onChange={e => setDescription(e.target.value)}
-      />
-      <br />
-      <button onClick={createCategory}>Save Category</button>
-      <br />
-      <br />
-      <table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Name</th>
-            <th>Description</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {documents.map((doc: any, i: number) => (
-            <tr key={doc.id}>
-              <td>{i + 1}</td>
-              <td>{doc.name}</td>
-              <td>{doc?.description}</td>
-              <td>
-                <button onClick={() => deleteCategory(doc.id)}>Delete</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <Container>
+      <InputField label='Name' value={name} onChange={setName} />
+      <InputField label='Description' value={description} onChange={setDescription} />
+      <Button label='Save Category' onClick={createCategory} />
+      <TableContainer>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>#</TableCell>
+              <TableCell>Name</TableCell>
+              <TableCell>Description</TableCell>
+              <TableCell align='right'></TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {documents.map((doc: any, i: number) => (
+              <TableRow key={i}>
+                <TableCell>{i + 1}</TableCell>
+                <TableCell>{doc?.name}</TableCell>
+                <TableCell>{doc?.description}</TableCell>
+                <TableCell align='right'>
+                  <IconButton>
+                    <DeleteForeverIcon
+                      style={{ color: '#ea6655' }}
+                      onClick={() => deleteCategory(doc.id)}
+                    />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Container>
   );
 }
