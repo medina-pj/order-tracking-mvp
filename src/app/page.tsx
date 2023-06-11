@@ -5,7 +5,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulo@healthnow.ph>
- * Last Modified time: June 11th 2023, 11:20:58 am
+ * Last Modified time: June 11th 2023, 1:06:24 pm
  * ---------------------------------------------
  */
 
@@ -25,79 +25,27 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 
 import InputField from '@/components/TextField';
 import Button from '@/components/Button';
+import useOrder from '@/hooks/orders';
+import OrderCard from '@/components/OrderCard';
 
 export default function Home() {
-  const { error, documents, createDoc, deleteDoc } = useCategory();
-
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-
-  const createCategory = async () => {
-    if (!name || !description) {
-      alert('Name & Description is required.');
-      return;
-    }
-
-    await createDoc({ name, description });
-
-    if (error) {
-      alert('Error occured.');
-      return;
-    }
-
-    setName('');
-    setDescription('');
-  };
-
-  const deleteCategory = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this record?')) return;
-
-    await deleteDoc(id);
-
-    if (error) {
-      alert('Error occured.');
-      return;
-    }
-  };
+  const { error, documents } = useOrder();
 
   console.log({
-    categories: documents,
+    orders: documents,
   });
 
   return (
     <Container>
-      <InputField label='Name' value={name} onChange={setName} />
-      <InputField label='Description' value={description} onChange={setDescription} />
-      <Button label='Save Category' onClick={createCategory} />
-      <TableContainer>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>#</TableCell>
-              <TableCell>Name</TableCell>
-              <TableCell>Description</TableCell>
-              <TableCell align='right'></TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {documents.map((doc: any, i: number) => (
-              <TableRow key={i}>
-                <TableCell>{i + 1}</TableCell>
-                <TableCell>{doc?.name}</TableCell>
-                <TableCell>{doc?.description}</TableCell>
-                <TableCell align='right'>
-                  <IconButton>
-                    <DeleteForeverIcon
-                      style={{ color: '#ea6655' }}
-                      onClick={() => deleteCategory(doc.id)}
-                    />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      {documents.map((order: any, i: number) => (
+        <OrderCard key={i} orderDetails={order} />
+      ))}
+      {documents.map((order: any, i: number) => (
+        <OrderCard key={i} orderDetails={order} />
+      ))}
+      {documents.map((order: any, i: number) => (
+        <OrderCard key={i} orderDetails={order} />
+      ))}
     </Container>
   );
 }

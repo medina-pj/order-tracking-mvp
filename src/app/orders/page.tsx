@@ -5,7 +5,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulo@healthnow.ph>
- * Last Modified time: June 10th 2023, 10:17:37 pm
+ * Last Modified time: June 11th 2023, 12:51:16 pm
  * ---------------------------------------------
  */
 
@@ -81,6 +81,7 @@ export default function Home() {
 
     const item = {
       productId: productDetails.id,
+      productCode: productDetails.productCode,
       productName: productDetails.name,
       price,
       quantity,

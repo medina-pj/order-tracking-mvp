@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulo@healthnow.ph>
- * Last Modified time: June 10th 2023, 10:17:26 pm
+ * Last Modified time: June 11th 2023, 12:49:55 pm
  * ---------------------------------------------
  */
 
@@ -35,11 +35,54 @@ export interface ICreateOrder {
       quantity: number;
     }
   ];
-  onlineOrderPlatform: string;
+  onlineOrderPlatform?: string;
+}
+
+export interface IOrder extends ICreateOrder {
+  id: string;
+  orderId: string;
+  history: any[];
+  data: any;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 const useOrder = () => {
   const [error, setError] = useState<any>(null);
+  const [documents, setDocuments] = useState<IOrder[]>([]);
+
+  useEffect(() => {
+    let ref = collection(db, constants.DB_ORDERS);
+    let qry = query(ref, where('isArchived', '==', false));
+
+    //will invoke everytime database is updated in the cloud
+    const unsub = onSnapshot(qry, async snapshot => {
+      let results: IOrder[] = [];
+
+      for (const doc of snapshot.docs) {
+        results.push({
+          id: doc.id,
+          orderId: doc.data().orderId,
+          notes: doc.data().notes,
+          customerNotes: doc.data().customerNotes,
+          items: doc.data().items,
+          history: doc.data().history,
+          type: doc.data().type,
+          status: doc.data().status,
+          orderPaid: doc.data().orderPaid,
+          discount: doc.data().discount,
+          data: doc.data().data,
+          createdAt: moment(doc.data()?.createdAt).format('MMM DD, YYYY hh:mma'),
+          updatedAt: moment(doc.data()?.updatedAt).format('MMM DD, YYYY hh:mma'),
+        });
+      }
+
+      setDocuments(results);
+    });
+
+    return () => unsub();
+  }, []);
 
   const createOrder = async (payload: ICreateOrder): Promise<void> => {
     try {
@@ -139,7 +182,7 @@ const useOrder = () => {
   //   }
   // };
 
-  return { error, createOrder };
+  return { error, documents, createOrder };
 };
 
 export default useOrder;
