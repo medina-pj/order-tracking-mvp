@@ -5,11 +5,11 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulo@healthnow.ph>
- * Last Modified time: June 11th 2023, 12:51:16 pm
+ * Last Modified time: June 12th 2023, 3:20:04 pm
  * ---------------------------------------------
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import useProduct from '@/hooks/products';
 import useOrder, { ICreateOrder } from '@/hooks/orders';
 import {
@@ -32,16 +32,12 @@ export default function Home() {
   const { documents: products } = useProduct();
   const { documents: tables } = useTable();
 
-  const [type, setType] = useState('');
+  const [type, setType] = useState('dine_in');
   const [onlineOrderPlatform, setOnlineOrderPlatform] = useState('');
   const [notes, setNotes] = useState('');
   const [customerNotes, setCustomerNotes] = useState('');
-  const [discount, setDiscount] = useState('');
+  const [discount, setDiscount] = useState(0);
   const [orderPaid, setOrderPaid] = useState(false);
-  // const [product, setProduct] = useState('');
-  // const [productCode, setProductCode] = useState('');
-  // const [price, setPrice] = useState(0);
-  // const [quantity, setQuantity] = useState(1);
   const [table, setTable] = useState('');
 
   const [items, setItems] = useState<any[]>([]);
@@ -52,8 +48,8 @@ export default function Home() {
     { name: 'Ordered Online', id: 'ordered_online' },
   ];
 
-  const setInitialItems = () => {
-    const initialItems = products.map((prod) => ({
+  const setInitialItems = useCallback(() => {
+    const initialItems = products.map(prod => ({
       productId: prod.id,
       productCode: prod.productCode,
       productName: prod.name,
@@ -61,10 +57,11 @@ export default function Home() {
       quantity: 0,
     }));
     setItems(initialItems);
-  };
+  }, [products]);
+
   useEffect(() => {
     setInitialItems();
-  }, [products]);
+  }, [products, setInitialItems]);
 
   const saveOrder = async () => {
     if (!items.length || !type) {
@@ -72,7 +69,7 @@ export default function Home() {
       return;
     }
 
-    const filteredItem = items.filter((item) => item.quantity > 0);
+    const filteredItem = items.filter(item => item.quantity > 0);
     const payload = {
       type,
       orderPaid,
@@ -95,7 +92,7 @@ export default function Home() {
     setOnlineOrderPlatform('');
     setNotes('');
     setCustomerNotes('');
-    setDiscount('');
+    setDiscount(0);
     setOrderPaid(false);
     // setProduct('');
     // setProductCode('');
@@ -142,8 +139,7 @@ export default function Home() {
 
   const onQuantityMinus = (index: number) => {
     const temp = [...items];
-    if (temp[index].quantity > 0)
-      temp[index].quantity = temp[index].quantity - 1;
+    if (temp[index].quantity > 0) temp[index].quantity = temp[index].quantity - 1;
     setItems(temp);
   };
   return (
@@ -155,9 +151,9 @@ export default function Home() {
           id='table-select-id'
           value={table}
           label='Select Table'
-          onChange={(e) => setTable(e.target.value)}
+          onChange={e => setTable(e.target.value)}
         >
-          {tables.map((table) => (
+          {tables.map(table => (
             <MenuItem key={table.id} value={table.id}>
               {table.name}
             </MenuItem>
@@ -172,9 +168,9 @@ export default function Home() {
           id='type-select-id'
           value={type}
           label='Select Type'
-          onChange={(e) => setType(e.target.value)}
+          onChange={e => setType(e.target.value)}
         >
-          {dineType.map((type) => (
+          {dineType.map(type => (
             <MenuItem key={type.id} value={type.id}>
               {type.name}
             </MenuItem>
@@ -187,7 +183,7 @@ export default function Home() {
           <input
             placeholder='Online Platform'
             value={onlineOrderPlatform}
-            onChange={(e) => setOnlineOrderPlatform(e.target.value)}
+            onChange={e => setOnlineOrderPlatform(e.target.value)}
           />
           <br />
         </>
@@ -200,7 +196,7 @@ export default function Home() {
           label='Note'
           variant='standard'
           value={notes}
-          onChange={(e) => setNotes(e.target.value)}
+          onChange={e => setNotes(e.target.value)}
         />
         <br />
         <TextField
@@ -208,7 +204,7 @@ export default function Home() {
           label={`Customer's Note`}
           variant='standard'
           value={customerNotes}
-          onChange={(e) => setCustomerNotes(e.target.value)}
+          onChange={e => setCustomerNotes(e.target.value)}
         />
 
         <br />
@@ -218,17 +214,15 @@ export default function Home() {
           label='Discount'
           variant='standard'
           value={discount}
-          onChange={(e) => setDiscount(Number(e.target.value))}
+          onChange={e => setDiscount(Number(e.target.value))}
         />
       </FormControl>
 
       <br />
 
       <FormControlLabel
-        control={<Checkbox />}
+        control={<Checkbox checked={orderPaid} onChange={e => setOrderPaid(e.target.checked)} />}
         label='Order Paid'
-        checked={orderPaid}
-        onChange={(e) => setOrderPaid(e.target.checked)}
       />
 
       <br />
@@ -260,8 +254,7 @@ export default function Home() {
         }}
       >
         TOTAL: P
-        {items.reduce((acc, cur) => acc + cur.quantity * cur.price, 0) -
-          Number(discount) || 0}
+        {items.reduce((acc, cur) => acc + cur.quantity * cur.price, 0) - Number(discount) || 0}
       </Typography>
       <br />
       <Button label='Create Order' onClick={saveOrder} />
