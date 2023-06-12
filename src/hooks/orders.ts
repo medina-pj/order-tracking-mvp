@@ -21,6 +21,7 @@ import {
   addDoc,
   doc,
   setDoc,
+  orderBy,
 } from 'firebase/firestore';
 
 import { db } from '../config/firebase';
@@ -63,7 +64,11 @@ const useOrder = () => {
 
   useEffect(() => {
     let ref = collection(db, constants.DB_ORDERS);
-    let qry = query(ref, where('isArchived', '==', false));
+    let qry = query(
+      ref,
+      where('isArchived', '==', false),
+      orderBy('createdAt', 'desc')
+    );
 
     //will invoke everytime database is updated in the cloud
     const unsub = onSnapshot(qry, async (snapshot) => {

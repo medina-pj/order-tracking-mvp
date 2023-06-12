@@ -27,6 +27,7 @@ import InputField from '@/components/TextField';
 import Button from '@/components/Button';
 import useOrder from '@/hooks/orders';
 import OrderCard from '@/components/OrderCard';
+import NavBar from '@/components/NavBar';
 
 export default function Home() {
   const { error, documents } = useOrder();
@@ -36,10 +37,12 @@ export default function Home() {
   });
 
   return (
-    <Container>
-      {documents.map((order: any, i: number) => (
-        <OrderCard key={i} orderDetails={order} />
-      ))}
-    </Container>
+    <>
+      <Container>
+        {documents.map((order: any, i: number) => (
+          <OrderCard key={i} orderDetails={order} />
+        ))}
+      </Container>
+    </>
   );
 }

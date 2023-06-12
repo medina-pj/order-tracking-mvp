@@ -63,7 +63,7 @@ export default function Home() {
   });
 
   return (
-    <Container>
+    <Container style={{ marginTop: '1rem' }}>
       <InputField label='Name' value={name} onChange={setName} />
       <Button label='Save Table' onClick={createTable} />
       <TableContainer>

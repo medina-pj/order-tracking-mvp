@@ -61,6 +61,11 @@ const OrderCard = ({ orderDetails }: { orderDetails: IOrder }) => {
           Table: {tables.find((table) => table.id === orderDetails.table)?.name}
         </Typography>
         <Typography
+          style={{ fontSize: '12px', fontWeight: '600', color: '#FF8B13' }}
+        >
+          Status: {orderDetails.status}
+        </Typography>
+        <Typography
           style={{ fontSize: '12px', fontWeight: '500', marginBottom: '10px' }}
         >
           {orderDetails?.createdAt}
