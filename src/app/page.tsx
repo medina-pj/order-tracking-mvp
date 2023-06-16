@@ -5,7 +5,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulo@healthnow.ph>
- * Last Modified time: June 11th 2023, 1:06:24 pm
+ * Last Modified time: June 16th 2023, 1:18:11 pm
  * ---------------------------------------------
  */
 
@@ -38,7 +38,7 @@ export default function Home() {
 
   return (
     <>
-      <Container>
+      <Container style={{ marginTop: '20px' }}>
         {documents.map((order: any, i: number) => (
           <OrderCard key={i} orderDetails={order} />
         ))}

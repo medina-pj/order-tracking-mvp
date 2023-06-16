@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulo@healthnow.ph>
- * Last Modified time: June 11th 2023, 12:49:55 pm
+ * Last Modified time: June 16th 2023, 2:41:18 pm
  * ---------------------------------------------
  */
 
@@ -22,10 +22,11 @@ import {
   doc,
   setDoc,
   orderBy,
+  arrayUnion,
 } from 'firebase/firestore';
 
 import { db } from '../config/firebase';
-import { OrderItemsSchema, OrderSchema, ProductSchema } from '../types/schema';
+import { OrderItemsSchema, OrderSchema, OrderStatus, ProductSchema } from '../types/schema';
 import constants from '../utils/constants';
 import generateNanoId from '@/utils/generateNanoId';
 
@@ -64,14 +65,10 @@ const useOrder = () => {
 
   useEffect(() => {
     let ref = collection(db, constants.DB_ORDERS);
-    let qry = query(
-      ref,
-      where('isArchived', '==', false),
-      orderBy('createdAt', 'desc')
-    );
+    let qry = query(ref, where('isArchived', '==', false), orderBy('createdAt', 'desc'));
 
     //will invoke everytime database is updated in the cloud
-    const unsub = onSnapshot(qry, async (snapshot) => {
+    const unsub = onSnapshot(qry, async snapshot => {
       let results: IOrder[] = [];
 
       for (const doc of snapshot.docs) {
@@ -88,12 +85,8 @@ const useOrder = () => {
           orderPaid: doc.data().orderPaid,
           discount: doc.data().discount,
           data: doc.data().data,
-          createdAt: moment(doc.data()?.createdAt).format(
-            'MMM DD, YYYY hh:mma'
-          ),
-          updatedAt: moment(doc.data()?.updatedAt).format(
-            'MMM DD, YYYY hh:mma'
-          ),
+          createdAt: moment(doc.data()?.createdAt).format('MMM DD, YYYY hh:mma'),
+          updatedAt: moment(doc.data()?.updatedAt).format('MMM DD, YYYY hh:mma'),
         });
       }
 
@@ -107,14 +100,12 @@ const useOrder = () => {
     try {
       setError(null);
 
-      const formattedItems: OrderItemsSchema[] = payload.items.map(
-        (item: any) => ({
-          ...item,
-          id: uuid(),
-          createdAt: moment().toDate().getTime(),
-          updatedAt: moment().toDate().getTime(),
-        })
-      );
+      const formattedItems: OrderItemsSchema[] = payload.items.map((item: any) => ({
+        ...item,
+        id: uuid(),
+        createdAt: moment().toDate().getTime(),
+        updatedAt: moment().toDate().getTime(),
+      }));
 
       const orderPayload: OrderSchema = {
         orderId: generateNanoId(),
@@ -154,57 +145,60 @@ const useOrder = () => {
     }
   };
 
-  // const deleteDoc = async (id: string): Promise<void> => {
-  //   try {
-  //     setError(null);
+  const updateOrderStatus = async (id: string, status: OrderStatus): Promise<void> => {
+    try {
+      setError(null);
 
-  //     const docRef = doc(db, constants.DB_PRODUCTS, id);
+      const docRef = doc(db, constants.DB_ORDERS, id);
 
-  //     await setDoc(
-  //       docRef,
-  //       {
-  //         isArchived: true,
-  //         updatedAt: moment().toDate().getTime(),
-  //       },
-  //       { merge: true }
-  //     );
+      const history = {
+        action: `order-${status}`,
+        actor: `staff`,
+        timestamp: moment().toDate().getTime(),
+      };
 
-  //     return;
-  //   } catch (error: any) {
-  //     setError(error?.message);
+      await setDoc(
+        docRef,
+        {
+          status,
+          history: arrayUnion(history),
+          updatedAt: moment().toDate().getTime(),
+        },
+        { merge: true }
+      );
 
-  //     return;
-  //   }
-  // };
+      return;
+    } catch (error: any) {
+      setError(error?.message);
 
-  // const updateDoc = async (payload: IUpdateProduct): Promise<void> => {
-  //   try {
-  //     setError(null);
+      return;
+    }
+  };
 
-  //     const docRef = doc(db, constants.DB_PRODUCTS, payload.id);
+  const updateOrderPaymentStatus = async (id: string, status: boolean): Promise<void> => {
+    try {
+      setError(null);
 
-  //     await setDoc(
-  //       docRef,
-  //       {
-  //         name: payload.name,
-  //         price: payload.price,
-  //         categoryId: payload.categoryId,
-  //         description: payload.description,
-  //         note: payload.note,
-  //         updatedAt: moment().toDate().getTime(),
-  //       },
-  //       { merge: true }
-  //     );
+      const docRef = doc(db, constants.DB_ORDERS, id);
 
-  //     return;
-  //   } catch (error: any) {
-  //     setError(error?.message);
+      await setDoc(
+        docRef,
+        {
+          orderPaid: status,
+          updatedAt: moment().toDate().getTime(),
+        },
+        { merge: true }
+      );
 
-  //     return;
-  //   }
-  // };
+      return;
+    } catch (error: any) {
+      setError(error?.message);
 
-  return { error, documents, createOrder };
+      return;
+    }
+  };
+
+  return { error, documents, createOrder, updateOrderStatus, updateOrderPaymentStatus };
 };
 
 export default useOrder;

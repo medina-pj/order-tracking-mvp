@@ -3,12 +3,12 @@
  * Author: PJ Medina
  * Date:   Sunday June 11th 2023
  * Last Modified by: PJ Medina - <paulo@healthnow.ph>
- * Last Modified time: June 11th 2023, 1:59:04 pm
+ * Last Modified time: June 16th 2023, 2:50:48 pm
  * ---------------------------------------------
  */
 import { CSSProperties } from 'react';
 import numeral from 'numeral';
-import { IOrder } from '@/hooks/orders';
+import useOrder, { IOrder } from '@/hooks/orders';
 
 import {
   Button,
@@ -23,9 +23,10 @@ import {
   Typography,
 } from '@mui/material';
 import useTable from '@/hooks/tables';
+import { OrderStatus } from '@/types/schema';
 
 const OrderCard = ({ orderDetails }: { orderDetails: IOrder }) => {
-  console.log({ orderDetails });
+  const { updateOrderStatus, updateOrderPaymentStatus } = useOrder();
 
   const { documents: tables } = useTable();
 
@@ -46,46 +47,42 @@ const OrderCard = ({ orderDetails }: { orderDetails: IOrder }) => {
     0
   );
 
+  console.log({ orderDetails });
+
   return (
     <Card sx={{ minWidth: 275 }} style={cardStyle}>
       <CardContent>
-        <Typography
-          style={{ fontSize: '14px', fontWeight: '600', color: '#FF8B13' }}
-        >
+        <Typography style={{ fontSize: '14px', fontWeight: '600', color: '#FF8B13' }}>
           {orderDetails?.orderId}
         </Typography>
 
-        <Typography
-          style={{ fontSize: '12px', fontWeight: '600', color: '#FF8B13' }}
-        >
-          Table: {tables.find((table) => table.id === orderDetails.table)?.name}
-        </Typography>
-        <Typography
-          style={{ fontSize: '12px', fontWeight: '600', color: '#FF8B13' }}
-        >
-          Status: {orderDetails.status}
-        </Typography>
-        <Typography
-          style={{ fontSize: '12px', fontWeight: '500', marginBottom: '10px' }}
-        >
+        <Typography style={{ fontSize: '12px', fontWeight: '500', marginBottom: '10px' }}>
           {orderDetails?.createdAt}
         </Typography>
 
-        <Typography style={{ fontSize: '14px', fontWeight: '600' }}>
-          Notes:
+        <Typography style={{ fontSize: '12px', fontWeight: '600', color: '#4fc3f7' }}>
+          {tables.find(table => table.id === orderDetails.table)?.name.toUpperCase()}
         </Typography>
+
+        <Typography style={{ fontSize: '12px', fontWeight: '600', color: '#4fc3f7' }}>
+          ORDER {orderDetails.status.toUpperCase()}
+        </Typography>
+
+        <Typography
+          style={{ fontSize: '12px', fontWeight: '600', marginBottom: '15px', color: '#4fc3f7' }}
+        >
+          {orderDetails?.orderPaid && `ORDER PAID`}
+        </Typography>
+
+        <Typography style={{ fontSize: '14px', fontWeight: '600' }}>Notes:</Typography>
         <Typography style={{ fontSize: '10px', fontWeight: '500' }}>
           Note: {orderDetails?.notes}
         </Typography>
-        <Typography
-          style={{ fontSize: '10px', fontWeight: '500', marginBottom: '20px' }}
-        >
+        <Typography style={{ fontSize: '10px', fontWeight: '500', marginBottom: '20px' }}>
           Customer: {orderDetails?.customerNotes}
         </Typography>
 
-        <Typography style={{ fontSize: '14px', fontWeight: '600' }}>
-          Orders:
-        </Typography>
+        <Typography style={{ fontSize: '14px', fontWeight: '600' }}>Orders:</Typography>
 
         <Table>
           <TableBody>
@@ -108,18 +105,91 @@ const OrderCard = ({ orderDetails }: { orderDetails: IOrder }) => {
             <TableRow>
               <TableCell colSpan={2} align='left' style={tableCellStyle}>
                 Total Amount:
-                <b>
-                  P{' '}
-                  {numeral(totalAmount - orderDetails?.discount).format(
-                    '0,0.00'
-                  )}
-                </b>
+                <b>P {numeral(totalAmount - orderDetails?.discount).format('0,0.00')}</b>
               </TableCell>
             </TableRow>
           </TableBody>
         </Table>
       </CardContent>
-      <CardActions></CardActions>
+      <CardActions>
+        {!orderDetails?.orderPaid && (
+          <>
+            <Button
+              variant='contained'
+              size='small'
+              fullWidth
+              onClick={() => updateOrderPaymentStatus(orderDetails.id, true)}
+            >
+              Order Paid
+            </Button>
+          </>
+        )}
+      </CardActions>
+      <CardActions>
+        {orderDetails?.status === OrderStatus.RECEIVED && (
+          <>
+            <Button
+              variant='contained'
+              size='small'
+              fullWidth
+              color='warning'
+              onClick={() => updateOrderStatus(orderDetails.id, OrderStatus.DECLINED)}
+            >
+              Decline Order
+            </Button>
+            <Button
+              variant='contained'
+              size='small'
+              fullWidth
+              onClick={() => updateOrderStatus(orderDetails.id, OrderStatus.PROCESSING)}
+            >
+              Processing
+            </Button>
+          </>
+        )}
+
+        {orderDetails?.status === OrderStatus.PROCESSING && (
+          <>
+            <Button
+              variant='contained'
+              size='small'
+              fullWidth
+              onClick={() => updateOrderStatus(orderDetails.id, OrderStatus.SERVED)}
+            >
+              Order Served
+            </Button>
+          </>
+        )}
+
+        {orderDetails?.status === OrderStatus.SERVED && (
+          <>
+            <Button
+              variant='contained'
+              size='small'
+              fullWidth
+              onClick={() => updateOrderStatus(orderDetails.id, OrderStatus.COMPLETED)}
+            >
+              Order Completed
+            </Button>
+          </>
+        )}
+
+        {![OrderStatus.DECLINED, OrderStatus.CANCEL].includes(
+          orderDetails.status as OrderStatus
+        ) && (
+          <>
+            <Button
+              variant='contained'
+              size='small'
+              fullWidth
+              color='error'
+              onClick={() => updateOrderStatus(orderDetails.id, OrderStatus.CANCEL)}
+            >
+              Cancel Order
+            </Button>
+          </>
+        )}
+      </CardActions>
     </Card>
   );
 };

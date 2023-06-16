@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulo@healthnow.ph>
- * Last Modified time: June 10th 2023, 9:58:07 pm
+ * Last Modified time: June 16th 2023, 2:41:37 pm
  * ---------------------------------------------
  */
 
@@ -47,6 +47,15 @@ export type OrderHistorySchema = {
   timestamp: number;
 };
 
+export enum OrderStatus {
+  RECEIVED = 'received',
+  DECLINED = 'declined',
+  PROCESSING = 'processing',
+  SERVED = 'served',
+  COMPLETED = 'completed',
+  CANCEL = 'cancelled',
+}
+
 export type OrderSchema = {
   id?: string;
   orderId: string;
@@ -56,7 +65,7 @@ export type OrderSchema = {
   history: OrderHistorySchema[];
   table: string;
   type: 'dine_in' | 'take_out' | 'ordered_online';
-  status: 'received' | 'declined' | 'processing' | 'served' | 'completed';
+  status: 'received' | 'declined' | 'processing' | 'served' | 'completed' | 'cancel';
   orderPaid: boolean;
   discount?: number;
   data: {
