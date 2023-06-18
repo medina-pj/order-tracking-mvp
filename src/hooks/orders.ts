@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulo@healthnow.ph>
- * Last Modified time: June 16th 2023, 2:41:18 pm
+ * Last Modified time: June 18th 2023, 6:38:44 pm
  * ---------------------------------------------
  */
 
@@ -23,10 +23,11 @@ import {
   setDoc,
   orderBy,
   arrayUnion,
+  QueryConstraint,
 } from 'firebase/firestore';
 
 import { db } from '../config/firebase';
-import { OrderItemsSchema, OrderSchema, OrderStatus, ProductSchema } from '../types/schema';
+import { OrderItemsSchema, OrderSchema, OrderStatus } from '../types/schema';
 import constants from '../utils/constants';
 import generateNanoId from '@/utils/generateNanoId';
 
@@ -59,13 +60,34 @@ export interface IOrder extends ICreateOrder {
   updatedAt: string;
 }
 
+export interface IFilterParams {
+  startDate: any;
+  endDate: any;
+  status: string;
+}
+
 const useOrder = () => {
   const [error, setError] = useState<any>(null);
   const [documents, setDocuments] = useState<IOrder[]>([]);
+  const [startDate, setStartDate] = useState<any>('');
+  const [endDate, setEndDate] = useState<any>('');
+  const [status, setStatus] = useState<any>('');
 
   useEffect(() => {
+    const queries: QueryConstraint[] = [
+      where('isArchived', '==', false),
+      where('createdAt', '>=', startDate || moment().startOf('day').valueOf()),
+      where('createdAt', '<=', endDate || moment().endOf('day').valueOf()),
+    ];
+
+    if (status) {
+      queries.push(where('status', '==', status));
+    }
+
+    console.log({ queries });
+
     let ref = collection(db, constants.DB_ORDERS);
-    let qry = query(ref, where('isArchived', '==', false), orderBy('createdAt', 'desc'));
+    let qry = query(ref, ...queries, orderBy('createdAt', 'desc'));
 
     //will invoke everytime database is updated in the cloud
     const unsub = onSnapshot(qry, async snapshot => {
@@ -94,7 +116,55 @@ const useOrder = () => {
     });
 
     return () => unsub();
-  }, []);
+  }, [endDate, startDate, status]);
+
+  const searchOrder = async (filters: IFilterParams) => {
+    if (filters.startDate && filters.endDate) {
+      setStartDate(moment(filters.startDate).startOf('day').valueOf());
+      setEndDate(moment(filters.endDate).endOf('day').valueOf());
+    } else {
+      setStartDate(moment().startOf('day').valueOf());
+      setEndDate(moment().endOf('day').valueOf());
+    }
+
+    if (filters.status) {
+      setStatus(filters.status);
+    } else {
+      setStatus('');
+    }
+    // const start: number = filters.sta
+    //   ? moment(startDate).startOf('day').valueOf()
+    //   : moment().startOf('day').valueOf();
+
+    // const end: number = endDate
+    //   ? moment(endDate).endOf('day').valueOf()
+    //   : moment().endOf('day').valueOf();
+
+    // const queries: QueryConstraint[] = [
+    //   where('isArchived', '==', false),
+    //   where('createdAt', '>=', start),
+    //   where('createdAt', '<=', end),
+    // ];
+
+    // if (status) {
+    //   queries.push(where('status', '==', status));
+    // }
+
+    // console.log({
+    //   end,
+    //   start,
+    // });
+
+    // let ref = collection(db, constants.DB_ORDERS);
+    // let qry = query(ref, ...queries, orderBy('createdAt', 'desc'));
+
+    // const querySnapshot = await getDocs(qry);
+
+    // // Process the query results
+    // querySnapshot.forEach(doc => {
+    //   console.log('Document data:', doc.data());
+    // });
+  };
 
   const createOrder = async (payload: ICreateOrder): Promise<void> => {
     try {
@@ -198,7 +268,14 @@ const useOrder = () => {
     }
   };
 
-  return { error, documents, createOrder, updateOrderStatus, updateOrderPaymentStatus };
+  return {
+    error,
+    documents,
+    createOrder,
+    updateOrderStatus,
+    updateOrderPaymentStatus,
+    searchOrder,
+  };
 };
 
 export default useOrder;

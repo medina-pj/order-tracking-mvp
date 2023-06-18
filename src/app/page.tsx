@@ -5,44 +5,113 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulo@healthnow.ph>
- * Last Modified time: June 16th 2023, 1:18:11 pm
+ * Last Modified time: June 18th 2023, 6:39:04 pm
  * ---------------------------------------------
  */
 
 import { useState } from 'react';
-import useCategory from '@/hooks/categories';
-import {
-  Container,
-  IconButton,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-} from '@mui/material';
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import { Container, Grid, MenuItem, Select, TextField, Button, FormControl } from '@mui/material';
 
-import InputField from '@/components/TextField';
-import Button from '@/components/Button';
 import useOrder from '@/hooks/orders';
 import OrderCard from '@/components/OrderCard';
-import NavBar from '@/components/NavBar';
+
+import { OrderStatus } from '@/types/schema';
+
+import moment from 'moment-timezone';
+moment.tz.setDefault('Asia/Manila');
 
 export default function Home() {
-  const { error, documents } = useOrder();
+  const { error, documents, searchOrder } = useOrder();
+  const [startDate, setStartDate] = useState(moment());
+  const [endDate, setEndDate] = useState(moment());
+  const [status, setStatus] = useState('default');
 
   console.log({
     orders: documents,
   });
 
+  const onSearchOrder = async () => {
+    await searchOrder({ startDate, endDate, status: status === 'default' ? '' : status });
+  };
+
   return (
-    <>
-      <Container style={{ marginTop: '20px' }}>
-        {documents.map((order: any, i: number) => (
-          <OrderCard key={i} orderDetails={order} />
-        ))}
-      </Container>
-    </>
+    <Container style={{ marginTop: '30px', marginBottom: '30px' }}>
+      <Grid container direction='column'>
+        <Grid xs={12}>
+          <TextField
+            label='Filter Start Date'
+            size='small'
+            type='date'
+            fullWidth
+            value={startDate}
+            onChange={(e: any) => setStartDate(e.target.value)}
+            InputProps={{
+              style: {
+                marginBottom: '20px',
+                backgroundColor: '#eeeeee',
+              },
+            }}
+            InputLabelProps={{ shrink: true }}
+          />
+        </Grid>
+
+        <Grid xs={12}>
+          <TextField
+            label='Filter End Date'
+            size='small'
+            type='date'
+            fullWidth
+            value={endDate}
+            onChange={(e: any) => setEndDate(e.target.value)}
+            InputProps={{
+              style: {
+                marginBottom: '20px',
+                backgroundColor: '#eeeeee',
+              },
+            }}
+            InputLabelProps={{ shrink: true }}
+          />
+        </Grid>
+
+        <Grid xs={12}>
+          <FormControl fullWidth>
+            <Select
+              size='small'
+              fullWidth
+              value={status}
+              onChange={(e: any) => setStatus(e.target.value)}
+              sx={{
+                marginBottom: '20px',
+                backgroundColor: '#eeeeee',
+              }}
+            >
+              <MenuItem value='default'>Filter Status</MenuItem>
+              <MenuItem value={OrderStatus.COMPLETED}>Completed</MenuItem>
+              <MenuItem value={OrderStatus.RECEIVED}>Received</MenuItem>
+              <MenuItem value={OrderStatus.PROCESSING}>Processing</MenuItem>
+              <MenuItem value={OrderStatus.DECLINED}>Declined Orders</MenuItem>
+              <MenuItem value={OrderStatus.SERVED}>Served Orders</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+
+        <Grid xs={12}>
+          <Button
+            variant='contained'
+            fullWidth
+            onClick={onSearchOrder}
+            style={{ marginBottom: '30px' }}
+          >
+            Search
+          </Button>
+        </Grid>
+
+        <Grid xs={12}>
+          {documents.map((order: any, i: number) => (
+            <OrderCard key={i} orderDetails={order} />
+          ))}
+        </Grid>
+      </Grid>
+    </Container>
   );
 }
