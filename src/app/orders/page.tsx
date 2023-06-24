@@ -5,7 +5,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulo@healthnow.ph>
- * Last Modified time: June 12th 2023, 3:20:04 pm
+ * Last Modified time: June 24th 2023, 11:04:47 pm
  * ---------------------------------------------
  */
 
@@ -143,7 +143,7 @@ export default function Home() {
     setItems(temp);
   };
   return (
-    <Container style={{ marginTop: '1rem' }}>
+    <Container style={{ marginTop: '2rem' }}>
       <FormControl fullWidth>
         <InputLabel id='table-select'>Table</InputLabel>
         <Select

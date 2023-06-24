@@ -5,7 +5,7 @@
  * Author: PJ Medina
  * Date:   Sunday June 11th 2023
  * Last Modified by: PJ Medina - <paulo@healthnow.ph>
- * Last Modified time: June 11th 2023, 1:12:27 pm
+ * Last Modified time: June 24th 2023, 11:04:54 pm
  * ---------------------------------------------
  */
 
@@ -63,7 +63,7 @@ export default function Home() {
   });
 
   return (
-    <Container style={{ marginTop: '1rem' }}>
+    <Container style={{ marginTop: '2rem' }}>
       <InputField label='Name' value={name} onChange={setName} />
       <Button label='Save Table' onClick={createTable} />
       <TableContainer>

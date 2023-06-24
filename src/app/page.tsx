@@ -5,7 +5,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulo@healthnow.ph>
- * Last Modified time: June 18th 2023, 6:39:04 pm
+ * Last Modified time: June 24th 2023, 11:05:06 pm
  * ---------------------------------------------
  */
 
@@ -35,7 +35,7 @@ export default function Home() {
   };
 
   return (
-    <Container style={{ marginTop: '30px', marginBottom: '30px' }}>
+    <Container style={{ marginTop: '2rem', marginBottom: '2rem' }}>
       <Grid container direction='column'>
         <Grid xs={12}>
           <TextField

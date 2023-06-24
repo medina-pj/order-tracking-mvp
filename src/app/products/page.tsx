@@ -5,13 +5,31 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulo@healthnow.ph>
- * Last Modified time: June 10th 2023, 9:57:46 pm
+ * Last Modified time: June 24th 2023, 11:04:32 pm
  * ---------------------------------------------
  */
 
 import { useState } from 'react';
 import useCategory from '@/hooks/categories';
 import useProduct from '@/hooks/products';
+import {
+  Container,
+  FormControl,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  Select,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+} from '@mui/material';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+
+import InputField from '@/components/TextField';
+import Button from '@/components/Button';
 
 export default function Home() {
   const { documents: categories } = useCategory();
@@ -60,68 +78,58 @@ export default function Home() {
   });
 
   return (
-    <div>
-      <input placeholder='Name' value={name} onChange={e => setName(e.target.value)} />
-      <br />
-      <input
-        type='number'
-        placeholder='Price'
-        value={price}
-        onChange={e => setPrice(Number(e.target.value))}
-      />
-      <br />
-      <input
-        placeholder='Description'
-        value={description}
-        onChange={e => setDescription(e.target.value)}
-      />
-      <br />
-      <input placeholder='Note' value={note} onChange={e => setNote(e.target.value)} />
-
-      <br />
-      <select value={category} onChange={e => setCategory(e.target.value)}>
-        <option value={''}>Select Category</option>
-        {categories.map((c: any) => (
-          <option key={c.id} value={c.id}>
-            {c.name}
-          </option>
-        ))}
-      </select>
-
-      <br />
-      <button onClick={createProduct}>Save Product</button>
-      <br />
-      <br />
-      <table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Product Code</th>
-            <th>Name</th>
-            <th>Category</th>
-            <th>Price</th>
-            <th>Note</th>
-            <th>Description</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {documents.map((doc: any, i: number) => (
-            <tr key={doc.id}>
-              <td>{i + 1}</td>
-              <td>{doc.productCode}</td>
-              <td>{doc.name}</td>
-              <td>{doc.category}</td>
-              <td>{doc.price}</td>
-              <td>{doc.note}</td>
-              <td>{doc.description}</td>
-              <td>
-                <button onClick={() => deleteProduct(doc.id)}>Delete</button>
-              </td>
-            </tr>
+    <Container style={{ marginTop: '2rem' }}>
+      <InputField label='Name' value={name} onChange={setName} />
+      <InputField label='Price' value={price} onChange={setPrice} type='number' />
+      <InputField label='Description' value={description} onChange={setDescription} />
+      <InputField label='Note' value={note} onChange={setNote} />
+      <FormControl fullWidth style={{ marginBottom: '20px' }}>
+        <InputLabel id='category-select'>Category</InputLabel>
+        <Select
+          labelId='category-select'
+          id='category-select-id'
+          value={category}
+          label='Select Category'
+          onChange={e => setCategory(e.target.value)}
+        >
+          {categories.map(category => (
+            <MenuItem key={category.id} value={category.id}>
+              {category.name}
+            </MenuItem>
           ))}
-        </tbody>
-      </table>
-    </div>
+        </Select>
+      </FormControl>
+      <Button label='Save Product' onClick={createProduct} />
+
+      <TableContainer>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>#</TableCell>
+              <TableCell>Name</TableCell>
+              <TableCell>Description</TableCell>
+              <TableCell align='right'></TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {documents.map((doc: any, i: number) => (
+              <TableRow key={i}>
+                <TableCell>{i + 1}</TableCell>
+                <TableCell>{doc?.name}</TableCell>
+                <TableCell>{doc?.description}</TableCell>
+                <TableCell align='right'>
+                  <IconButton>
+                    <DeleteForeverIcon
+                      style={{ color: '#ea6655' }}
+                      onClick={() => deleteProduct(doc.id)}
+                    />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Container>
   );
 }
