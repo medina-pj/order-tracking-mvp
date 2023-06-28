@@ -2,10 +2,32 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
- * Last Modified by: PJ Medina - <paulo@healthnow.ph>
- * Last Modified time: June 16th 2023, 2:41:37 pm
+ * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
+ * Last Modified time: June 28th 2023, 12:52:07 pm
  * ---------------------------------------------
  */
+
+export enum OrderStatus {
+  RECEIVED = 'received',
+  DECLINED = 'declined',
+  PROCESSING = 'processing',
+  SERVED = 'served',
+  COMPLETED = 'completed',
+  CANCEL = 'cancelled',
+}
+
+export type UserSchema = {
+  id?: string;
+  username: string;
+  password: string;
+  name: string;
+  contactNumber: string;
+  userType: 'admin' | 'staff';
+  createdBy?: string;
+  createdAt?: number;
+  updatedAt?: number;
+  isArchived?: boolean;
+};
 
 export type CategorySchema = {
   id?: string;
@@ -20,23 +42,62 @@ export type ProductSchema = {
   id?: string;
   productCode: string;
   name: string;
-  price: number;
-  categoryId: string;
   description?: string;
-  note?: string;
-  isAvailable?: boolean;
+  addOns: string[];
+  categoryId: string;
   createdAt?: number;
   updatedAt?: number;
-  isArchived?: boolean;
 };
 
-export type OrderItemsSchema = {
-  id: string;
+export type StoreSchema = {
+  id?: string;
+  name: string;
+  location: string;
+  contactNumber: string;
+  staff: string[];
+};
+
+export type StoreTableSchema = {
+  id?: string;
+  storeId: string;
+  isAvailble: boolean;
+  capacity: number;
+  createdAt?: number;
+  updatedAt?: number;
+  isArchived: boolean;
+};
+
+export type StoreProductSchema = {
+  id?: string;
+  storeId: string;
   productId: string;
+  producAbbrev: string;
+  price: number;
+  note?: string;
+  isAvailable: boolean;
+  createdAt?: number;
+  updatedAt?: number;
+  isArchived: boolean;
+};
+
+export type CartAddOnsSchema = {
+  storeProductId: string;
   productCode: string;
   productName: string;
+  productAbbrev: string;
   price: number;
   quantity: number;
+};
+
+export type CartItemsSchema = {
+  storeProductId: string;
+  productCode: string;
+  productName: string;
+  productAbbrev: string;
+  price: number;
+  quantity: number;
+  notes?: number;
+  addOns?: CartAddOnsSchema[];
   createdAt?: number;
   updatedAt?: number;
 };
@@ -47,21 +108,12 @@ export type OrderHistorySchema = {
   timestamp: number;
 };
 
-export enum OrderStatus {
-  RECEIVED = 'received',
-  DECLINED = 'declined',
-  PROCESSING = 'processing',
-  SERVED = 'served',
-  COMPLETED = 'completed',
-  CANCEL = 'cancelled',
-}
-
 export type OrderSchema = {
   id?: string;
   orderId: string;
   notes: string;
   customerNotes: string;
-  items: OrderItemsSchema[];
+  items: CartItemsSchema[];
   history: OrderHistorySchema[];
   table: string;
   type: 'dine_in' | 'take_out' | 'ordered_online';
@@ -71,14 +123,6 @@ export type OrderSchema = {
   data: {
     onlineOrderPlatform?: string;
   };
-  createdAt?: number;
-  updatedAt?: number;
-  isArchived?: boolean;
-};
-
-export type TableSchema = {
-  id?: string;
-  name: string;
   createdAt?: number;
   updatedAt?: number;
   isArchived?: boolean;
