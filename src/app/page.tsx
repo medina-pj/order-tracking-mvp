@@ -4,13 +4,14 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
- * Last Modified by: PJ Medina - <paulo@healthnow.ph>
- * Last Modified time: June 24th 2023, 11:05:06 pm
+ * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
+ * Last Modified time: July 1st 2023, 5:27:08 pm
  * ---------------------------------------------
  */
 
 import { useState } from 'react';
-import { Container, Grid, MenuItem, Select, TextField, Button, FormControl } from '@mui/material';
+import { Container, Grid, MenuItem, Select, TextField, FormControl } from '@mui/material';
+import Button from '@/components/Button';
 
 import useOrder from '@/hooks/orders';
 import OrderCard from '@/components/OrderCard';
@@ -18,100 +19,53 @@ import OrderCard from '@/components/OrderCard';
 import { OrderStatus } from '@/types/schema';
 
 import moment from 'moment-timezone';
+import InputField from '@/components/TextField';
+import useAuth, { IAdminSignUp } from '@/hooks/auth';
 moment.tz.setDefault('Asia/Manila');
 
-export default function Home() {
-  const { error, documents, searchOrder } = useOrder();
-  const [startDate, setStartDate] = useState(moment());
-  const [endDate, setEndDate] = useState(moment());
-  const [status, setStatus] = useState('default');
+export default function Login() {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [name, setName] = useState('');
+  const [contactNumber, setContactNumber] = useState('');
 
-  console.log({
-    orders: documents,
-  });
+  const { signUp } = useAuth();
 
-  const onSearchOrder = async () => {
-    await searchOrder({ startDate, endDate, status: status === 'default' ? '' : status });
+  const onSignUp = async () => {
+    if (!password || password !== confirmPassword) {
+      alert('Password is required / password did not match.');
+      return;
+    }
+
+    const payload: IAdminSignUp = {
+      username,
+      password,
+      name,
+      contactNumber,
+    };
+
+    const res = await signUp(payload);
+
+    console.log({
+      payload,
+      res,
+    });
   };
 
   return (
     <Container style={{ marginTop: '2rem', marginBottom: '2rem' }}>
-      <Grid container direction='column'>
-        <Grid xs={12}>
-          <TextField
-            label='Filter Start Date'
-            size='small'
-            type='date'
-            fullWidth
-            value={startDate}
-            onChange={(e: any) => setStartDate(e.target.value)}
-            InputProps={{
-              style: {
-                marginBottom: '20px',
-                backgroundColor: '#eeeeee',
-              },
-            }}
-            InputLabelProps={{ shrink: true }}
-          />
-        </Grid>
-
-        <Grid xs={12}>
-          <TextField
-            label='Filter End Date'
-            size='small'
-            type='date'
-            fullWidth
-            value={endDate}
-            onChange={(e: any) => setEndDate(e.target.value)}
-            InputProps={{
-              style: {
-                marginBottom: '20px',
-                backgroundColor: '#eeeeee',
-              },
-            }}
-            InputLabelProps={{ shrink: true }}
-          />
-        </Grid>
-
-        <Grid xs={12}>
-          <FormControl fullWidth>
-            <Select
-              size='small'
-              fullWidth
-              value={status}
-              onChange={(e: any) => setStatus(e.target.value)}
-              sx={{
-                marginBottom: '20px',
-                backgroundColor: '#eeeeee',
-              }}
-            >
-              <MenuItem value='default'>Filter Status</MenuItem>
-              <MenuItem value={OrderStatus.COMPLETED}>Completed</MenuItem>
-              <MenuItem value={OrderStatus.RECEIVED}>Received</MenuItem>
-              <MenuItem value={OrderStatus.PROCESSING}>Processing</MenuItem>
-              <MenuItem value={OrderStatus.DECLINED}>Declined Orders</MenuItem>
-              <MenuItem value={OrderStatus.SERVED}>Served Orders</MenuItem>
-            </Select>
-          </FormControl>
-        </Grid>
-
-        <Grid xs={12}>
-          <Button
-            variant='contained'
-            fullWidth
-            onClick={onSearchOrder}
-            style={{ marginBottom: '30px' }}
-          >
-            Search
-          </Button>
-        </Grid>
-
-        <Grid xs={12}>
-          {documents.map((order: any, i: number) => (
-            <OrderCard key={i} orderDetails={order} />
-          ))}
-        </Grid>
-      </Grid>
+      <InputField label='Username' value={username} onChange={setUsername} />
+      <InputField label='Password' value={password} onChange={setPassword} type='password' />
+      <InputField
+        label='Confirm Password'
+        value={confirmPassword}
+        onChange={setConfirmPassword}
+        type='password'
+      />
+      <InputField label='Name' value={name} onChange={setName} />
+      <InputField label='Contact Number' value={contactNumber} onChange={setContactNumber} />
+      <Button label='Create User' onClick={onSignUp} />
     </Container>
   );
 }

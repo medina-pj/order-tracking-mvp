@@ -2,14 +2,14 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Friday June 9th 2023
- * Last Modified by: PJ Medina - <paulo@healthnow.ph>
- * Last Modified time: June 10th 2023, 9:36:44 am
+ * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
+ * Last Modified time: July 1st 2023, 10:36:08 am
  * ---------------------------------------------
  */
 
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
-// import { getAuth } from 'firebase/auth';
+import { getAuth } from 'firebase/auth';
 // import { getStorage } from 'firebase/storage';
 import constants from '../utils/constants';
 
@@ -25,7 +25,10 @@ const firebaseConfig = {
 // init firebase
 const app = initializeApp(firebaseConfig);
 
-// init firestore
-const db = getFirestore();
+// init firebase auth
+const auth = getAuth(app);
 
-export { db };
+// init firestore
+const db = getFirestore(app);
+
+export { db, auth };

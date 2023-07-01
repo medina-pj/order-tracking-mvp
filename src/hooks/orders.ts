@@ -2,8 +2,8 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
- * Last Modified by: PJ Medina - <paulo@healthnow.ph>
- * Last Modified time: June 18th 2023, 6:38:44 pm
+ * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
+ * Last Modified time: July 2nd 2023, 7:45:44 am
  * ---------------------------------------------
  */
 
@@ -26,9 +26,9 @@ import {
   QueryConstraint,
 } from 'firebase/firestore';
 
-import { db } from '../config/firebase';
-import { OrderItemsSchema, OrderSchema, OrderStatus } from '../types/schema';
-import constants from '../utils/constants';
+import { db } from '@/config/firebase';
+import { OrderItemsSchema, OrderSchema, OrderStatus } from '@/types/schema';
+import constants from '@/utils/constants';
 import generateNanoId from '@/utils/generateNanoId';
 
 export interface ICreateOrder {

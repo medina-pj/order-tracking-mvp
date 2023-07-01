@@ -4,8 +4,8 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
- * Last Modified by: PJ Medina - <paulo@healthnow.ph>
- * Last Modified time: June 24th 2023, 11:04:32 pm
+ * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
+ * Last Modified time: June 29th 2023, 6:46:39 pm
  * ---------------------------------------------
  */
 
@@ -31,7 +31,7 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import InputField from '@/components/TextField';
 import Button from '@/components/Button';
 
-export default function Home() {
+export default function Product() {
   const { documents: categories } = useCategory();
   const { error, documents, createDoc, deleteDoc } = useProduct();
 

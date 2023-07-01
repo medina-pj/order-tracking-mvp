@@ -2,8 +2,8 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
- * Last Modified by: PJ Medina - <paulo@healthnow.ph>
- * Last Modified time: June 10th 2023, 9:55:37 pm
+ * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
+ * Last Modified time: July 2nd 2023, 7:46:08 am
  * ---------------------------------------------
  */
 
@@ -11,19 +11,11 @@ import { useState, useEffect } from 'react';
 import moment from 'moment-timezone';
 moment.tz.setDefault('Asia/Manila');
 
-import {
-  collection,
-  query,
-  onSnapshot,
-  where,
-  addDoc,
-  doc,
-  setDoc,
-} from 'firebase/firestore';
+import { collection, query, onSnapshot, where, addDoc, doc, setDoc } from 'firebase/firestore';
 
-import { db } from '../config/firebase';
-import { TableSchema } from '../types/schema';
-import constants from '../utils/constants';
+import { db } from '@/config/firebase';
+import { TableSchema } from '@/types/schema';
+import constants from '@/utils/constants';
 
 export interface ISaveTable {
   name: string;
@@ -47,19 +39,15 @@ const useTable = () => {
     let qry = query(ref, where('isArchived', '==', false));
 
     //will invoke everytime database is updated in the cloud
-    const unsub = onSnapshot(qry, async (snapshot) => {
+    const unsub = onSnapshot(qry, async snapshot => {
       let results: ITable[] = [];
 
       for (const doc of snapshot.docs) {
         results.push({
           id: doc.id,
           name: doc.data().name,
-          createdAt: moment(doc.data()?.createdAt).format(
-            'MMM DD, YYYY hh:mma'
-          ),
-          updatedAt: moment(doc.data()?.updatedAt).format(
-            'MMM DD, YYYY hh:mma'
-          ),
+          createdAt: moment(doc.data()?.createdAt).format('MMM DD, YYYY hh:mma'),
+          updatedAt: moment(doc.data()?.updatedAt).format('MMM DD, YYYY hh:mma'),
         });
       }
 

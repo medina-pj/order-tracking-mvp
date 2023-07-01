@@ -4,8 +4,8 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
- * Last Modified by: PJ Medina - <paulo@healthnow.ph>
- * Last Modified time: June 24th 2023, 11:04:47 pm
+ * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
+ * Last Modified time: June 29th 2023, 6:46:48 pm
  * ---------------------------------------------
  */
 
@@ -27,7 +27,7 @@ import useTable from '@/hooks/tables';
 import ProductCard from '@/components/ProductCard';
 import Button from '@/components/Button';
 
-export default function Home() {
+export default function Order() {
   const { error, createOrder } = useOrder();
   const { documents: products } = useProduct();
   const { documents: tables } = useTable();

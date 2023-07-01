@@ -2,8 +2,8 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Friday June 9th 2023
- * Last Modified by: PJ Medina - <paulo@healthnow.ph>
- * Last Modified time: June 10th 2023, 5:46:37 pm
+ * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
+ * Last Modified time: July 1st 2023, 12:27:53 pm
  * ---------------------------------------------
  */
 
@@ -13,8 +13,8 @@ moment.tz.setDefault('Asia/Manila');
 
 import { collection, query, onSnapshot, where, addDoc, doc, setDoc } from 'firebase/firestore';
 
-import { db } from '../config/firebase';
-import { CategorySchema } from '../types/schema';
+import { db } from '@/config/firebase';
+import { CategorySchema } from '@/types/schema';
 import constants from '@/utils/constants';
 
 export interface ISaveCategory {
