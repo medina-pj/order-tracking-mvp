@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Friday June 9th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 1st 2023, 12:27:53 pm
+ * Last Modified time: July 2nd 2023, 12:51:44 pm
  * ---------------------------------------------
  */
 
@@ -85,7 +85,7 @@ const useCategory = () => {
     try {
       setError(null);
 
-      const docRef = doc(db, 'categories', id);
+      const docRef = doc(db, constants.DB_CATEGORIES, id);
 
       await setDoc(
         docRef,
