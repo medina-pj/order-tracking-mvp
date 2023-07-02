@@ -3,15 +3,25 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 2nd 2023, 1:39:34 pm
+ * Last Modified time: July 2nd 2023, 2:11:25 pm
  * ---------------------------------------------
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import moment from 'moment-timezone';
 moment.tz.setDefault('Asia/Manila');
 
-import { collection, query, onSnapshot, where, addDoc, doc, setDoc } from 'firebase/firestore';
+import {
+  collection,
+  query,
+  onSnapshot,
+  where,
+  addDoc,
+  doc,
+  setDoc,
+  getDocs,
+  documentId,
+} from 'firebase/firestore';
 
 import { db } from '@/config/firebase';
 import { ProductSchema } from '@/types/schema/product';
@@ -40,6 +50,7 @@ export interface IProduct {
     name?: string;
     description?: string;
   };
+  addOns?: Partial<IProduct[]>;
   createdAt: string;
   updatedAt: string;
 }
@@ -49,41 +60,76 @@ const useProduct = () => {
   const [error, setError] = useState<any>(null);
   const [documents, setDocuments] = useState<IProduct[]>([]);
 
-  useEffect(() => {
-    if (categories.length) {
-      let ref = collection(db, constants.DB_PRODUCTS);
-      let qry = query(ref, where('isArchived', '==', false));
+  const fetchCategory = useCallback(
+    (categoryId: string) => {
+      const category: ICategory | undefined = categories.find((c: any) => c.id === categoryId);
 
-      //will invoke everytime database is updated in the cloud
-      const unsub = onSnapshot(qry, async snapshot => {
-        let results: IProduct[] = [];
+      return {
+        id: category?.id,
+        name: category?.name,
+        description: category?.description,
+      };
+    },
+    [categories]
+  );
 
-        for (const doc of snapshot.docs) {
-          const category: ICategory | undefined = categories.find(
-            (c: any) => c.id === doc.data().categoryId
-          );
+  const fetchAddOns = useCallback(
+    async (productIds: string[]): Promise<Partial<IProduct[]>> => {
+      if (!productIds.length) return [];
 
-          results.push({
-            id: doc.id,
-            productCode: doc.data().productCode,
-            name: doc.data().name,
-            category: {
-              id: category?.id,
-              name: category?.name,
-              description: category?.description,
-            },
-            description: doc.data().description,
-            createdAt: moment(doc.data()?.createdAt).format('MMM DD, YYYY hh:mma'),
-            updatedAt: moment(doc.data()?.updatedAt).format('MMM DD, YYYY hh:mma'),
-          });
-        }
+      let results: any = [];
 
-        setDocuments(results);
+      const qry = query(
+        collection(db, constants.DB_PRODUCTS),
+        where(documentId(), 'in', productIds)
+      );
+      const querySnapshot = await getDocs(qry);
+
+      querySnapshot.forEach(doc => {
+        results.push({
+          id: doc.id,
+          productCode: doc.data().productCode,
+          name: doc.data().name,
+          category: fetchCategory(doc.data().categoryId),
+          description: doc.data().description,
+        });
       });
 
-      return () => unsub();
-    }
-  }, [categories]);
+      return results;
+    },
+    [fetchCategory]
+  );
+
+  useEffect(() => {
+    (async function () {
+      if (categories.length) {
+        let ref = collection(db, constants.DB_PRODUCTS);
+        let qry = query(ref, where('isArchived', '==', false));
+
+        //will invoke everytime database is updated in the cloud
+        const unsub = onSnapshot(qry, async snapshot => {
+          let results: IProduct[] = [];
+
+          for (const doc of snapshot.docs) {
+            results.push({
+              id: doc.id,
+              productCode: doc.data().productCode,
+              name: doc.data().name,
+              category: fetchCategory(doc.data().categoryId),
+              description: doc.data().description,
+              addOns: await fetchAddOns(doc.data()?.addOns || []),
+              createdAt: moment(doc.data()?.createdAt).format('MMM DD, YYYY hh:mma'),
+              updatedAt: moment(doc.data()?.updatedAt).format('MMM DD, YYYY hh:mma'),
+            });
+          }
+
+          setDocuments(results);
+        });
+
+        return () => unsub();
+      }
+    })();
+  }, [categories, fetchAddOns, fetchCategory]);
 
   const createDoc = async (payload: ISaveProduct): Promise<void> => {
     try {
