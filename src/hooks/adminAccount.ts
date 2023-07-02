@@ -2,8 +2,8 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Sunday July 2nd 2023
- * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 2nd 2023, 12:01:33 pm
+ * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
+ * Last Modified time: July 2nd 2023, 4:40:15 pm
  * ---------------------------------------------
  */
 
@@ -38,31 +38,37 @@ const useAdminAccount = (user: UserSchema) => {
   const [documents, setDocuments] = useState<UserSchema[]>([]);
 
   useEffect(() => {
-    let ref = collection(db, constants.DB_ADMINS);
-    let qry = query(ref, where('isArchived', '==', false), where('id', '!=', user.id));
+    if (user !== null) {
+      let ref = collection(db, constants.DB_ADMINS);
+      let qry = query(
+        ref,
+        where('isArchived', '==', false)
+        // where('id', '!=', user.id)
+      );
 
-    //will invoke everytime database is updated in the cloud
-    const unsub = onSnapshot(qry, async snapshot => {
-      let results: UserSchema[] = [];
+      //will invoke everytime database is updated in the cloud
+      const unsub = onSnapshot(qry, async snapshot => {
+        let results: UserSchema[] = [];
 
-      for (const doc of snapshot.docs) {
-        results.push({
-          id: doc.id,
-          authId: doc.data().authId,
-          username: doc.data().username,
-          name: doc.data()?.name,
-          contactNumber: doc.data()?.contactNumber,
-          userType: doc.data().userType,
-          createdAt: moment(doc.data()?.createdAt).format('MMM DD, YYYY hh:mma'),
-          updatedAt: moment(doc.data()?.updatedAt).format('MMM DD, YYYY hh:mma'),
-        });
-      }
+        for (const doc of snapshot.docs) {
+          results.push({
+            id: doc.id,
+            authId: doc.data().authId,
+            username: doc.data().username,
+            name: doc.data()?.name,
+            contactNumber: doc.data()?.contactNumber,
+            userType: doc.data().userType,
+            createdAt: moment(doc.data()?.createdAt).format('MMM DD, YYYY hh:mma'),
+            updatedAt: moment(doc.data()?.updatedAt).format('MMM DD, YYYY hh:mma'),
+          });
+        }
 
-      setDocuments(results);
-    });
+        setDocuments(results);
+      });
 
-    return () => unsub();
-  }, [user.id]);
+      return () => unsub();
+    }
+  }, [user]);
 
   const create = async (payload: IAdminSignUp): Promise<void> => {
     try {

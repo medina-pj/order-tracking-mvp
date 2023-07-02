@@ -2,8 +2,8 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Sunday June 11th 2023
- * Last Modified by: PJ Medina - <paulo@healthnow.ph>
- * Last Modified time: June 16th 2023, 2:50:48 pm
+ * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
+ * Last Modified time: July 2nd 2023, 12:56:10 pm
  * ---------------------------------------------
  */
 import { CSSProperties } from 'react';
@@ -23,7 +23,7 @@ import {
   Typography,
 } from '@mui/material';
 import useTable from '@/hooks/tables';
-import { OrderStatus } from '@/types/schema';
+import { OrderStatus } from '@/types/schema/order';
 
 const OrderCard = ({ orderDetails }: { orderDetails: IOrder }) => {
   const { updateOrderStatus, updateOrderPaymentStatus } = useOrder();
@@ -42,10 +42,7 @@ const OrderCard = ({ orderDetails }: { orderDetails: IOrder }) => {
     fontSize: '11px',
   };
 
-  const totalAmount = orderDetails.items.reduce(
-    (acc: any, curr: any) => acc + curr.price * curr.quantity,
-    0
-  );
+  const totalAmount = orderDetails.items.reduce((acc: any, curr: any) => acc + curr.price * curr.quantity, 0);
 
   console.log({ orderDetails });
 
@@ -68,16 +65,12 @@ const OrderCard = ({ orderDetails }: { orderDetails: IOrder }) => {
           ORDER {orderDetails.status.toUpperCase()}
         </Typography>
 
-        <Typography
-          style={{ fontSize: '12px', fontWeight: '600', marginBottom: '15px', color: '#4fc3f7' }}
-        >
+        <Typography style={{ fontSize: '12px', fontWeight: '600', marginBottom: '15px', color: '#4fc3f7' }}>
           {orderDetails?.orderPaid && `ORDER PAID`}
         </Typography>
 
         <Typography style={{ fontSize: '14px', fontWeight: '600' }}>Notes:</Typography>
-        <Typography style={{ fontSize: '10px', fontWeight: '500' }}>
-          Note: {orderDetails?.notes}
-        </Typography>
+        <Typography style={{ fontSize: '10px', fontWeight: '500' }}>Note: {orderDetails?.notes}</Typography>
         <Typography style={{ fontSize: '10px', fontWeight: '500', marginBottom: '20px' }}>
           Customer: {orderDetails?.customerNotes}
         </Typography>
@@ -118,8 +111,7 @@ const OrderCard = ({ orderDetails }: { orderDetails: IOrder }) => {
               variant='contained'
               size='small'
               fullWidth
-              onClick={() => updateOrderPaymentStatus(orderDetails.id, true)}
-            >
+              onClick={() => updateOrderPaymentStatus(orderDetails.id, true)}>
               Order Paid
             </Button>
           </>
@@ -133,16 +125,14 @@ const OrderCard = ({ orderDetails }: { orderDetails: IOrder }) => {
               size='small'
               fullWidth
               color='warning'
-              onClick={() => updateOrderStatus(orderDetails.id, OrderStatus.DECLINED)}
-            >
+              onClick={() => updateOrderStatus(orderDetails.id, OrderStatus.DECLINED)}>
               Decline Order
             </Button>
             <Button
               variant='contained'
               size='small'
               fullWidth
-              onClick={() => updateOrderStatus(orderDetails.id, OrderStatus.PROCESSING)}
-            >
+              onClick={() => updateOrderStatus(orderDetails.id, OrderStatus.PROCESSING)}>
               Processing
             </Button>
           </>
@@ -154,8 +144,7 @@ const OrderCard = ({ orderDetails }: { orderDetails: IOrder }) => {
               variant='contained'
               size='small'
               fullWidth
-              onClick={() => updateOrderStatus(orderDetails.id, OrderStatus.SERVED)}
-            >
+              onClick={() => updateOrderStatus(orderDetails.id, OrderStatus.SERVED)}>
               Order Served
             </Button>
           </>
@@ -167,24 +156,20 @@ const OrderCard = ({ orderDetails }: { orderDetails: IOrder }) => {
               variant='contained'
               size='small'
               fullWidth
-              onClick={() => updateOrderStatus(orderDetails.id, OrderStatus.COMPLETED)}
-            >
+              onClick={() => updateOrderStatus(orderDetails.id, OrderStatus.COMPLETED)}>
               Order Completed
             </Button>
           </>
         )}
 
-        {![OrderStatus.DECLINED, OrderStatus.CANCEL].includes(
-          orderDetails.status as OrderStatus
-        ) && (
+        {![OrderStatus.DECLINED, OrderStatus.CANCEL].includes(orderDetails.status as OrderStatus) && (
           <>
             <Button
               variant='contained'
               size='small'
               fullWidth
               color='error'
-              onClick={() => updateOrderStatus(orderDetails.id, OrderStatus.CANCEL)}
-            >
+              onClick={() => updateOrderStatus(orderDetails.id, OrderStatus.CANCEL)}>
               Cancel Order
             </Button>
           </>

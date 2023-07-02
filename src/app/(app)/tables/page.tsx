@@ -4,8 +4,8 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Sunday June 11th 2023
- * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: June 29th 2023, 6:47:12 pm
+ * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
+ * Last Modified time: July 2nd 2023, 4:53:22 pm
  * ---------------------------------------------
  */
 
@@ -47,7 +47,7 @@ export default function Tables() {
     setName('');
   };
 
-  const deleteCategory = async (id: string) => {
+  const deleteTable = async (id: string) => {
     if (!confirm('Are you sure you want to delete this record?')) return;
 
     await deleteDoc(id);
@@ -81,11 +81,8 @@ export default function Tables() {
                 <TableCell>{i + 1}</TableCell>
                 <TableCell>{doc?.name}</TableCell>
                 <TableCell align='right'>
-                  <IconButton>
-                    <DeleteForeverIcon
-                      style={{ color: '#ea6655' }}
-                      onClick={() => deleteCategory(doc.id)}
-                    />
+                  <IconButton onClick={() => deleteTable(doc.id)}>
+                    <DeleteForeverIcon style={{ color: '#ea6655' }} />
                   </IconButton>
                 </TableCell>
               </TableRow>

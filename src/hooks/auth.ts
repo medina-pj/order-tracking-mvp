@@ -2,8 +2,8 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Saturday July 1st 2023
- * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 2nd 2023, 12:00:08 pm
+ * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
+ * Last Modified time: July 2nd 2023, 3:41:17 pm
  * ---------------------------------------------
  */
 
@@ -84,7 +84,7 @@ const useAuth = () => {
     }
   };
 
-  return { login, logout, error, loading, user };
+  return { login, logout, error, loading, user, userInfo };
 };
 
 export default useAuth;

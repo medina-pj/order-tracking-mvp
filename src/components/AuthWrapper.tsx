@@ -4,18 +4,20 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Sunday July 2nd 2023
- * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 2nd 2023, 9:05:30 am
+ * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
+ * Last Modified time: July 2nd 2023, 5:59:19 pm
  * ---------------------------------------------
  */
 
 import useAuth from '@/hooks/auth';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
+
 import { useEffect } from 'react';
 
 export default function AuthWrapper({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const path = usePathname();
 
   useEffect(() => {
     if (loading) {
@@ -28,9 +30,10 @@ export default function AuthWrapper({ children }: { children: React.ReactNode })
       router.replace('/');
     } else {
       // Redirect to the dashboard if the user is authenticated
-      router.replace('/dashboard');
+      if (path === '/' || path === '') router.push('/dashboard');
+      else router.push(path);
     }
-  }, [user, loading, router]);
+  }, [user, loading, router, path]);
 
   if (loading) {
     return <div>LOADING...</div>;

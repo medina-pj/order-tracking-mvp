@@ -1,20 +1,14 @@
 'use client';
 
 import React from 'react';
-import {
-  AppBar,
-  Toolbar,
-  IconButton,
-  Typography,
-  Menu,
-  MenuItem,
-} from '@mui/material';
+import { AppBar, Toolbar, IconButton, Typography, Menu, MenuItem } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
+import useAuth from '@/hooks/auth';
 
 const NavBar = () => {
-  const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
-    null
-  );
+  const { logout } = useAuth();
+
+  const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
@@ -33,8 +27,7 @@ const NavBar = () => {
           aria-controls='menu-appbar'
           aria-haspopup='true'
           onClick={handleOpenNavMenu}
-          color='inherit'
-        >
+          color='inherit'>
           <MenuIcon />
         </IconButton>
         <Menu
@@ -51,10 +44,9 @@ const NavBar = () => {
             horizontal: 'right',
           }}
           open={Boolean(anchorElNav)}
-          onClose={handleCloseNavMenu}
-        >
+          onClose={handleCloseNavMenu}>
           <MenuItem key={'Home'} onClick={handleCloseNavMenu}>
-            <Typography textAlign='center' component='a' href='/'>
+            <Typography textAlign='center' component='a' href='/dashboard'>
               Home
             </Typography>
           </MenuItem>
@@ -68,6 +60,11 @@ const NavBar = () => {
               {'Products'}
             </Typography>
           </MenuItem>
+          <MenuItem key={'Stores'} onClick={handleCloseNavMenu}>
+            <Typography textAlign='center' component='a' href='/stores'>
+              {'Stores'}
+            </Typography>
+          </MenuItem>
           <MenuItem key={'Tables'} onClick={handleCloseNavMenu}>
             <Typography textAlign='center' component='a' href='/tables'>
               {'Tables'}
@@ -76,6 +73,11 @@ const NavBar = () => {
           <MenuItem key={'Category'} onClick={handleCloseNavMenu}>
             <Typography textAlign='center' component='a' href='/category'>
               {'Category'}
+            </Typography>
+          </MenuItem>
+          <MenuItem key={'Logout'} onClick={handleCloseNavMenu}>
+            <Typography textAlign='center' onClick={() => logout()}>
+              {'Logout'}
             </Typography>
           </MenuItem>
         </Menu>

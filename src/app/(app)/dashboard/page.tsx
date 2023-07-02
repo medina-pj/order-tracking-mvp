@@ -4,8 +4,8 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
- * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 1st 2023, 4:38:05 pm
+ * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
+ * Last Modified time: July 2nd 2023, 12:55:28 pm
  * ---------------------------------------------
  */
 
@@ -15,7 +15,7 @@ import { Container, Grid, MenuItem, Select, TextField, Button, FormControl } fro
 import useOrder from '@/hooks/orders';
 import OrderCard from '@/components/OrderCard';
 
-import { OrderStatus } from '@/types/schema';
+import { OrderStatus } from '@/types/schema/order';
 
 import moment from 'moment-timezone';
 import { useRouter } from 'next/navigation';
@@ -84,8 +84,7 @@ export default function Dashboard() {
               sx={{
                 marginBottom: '20px',
                 backgroundColor: '#eeeeee',
-              }}
-            >
+              }}>
               <MenuItem value='default'>Filter Status</MenuItem>
               <MenuItem value={OrderStatus.COMPLETED}>Completed</MenuItem>
               <MenuItem value={OrderStatus.RECEIVED}>Received</MenuItem>
@@ -97,12 +96,7 @@ export default function Dashboard() {
         </Grid>
 
         <Grid xs={12}>
-          <Button
-            variant='contained'
-            fullWidth
-            onClick={onSearchOrder}
-            style={{ marginBottom: '30px' }}
-          >
+          <Button variant='contained' fullWidth onClick={onSearchOrder} style={{ marginBottom: '30px' }}>
             Search
           </Button>
         </Grid>
