@@ -16,47 +16,6 @@ export enum OrderStatus {
   CANCEL = 'cancelled',
 }
 
-export type UserSchema = {
-  id?: string;
-  authId?: string;
-  username: string;
-  name: string;
-  contactNumber: string;
-  userType: 'admin' | 'staff';
-  createdBy?: string;
-  createdAt?: number;
-  updatedAt?: number;
-  isArchived?: boolean;
-};
-
-export type CategorySchema = {
-  id?: string;
-  name: string;
-  description?: string;
-  createdAt?: number;
-  updatedAt?: number;
-  isArchived?: boolean;
-};
-
-export type ProductSchema = {
-  id?: string;
-  productCode: string;
-  name: string;
-  description?: string;
-  addOns: string[];
-  categoryId: string;
-  createdAt?: number;
-  updatedAt?: number;
-};
-
-export type StoreSchema = {
-  id?: string;
-  name: string;
-  location: string;
-  contactNumber: string;
-  staff: string[];
-};
-
 export type CartAddOnsSchema = {
   storeProductId: string;
   productCode: string;

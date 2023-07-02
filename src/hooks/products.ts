@@ -14,7 +14,7 @@ moment.tz.setDefault('Asia/Manila');
 import { collection, query, onSnapshot, where, addDoc, doc, setDoc } from 'firebase/firestore';
 
 import { db } from '@/config/firebase';
-import { ProductSchema } from '@/types/schema';
+import { ProductSchema } from '@/types/schema/product';
 import constants from '@/utils/constants';
 import generateNanoId from '@/utils/generateNanoId';
 

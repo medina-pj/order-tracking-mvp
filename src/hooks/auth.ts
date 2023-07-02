@@ -17,7 +17,7 @@ moment.tz.setDefault('Asia/Manila');
 import { auth, db } from '@/config/firebase';
 import constants from '@/utils/constants';
 import { useEffect, useState } from 'react';
-import { UserSchema } from '@/types/schema';
+import { UserSchema } from '@/types/schema/user';
 
 export interface IAdminSignUp {
   username: string;
@@ -71,11 +71,7 @@ const useAuth = () => {
       setError(null);
 
       // create firebase auth account
-      const { user } = await createUserWithEmailAndPassword(
-        auth,
-        payload.username,
-        payload.password
-      );
+      const { user } = await createUserWithEmailAndPassword(auth, payload.username, payload.password);
 
       if (!user) {
         throw new Error('Failed to create account.');

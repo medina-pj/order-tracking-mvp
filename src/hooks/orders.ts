@@ -27,7 +27,7 @@ import {
 } from 'firebase/firestore';
 
 import { db } from '@/config/firebase';
-import { OrderItemsSchema, OrderSchema, OrderStatus } from '@/types/schema';
+import { CartItemsSchema, OrderSchema, OrderStatus } from '@/types/schema/order';
 import constants from '@/utils/constants';
 import generateNanoId from '@/utils/generateNanoId';
 
@@ -170,7 +170,7 @@ const useOrder = () => {
     try {
       setError(null);
 
-      const formattedItems: OrderItemsSchema[] = payload.items.map((item: any) => ({
+      const formattedItems: CartItemsSchema[] = payload.items.map((item: any) => ({
         ...item,
         id: uuid(),
         createdAt: moment().toDate().getTime(),

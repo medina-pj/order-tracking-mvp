@@ -14,7 +14,7 @@ moment.tz.setDefault('Asia/Manila');
 import { collection, query, onSnapshot, where, addDoc, doc, setDoc } from 'firebase/firestore';
 
 import { db } from '../config/firebase';
-import { StoreSchema } from '../types/store.schema';
+import { StoreSchema } from '../types/schema/store';
 import constants from '@/utils/constants';
 
 export interface ISaveStore {
