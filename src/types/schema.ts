@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: June 28th 2023, 12:52:07 pm
+ * Last Modified time: July 2nd 2023, 8:14:20 am
  * ---------------------------------------------
  */
 
@@ -18,8 +18,8 @@ export enum OrderStatus {
 
 export type UserSchema = {
   id?: string;
+  authId?: string;
   username: string;
-  password: string;
   name: string;
   contactNumber: string;
   userType: 'admin' | 'staff';

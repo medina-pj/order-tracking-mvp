@@ -5,23 +5,16 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 1st 2023, 5:27:08 pm
+ * Last Modified time: July 2nd 2023, 8:43:01 am
  * ---------------------------------------------
  */
 
 import { useState } from 'react';
-import { Container, Grid, MenuItem, Select, TextField, FormControl } from '@mui/material';
+import { Container } from '@mui/material';
 import Button from '@/components/Button';
-
-import useOrder from '@/hooks/orders';
-import OrderCard from '@/components/OrderCard';
-
-import { OrderStatus } from '@/types/schema';
-
-import moment from 'moment-timezone';
 import InputField from '@/components/TextField';
+
 import useAuth, { IAdminSignUp } from '@/hooks/auth';
-moment.tz.setDefault('Asia/Manila');
 
 export default function Login() {
   const [username, setUsername] = useState('');
@@ -30,9 +23,9 @@ export default function Login() {
   const [name, setName] = useState('');
   const [contactNumber, setContactNumber] = useState('');
 
-  const { signUp } = useAuth();
+  const { signup, login, logout } = useAuth();
 
-  const onSignUp = async () => {
+  const onSignup = async () => {
     if (!password || password !== confirmPassword) {
       alert('Password is required / password did not match.');
       return;
@@ -45,12 +38,15 @@ export default function Login() {
       contactNumber,
     };
 
-    const res = await signUp(payload);
+    await signup(payload);
+  };
 
-    console.log({
-      payload,
-      res,
-    });
+  const onLogin = async () => {
+    await login(username, password);
+  };
+
+  const onLogout = async () => {
+    await logout();
   };
 
   return (
@@ -65,7 +61,9 @@ export default function Login() {
       />
       <InputField label='Name' value={name} onChange={setName} />
       <InputField label='Contact Number' value={contactNumber} onChange={setContactNumber} />
-      <Button label='Create User' onClick={onSignUp} />
+      <Button label='Create User' onClick={onSignup} />
+      <Button label='Login' onClick={onLogin} />
+      <Button label='Logout' onClick={onLogout} />
     </Container>
   );
 }
