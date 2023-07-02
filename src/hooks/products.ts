@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 2nd 2023, 2:11:25 pm
+ * Last Modified time: July 2nd 2023, 9:11:45 pm
  * ---------------------------------------------
  */
 
@@ -11,17 +11,7 @@ import { useState, useEffect, useCallback } from 'react';
 import moment from 'moment-timezone';
 moment.tz.setDefault('Asia/Manila');
 
-import {
-  collection,
-  query,
-  onSnapshot,
-  where,
-  addDoc,
-  doc,
-  setDoc,
-  getDocs,
-  documentId,
-} from 'firebase/firestore';
+import { collection, query, onSnapshot, where, addDoc, doc, setDoc } from 'firebase/firestore';
 
 import { db } from '@/config/firebase';
 import { ProductSchema } from '@/types/schema/product';
@@ -50,17 +40,16 @@ export interface IProduct {
     name?: string;
     description?: string;
   };
-  addOns?: Partial<IProduct[]>;
   createdAt: string;
   updatedAt: string;
 }
 
-const useProduct = () => {
+export const useProduct = () => {
   const { documents: categories } = useCategory();
   const [error, setError] = useState<any>(null);
   const [documents, setDocuments] = useState<IProduct[]>([]);
 
-  const fetchCategory = useCallback(
+  const fetchCategoryDetails = useCallback(
     (categoryId: string) => {
       const category: ICategory | undefined = categories.find((c: any) => c.id === categoryId);
 
@@ -73,32 +62,17 @@ const useProduct = () => {
     [categories]
   );
 
-  const fetchAddOns = useCallback(
-    async (productIds: string[]): Promise<Partial<IProduct[]>> => {
-      if (!productIds.length) return [];
+  const getProductDetails = (id: string) => {
+    const product: IProduct | undefined = documents.find((d: any) => d.id === id);
 
-      let results: any = [];
-
-      const qry = query(
-        collection(db, constants.DB_PRODUCTS),
-        where(documentId(), 'in', productIds)
-      );
-      const querySnapshot = await getDocs(qry);
-
-      querySnapshot.forEach(doc => {
-        results.push({
-          id: doc.id,
-          productCode: doc.data().productCode,
-          name: doc.data().name,
-          category: fetchCategory(doc.data().categoryId),
-          description: doc.data().description,
-        });
-      });
-
-      return results;
-    },
-    [fetchCategory]
-  );
+    return {
+      id,
+      productCode: product?.productCode,
+      name: product?.name,
+      description: product?.description,
+      category: product?.category,
+    };
+  };
 
   useEffect(() => {
     (async function () {
@@ -115,9 +89,8 @@ const useProduct = () => {
               id: doc.id,
               productCode: doc.data().productCode,
               name: doc.data().name,
-              category: fetchCategory(doc.data().categoryId),
+              category: fetchCategoryDetails(doc.data().categoryId),
               description: doc.data().description,
-              addOns: await fetchAddOns(doc.data()?.addOns || []),
               createdAt: moment(doc.data()?.createdAt).format('MMM DD, YYYY hh:mma'),
               updatedAt: moment(doc.data()?.updatedAt).format('MMM DD, YYYY hh:mma'),
             });
@@ -129,7 +102,7 @@ const useProduct = () => {
         return () => unsub();
       }
     })();
-  }, [categories, fetchAddOns, fetchCategory]);
+  }, [categories, fetchCategoryDetails]);
 
   const createDoc = async (payload: ISaveProduct): Promise<void> => {
     try {
@@ -139,7 +112,6 @@ const useProduct = () => {
         productCode: generateNanoId(5),
         name: payload.name,
         categoryId: payload.categoryId,
-        addOns: payload?.addOns || [],
         description: payload?.description || '',
         createdAt: moment().toDate().getTime(),
         updatedAt: moment().toDate().getTime(),
@@ -191,7 +163,6 @@ const useProduct = () => {
           name: payload.name,
           categoryId: payload.categoryId,
           description: payload.description,
-          addOns: payload.addOns,
           updatedAt: moment().toDate().getTime(),
         },
         { merge: true }
@@ -205,7 +176,7 @@ const useProduct = () => {
     }
   };
 
-  return { error, documents, createDoc, deleteDoc, updateDoc };
+  return { error, documents, createDoc, deleteDoc, updateDoc, getProductDetails };
 };
 
 export default useProduct;

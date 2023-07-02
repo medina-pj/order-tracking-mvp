@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Saturday July 1st 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 2nd 2023, 11:17:42 am
+ * Last Modified time: July 2nd 2023, 8:14:00 pm
  * ---------------------------------------------
  */
 
@@ -32,11 +32,13 @@ export type StoreProductSchema = {
   id?: string;
   storeId: string;
   productId: string;
-  producAbbrev: string;
   price: number;
-  note?: string;
   isAvailable: boolean;
+  isAddOn: boolean;
+  addOns?: string[];
+  productAbbrev?: string;
+  note?: string;
   createdAt?: number;
   updatedAt?: number;
-  isArchived: boolean;
+  isArchived?: boolean;
 };

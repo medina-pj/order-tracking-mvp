@@ -2,13 +2,22 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Sunday July 2nd 2023
- * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
- * Last Modified time: July 2nd 2023, 4:40:15 pm
+ * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
+ * Last Modified time: July 2nd 2023, 6:46:52 pm
  * ---------------------------------------------
  */
 
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { collection, query, where, addDoc, onSnapshot, doc, setDoc } from 'firebase/firestore';
+import {
+  collection,
+  query,
+  where,
+  addDoc,
+  onSnapshot,
+  doc,
+  setDoc,
+  documentId,
+} from 'firebase/firestore';
 
 import moment from 'moment-timezone';
 moment.tz.setDefault('Asia/Manila');
@@ -40,11 +49,7 @@ const useAdminAccount = (user: UserSchema) => {
   useEffect(() => {
     if (user !== null) {
       let ref = collection(db, constants.DB_ADMINS);
-      let qry = query(
-        ref,
-        where('isArchived', '==', false)
-        // where('id', '!=', user.id)
-      );
+      let qry = query(ref, where('isArchived', '==', false), where(documentId(), '!=', user.id));
 
       //will invoke everytime database is updated in the cloud
       const unsub = onSnapshot(qry, async snapshot => {

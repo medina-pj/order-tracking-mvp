@@ -2,8 +2,8 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Friday June 9th 2023
- * Last Modified by: PJ Medina - <paulo@healthnow.ph>
- * Last Modified time: June 10th 2023, 5:46:37 pm
+ * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
+ * Last Modified time: July 2nd 2023, 9:08:51 pm
  * ---------------------------------------------
  */
 
@@ -62,6 +62,15 @@ const useStore = () => {
 
     return () => unsub();
   }, []);
+
+  const getStoreDetails = (id: string) => {
+    const store: IStore | undefined = documents.find((d: any) => d.id === id);
+
+    return {
+      id,
+      name: store?.name,
+    };
+  };
 
   const createDoc = async (payload: ISaveStore): Promise<void> => {
     try {
@@ -136,7 +145,7 @@ const useStore = () => {
     }
   };
 
-  return { error, documents, createDoc, deleteDoc, updateDoc };
+  return { error, documents, createDoc, deleteDoc, updateDoc, getStoreDetails };
 };
 
 export default useStore;
