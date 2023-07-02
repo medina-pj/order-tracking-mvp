@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Saturday July 1st 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 2nd 2023, 8:54:23 am
+ * Last Modified time: July 2nd 2023, 12:00:08 pm
  * ---------------------------------------------
  */
 
@@ -19,14 +19,6 @@ import constants from '@/utils/constants';
 import { useEffect, useState } from 'react';
 import { UserSchema } from '@/types/schema/user';
 
-export interface IAdminSignUp {
-  username: string;
-  password: string;
-  name: string;
-  contactNumber: string;
-  userType?: 'admin' | 'staff';
-}
-
 const useAuth = () => {
   const [user, loading] = useAuthState(auth);
   const [error, setError] = useState<any>(null);
@@ -40,7 +32,7 @@ const useAuth = () => {
     })();
   }, [user, userInfo]);
 
-  const fetchUserInfo = async (authId: string) => {
+  const fetchUserInfo = async (authId: string): Promise<void> => {
     try {
       setError(null);
 
@@ -66,38 +58,7 @@ const useAuth = () => {
     }
   };
 
-  const signup = async (payload: IAdminSignUp) => {
-    try {
-      setError(null);
-
-      // create firebase auth account
-      const { user } = await createUserWithEmailAndPassword(auth, payload.username, payload.password);
-
-      if (!user) {
-        throw new Error('Failed to create account.');
-      }
-
-      // save account details
-      const accountPayload = {
-        authId: user.uid,
-        username: payload.username,
-        name: payload.name,
-        contactNumber: payload.contactNumber,
-        userType: payload.userType || 'staff',
-        isArchived: false,
-        createdAt: moment().toDate().getTime(),
-        updatedAt: moment().toDate().getTime(),
-      };
-
-      await addDoc(collection(db, constants.DB_ADMINS), accountPayload);
-
-      await fetchUserInfo(user.uid);
-    } catch (err: any) {
-      setError(err.message);
-    }
-  };
-
-  const login = async (username: string, password: string) => {
+  const login = async (username: string, password: string): Promise<void> => {
     try {
       setError(null);
 
@@ -114,7 +75,7 @@ const useAuth = () => {
     }
   };
 
-  const logout = async () => {
+  const logout = async (): Promise<void> => {
     try {
       await signOut(auth);
       setUserInfo(null);
@@ -123,7 +84,7 @@ const useAuth = () => {
     }
   };
 
-  return { signup, login, logout, error, loading, user };
+  return { login, logout, error, loading, user };
 };
 
 export default useAuth;

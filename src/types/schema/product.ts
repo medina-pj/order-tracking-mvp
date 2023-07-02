@@ -1,3 +1,12 @@
+/*
+ * ---------------------------------------------
+ * Author: PJ Medina
+ * Date:   Saturday June 10th 2023
+ * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
+ * Last Modified time: July 2nd 2023, 11:14:49 am
+ * ---------------------------------------------
+ */
+
 export type CategorySchema = {
   id?: string;
   name: string;
