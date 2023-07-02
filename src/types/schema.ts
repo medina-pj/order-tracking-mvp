@@ -57,29 +57,6 @@ export type StoreSchema = {
   staff: string[];
 };
 
-export type StoreTableSchema = {
-  id?: string;
-  storeId: string;
-  isAvailble: boolean;
-  capacity: number;
-  createdAt?: number;
-  updatedAt?: number;
-  isArchived: boolean;
-};
-
-export type StoreProductSchema = {
-  id?: string;
-  storeId: string;
-  productId: string;
-  producAbbrev: string;
-  price: number;
-  note?: string;
-  isAvailable: boolean;
-  createdAt?: number;
-  updatedAt?: number;
-  isArchived: boolean;
-};
-
 export type CartAddOnsSchema = {
   storeProductId: string;
   productCode: string;

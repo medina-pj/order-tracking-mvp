@@ -19,6 +19,7 @@ const constants = {
   DB_ORDERS: 'orders',
   DB_TABLES: 'tables',
   DB_ADMINS: 'admins',
+  DB_STORE: 'stores',
 };
 
 export default constants;
