@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Saturday July 1st 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 2nd 2023, 8:14:00 pm
+ * Last Modified time: July 3rd 2023, 9:27:44 pm
  * ---------------------------------------------
  */
 
@@ -21,8 +21,9 @@ export type StoreSchema = {
 export type StoreTableSchema = {
   id?: string;
   storeId: string;
-  isAvailble: boolean;
+  name: string;
   capacity: number;
+  isAvailble: boolean;
   createdAt?: number;
   updatedAt?: number;
   isArchived: boolean;

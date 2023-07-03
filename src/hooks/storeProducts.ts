@@ -3,15 +3,23 @@
  * Author: PJ Medina
  * Date:   Sunday July 2nd 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 2nd 2023, 9:14:06 pm
+ * Last Modified time: July 3rd 2023, 9:34:35 pm
  * ---------------------------------------------
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import moment from 'moment-timezone';
 moment.tz.setDefault('Asia/Manila');
 
-import { collection, query, onSnapshot, where, addDoc } from 'firebase/firestore';
+import {
+  collection,
+  query,
+  onSnapshot,
+  where,
+  addDoc,
+  documentId,
+  getDocs,
+} from 'firebase/firestore';
 
 import { db } from '@/config/firebase';
 import constants from '@/utils/constants';
@@ -38,7 +46,7 @@ export interface IUpdateProduct extends ISaveStoreProduct {
 export interface IStoreProduct {
   id: string;
   price: number;
-  isAddOn: boolean;
+  isAddOn?: boolean;
   isAvailable: boolean;
   productAbbrev?: string;
   note?: string;
@@ -51,7 +59,7 @@ export interface IStoreProduct {
     productCode?: string;
     name?: string;
     description?: string;
-    category: {
+    category?: {
       id?: string;
       name?: string;
       description?: string;
@@ -69,11 +77,39 @@ const useStoreProduct = () => {
   const [error, setError] = useState<any>(null);
   const [documents, setDocuments] = useState<IStoreProduct[]>([]);
 
+  const fetchAddOns = useCallback(
+    async (storeProductIds: string[]): Promise<Partial<IStoreProduct[]>> => {
+      if (!storeProductIds.length) return [];
+
+      let results: any = [];
+
+      const qry = query(
+        collection(db, constants.DB_STORE_PRODUCT),
+        where(documentId(), 'in', storeProductIds)
+      );
+      const querySnapshot = await getDocs(qry);
+
+      querySnapshot.forEach(doc => {
+        results.push({
+          id: doc.id,
+          product: getProductDetails(doc.data()?.productId),
+          price: doc.data().price,
+          isAvailable: doc.data()?.isAvailable,
+        });
+      });
+
+      return results;
+    },
+    [getProductDetails]
+  );
+
   useEffect(() => {
     (async function () {
       if (products.length && stores.length) {
         let ref = collection(db, constants.DB_STORE_PRODUCT);
         let qry = query(ref, where('isArchived', '==', false));
+
+        //FIXME: FETCH ONLY STORES PRODUCTS
 
         //will invoke everytime database is updated in the cloud
         const unsub = onSnapshot(qry, async snapshot => {
@@ -83,11 +119,11 @@ const useStoreProduct = () => {
             results.push({
               id: doc.id,
               store: getStoreDetails(doc.data()?.storeId),
-              product: getProductDetails(doc.data()?.productId) as any, //fix this; remove as any
+              product: getProductDetails(doc.data()?.productId),
               price: doc.data()?.price,
               isAvailable: doc.data()?.isAvailable,
               isAddOn: doc.data()?.isAddOn,
-              // addOns: string[], // fix this
+              addOns: await fetchAddOns(doc.data()?.addOns),
               productAbbrev: doc.data()?.productAbbrev,
               note: doc.data()?.note,
               createdAt: moment(doc.data()?.createdAt).format('MMM DD, YYYY hh:mma'),
@@ -101,34 +137,7 @@ const useStoreProduct = () => {
         return () => unsub();
       }
     })();
-  }, [getProductDetails, getStoreDetails, products, stores]);
-
-  // const fetchAddOns = useCallback(
-  //   async (productIds: string[]): Promise<Partial<IProduct[]>> => {
-  //     if (!productIds.length) return [];
-
-  //     let results: any = [];
-
-  //     const qry = query(
-  //       collection(db, constants.DB_PRODUCTS),
-  //       where(documentId(), 'in', productIds)
-  //     );
-  //     const querySnapshot = await getDocs(qry);
-
-  //     querySnapshot.forEach(doc => {
-  //       results.push({
-  //         id: doc.id,
-  //         productCode: doc.data().productCode,
-  //         name: doc.data().name,
-  //         category: fetchCategory(doc.data().categoryId),
-  //         description: doc.data().description,
-  //       });
-  //     });
-
-  //     return results;
-  //   },
-  //   [fetchCategory]
-  // );
+  }, [fetchAddOns, getProductDetails, getStoreDetails, products, stores]);
 
   const createDoc = async (payload: ISaveStoreProduct): Promise<void> => {
     try {

@@ -2,17 +2,14 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Saturday July 1st 2023
- * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
- * Last Modified time: July 2nd 2023, 3:41:17 pm
+ * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
+ * Last Modified time: July 3rd 2023, 7:15:38 pm
  * ---------------------------------------------
  */
 
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { createUserWithEmailAndPassword, signOut, signInWithEmailAndPassword } from 'firebase/auth';
-import { collection, getDocs, query, where, addDoc } from 'firebase/firestore';
-
-import moment from 'moment-timezone';
-moment.tz.setDefault('Asia/Manila');
+import { signOut, signInWithEmailAndPassword } from 'firebase/auth';
+import { collection, getDocs, query, where } from 'firebase/firestore';
 
 import { auth, db } from '@/config/firebase';
 import constants from '@/utils/constants';
