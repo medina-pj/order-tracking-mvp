@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Sunday July 2nd 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 2nd 2023, 6:46:52 pm
+ * Last Modified time: July 3rd 2023, 10:50:45 pm
  * ---------------------------------------------
  */
 
@@ -26,30 +26,35 @@ import { auth, db } from '@/config/firebase';
 import constants from '@/utils/constants';
 import { useEffect, useState } from 'react';
 import { UserSchema } from '@/types/schema/user';
+import useAuth from './auth';
 
 export interface IAdminSignUp {
   username: string;
   password: string;
   name: string;
   contactNumber: string;
-  userType?: 'admin' | 'staff';
+  userType?: string;
 }
 
 export interface IAdminUpdate {
   id: string;
   name: string;
   contactNumber: string;
-  userType: 'admin' | 'staff';
+  userType: string;
 }
 
-const useAdminAccount = (user: UserSchema) => {
-  const [error, setError] = useState<any>(null);
+const useAdminAccount = () => {
+  const { userInfo } = useAuth();
   const [documents, setDocuments] = useState<UserSchema[]>([]);
 
   useEffect(() => {
-    if (user !== null) {
+    if (userInfo !== null && userInfo?.userType === 'admin') {
       let ref = collection(db, constants.DB_ADMINS);
-      let qry = query(ref, where('isArchived', '==', false), where(documentId(), '!=', user.id));
+      let qry = query(
+        ref,
+        where('isArchived', '==', false),
+        where(documentId(), '!=', userInfo.id)
+      );
 
       //will invoke everytime database is updated in the cloud
       const unsub = onSnapshot(qry, async snapshot => {
@@ -73,87 +78,89 @@ const useAdminAccount = (user: UserSchema) => {
 
       return () => unsub();
     }
-  }, [user]);
+  }, [userInfo]);
 
-  const create = async (payload: IAdminSignUp): Promise<void> => {
+  const createAccount = async (payload: IAdminSignUp): Promise<void> => {
     try {
-      setError(null);
+      if (userInfo !== null && userInfo?.userType === 'admin') {
+        // create firebase auth account
+        const { user: createdUser } = await createUserWithEmailAndPassword(
+          auth,
+          payload.username,
+          payload.password
+        );
 
-      // create firebase auth account
-      const { user: createdUser } = await createUserWithEmailAndPassword(
-        auth,
-        payload.username,
-        payload.password
-      );
+        if (!createdUser) {
+          throw new Error('Failed to create account.');
+        }
 
-      if (!createdUser) {
-        throw new Error('Failed to create account.');
-      }
-
-      // save account details
-      const accountPayload = {
-        authId: createdUser.uid,
-        username: payload.username,
-        name: payload.name,
-        contactNumber: payload.contactNumber,
-        userType: payload.userType || 'staff',
-        isArchived: false,
-        createdBy: user.id,
-        createdAt: moment().toDate().getTime(),
-        updatedAt: moment().toDate().getTime(),
-      };
-
-      await addDoc(collection(db, constants.DB_ADMINS), accountPayload);
-    } catch (err: any) {
-      setError(err.message);
-    }
-  };
-
-  const update = async (payload: IAdminUpdate): Promise<void> => {
-    try {
-      setError(null);
-
-      const docRef = doc(db, constants.DB_ADMINS, payload.id);
-
-      await setDoc(
-        docRef,
-        {
+        // save account details in firestore
+        const accountPayload = {
+          authId: createdUser.uid,
+          username: payload.username,
           name: payload.name,
           contactNumber: payload.contactNumber,
-          userType: payload.userType,
+          userType: payload.userType || 'staff',
+          isArchived: false,
+          createdBy: userInfo.id,
+          createdAt: moment().toDate().getTime(),
           updatedAt: moment().toDate().getTime(),
-        },
-        { merge: true }
-      );
-    } catch (error: any) {
-      setError(error?.message);
+        };
+
+        await addDoc(collection(db, constants.DB_ADMINS), accountPayload);
+      } else {
+        throw new Error('Only admins can create an account.');
+      }
+    } catch (err: any) {
+      throw err;
     }
   };
 
-  const deleteDoc = async (id: string): Promise<void> => {
+  const updateAccount = async (payload: IAdminUpdate): Promise<void> => {
     try {
-      setError(null);
+      if (userInfo !== null && userInfo?.userType === 'admin') {
+        const docRef = doc(db, constants.DB_ADMINS, payload.id);
 
-      const docRef = doc(db, constants.DB_ADMINS, id);
-
-      await setDoc(
-        docRef,
-        {
-          isArchived: true,
-          updatedAt: moment().toDate().getTime(),
-        },
-        { merge: true }
-      );
-
-      return;
-    } catch (error: any) {
-      setError(error?.message);
-
-      return;
+        await setDoc(
+          docRef,
+          {
+            name: payload.name,
+            contactNumber: payload.contactNumber,
+            userType: payload.userType,
+            updatedAt: moment().toDate().getTime(),
+          },
+          { merge: true }
+        );
+      } else {
+        throw new Error('Only admins can update an account.');
+      }
+    } catch (err: any) {
+      throw err;
     }
   };
 
-  return { create, update, deleteDoc, documents, error };
+  const deleteAccount = async (id: string): Promise<void> => {
+    try {
+      if (userInfo !== null && userInfo?.userType === 'admin') {
+        const docRef = doc(db, constants.DB_ADMINS, id);
+
+        await setDoc(
+          docRef,
+          {
+            isArchived: true,
+            updatedAt: moment().toDate().getTime(),
+          },
+          { merge: true }
+        );
+      } else {
+        throw new Error('Only admins can update an account.');
+      }
+    } catch (err: any) {
+      throw err;
+    }
+  };
+
+  return { createAccount, updateAccount, deleteAccount, documents };
 };
 
 export default useAdminAccount;

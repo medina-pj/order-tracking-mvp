@@ -6,7 +6,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import useAuth from '@/hooks/auth';
 
 const NavBar = () => {
-  const { logout } = useAuth();
+  const { logout, userInfo } = useAuth();
 
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
 
@@ -25,6 +25,9 @@ const NavBar = () => {
       console.log(err?.message);
     }
   };
+
+  //FIXME: HIDE PAGES BASE ON USER TYPE
+  console.log(userInfo);
 
   return (
     <AppBar position='sticky'>
@@ -83,6 +86,11 @@ const NavBar = () => {
           <MenuItem key={'Category'} onClick={handleCloseNavMenu}>
             <Typography textAlign='center' component='a' href='/category'>
               {'Category'}
+            </Typography>
+          </MenuItem>
+          <MenuItem key={'Accounts'} onClick={handleCloseNavMenu}>
+            <Typography textAlign='center' component='a' href='/accounts'>
+              {'Accounts'}
             </Typography>
           </MenuItem>
           <MenuItem key={'Logout'} onClick={handleCloseNavMenu}>
