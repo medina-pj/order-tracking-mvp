@@ -18,6 +18,14 @@ const NavBar = () => {
     setAnchorElNav(null);
   };
 
+  const onLogout = async () => {
+    try {
+      await logout();
+    } catch (err: any) {
+      console.log(err?.message);
+    }
+  };
+
   return (
     <AppBar position='sticky'>
       <Toolbar variant='dense'>
@@ -27,7 +35,8 @@ const NavBar = () => {
           aria-controls='menu-appbar'
           aria-haspopup='true'
           onClick={handleOpenNavMenu}
-          color='inherit'>
+          color='inherit'
+        >
           <MenuIcon />
         </IconButton>
         <Menu
@@ -44,7 +53,8 @@ const NavBar = () => {
             horizontal: 'right',
           }}
           open={Boolean(anchorElNav)}
-          onClose={handleCloseNavMenu}>
+          onClose={handleCloseNavMenu}
+        >
           <MenuItem key={'Home'} onClick={handleCloseNavMenu}>
             <Typography textAlign='center' component='a' href='/dashboard'>
               Home
@@ -76,7 +86,7 @@ const NavBar = () => {
             </Typography>
           </MenuItem>
           <MenuItem key={'Logout'} onClick={handleCloseNavMenu}>
-            <Typography textAlign='center' onClick={() => logout()}>
+            <Typography textAlign='center' onClick={onLogout}>
               {'Logout'}
             </Typography>
           </MenuItem>

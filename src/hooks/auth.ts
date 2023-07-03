@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Saturday July 1st 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 3rd 2023, 7:15:38 pm
+ * Last Modified time: July 3rd 2023, 9:52:31 pm
  * ---------------------------------------------
  */
 
@@ -18,7 +18,6 @@ import { UserSchema } from '@/types/schema/user';
 
 const useAuth = () => {
   const [user, loading] = useAuthState(auth);
-  const [error, setError] = useState<any>(null);
   const [userInfo, setUserInfo] = useState<UserSchema | null>(null);
 
   useEffect(() => {
@@ -31,8 +30,6 @@ const useAuth = () => {
 
   const fetchUserInfo = async (authId: string): Promise<void> => {
     try {
-      setError(null);
-
       // get account details
       const ref = collection(db, constants.DB_ADMINS);
       const q = query(ref, where('authId', '==', authId), where('isArchived', '==', false));
@@ -51,14 +48,12 @@ const useAuth = () => {
         ...(account[0] as UserSchema),
       });
     } catch (err: any) {
-      setError(err.message);
+      throw err;
     }
   };
 
   const login = async (username: string, password: string): Promise<void> => {
     try {
-      setError(null);
-
       // signin using firebase auth
       const { user } = await signInWithEmailAndPassword(auth, username, password);
 
@@ -68,7 +63,7 @@ const useAuth = () => {
 
       await fetchUserInfo(user.uid);
     } catch (err: any) {
-      setError(err.message);
+      throw err;
     }
   };
 
@@ -77,11 +72,11 @@ const useAuth = () => {
       await signOut(auth);
       setUserInfo(null);
     } catch (err: any) {
-      setError(err.message);
+      throw err;
     }
   };
 
-  return { login, logout, error, loading, user, userInfo };
+  return { login, logout, loading, user, userInfo };
 };
 
 export default useAuth;
