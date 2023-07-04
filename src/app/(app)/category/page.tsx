@@ -5,7 +5,7 @@
  * Author: PJ Medina
  * Date:   Sunday June 11th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: June 29th 2023, 6:47:02 pm
+ * Last Modified time: July 4th 2023, 7:50:36 pm
  * ---------------------------------------------
  */
 
@@ -27,48 +27,47 @@ import InputField from '@/components/TextField';
 import Button from '@/components/Button';
 
 export default function Category() {
-  const { error, documents, createDoc, deleteDoc } = useCategory();
-
+  const { documents, createDoc, deleteDoc } = useCategory();
+  const [error, setError] = useState('');
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
 
   const createCategory = async () => {
-    if (!name || !description) {
-      alert('Name & Description is required.');
-      return;
+    try {
+      setError('');
+
+      if (!name || !description) {
+        alert('Name & Description is required.');
+        return;
+      }
+
+      await createDoc({ name, description });
+
+      setName('');
+      setDescription('');
+    } catch (err: any) {
+      setError(err?.message);
     }
-
-    await createDoc({ name, description });
-
-    if (error) {
-      alert('Error occured.');
-      return;
-    }
-
-    setName('');
-    setDescription('');
   };
 
   const deleteCategory = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this record?')) return;
+    try {
+      setError('');
 
-    await deleteDoc(id);
+      if (!confirm('Are you sure you want to delete this record?')) return;
 
-    if (error) {
-      alert('Error occured.');
-      return;
+      await deleteDoc(id);
+    } catch (err: any) {
+      setError(err?.message);
     }
   };
-
-  console.log({
-    categories: documents,
-  });
 
   return (
     <Container style={{ marginTop: '2rem' }}>
       <InputField label='Name' value={name} onChange={setName} />
       <InputField label='Description' value={description} onChange={setDescription} />
       <Button label='Save Category' onClick={createCategory} />
+      <p>{error}</p>
       <TableContainer>
         <Table>
           <TableHead>
@@ -86,11 +85,8 @@ export default function Category() {
                 <TableCell>{doc?.name}</TableCell>
                 <TableCell>{doc?.description}</TableCell>
                 <TableCell align='right'>
-                  <IconButton>
-                    <DeleteForeverIcon
-                      style={{ color: '#ea6655' }}
-                      onClick={() => deleteCategory(doc.id)}
-                    />
+                  <IconButton onClick={() => deleteCategory(doc.id)}>
+                    <DeleteForeverIcon style={{ color: '#ea6655' }} />
                   </IconButton>
                 </TableCell>
               </TableRow>

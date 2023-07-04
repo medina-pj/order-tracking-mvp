@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 2nd 2023, 9:11:45 pm
+ * Last Modified time: July 4th 2023, 7:51:47 pm
  * ---------------------------------------------
  */
 
@@ -22,7 +22,6 @@ import useCategory, { ICategory } from './categories';
 export interface ISaveProduct {
   name: string;
   categoryId: string;
-  addOns?: string[];
   description?: string;
 }
 
@@ -46,7 +45,7 @@ export interface IProduct {
 
 export const useProduct = () => {
   const { documents: categories } = useCategory();
-  const [error, setError] = useState<any>(null);
+
   const [documents, setDocuments] = useState<IProduct[]>([]);
 
   const fetchCategoryDetails = useCallback(
@@ -106,8 +105,6 @@ export const useProduct = () => {
 
   const createDoc = async (payload: ISaveProduct): Promise<void> => {
     try {
-      setError(null);
-
       const productPayload: ProductSchema = {
         productCode: generateNanoId(5),
         name: payload.name,
@@ -119,19 +116,13 @@ export const useProduct = () => {
       };
 
       await addDoc(collection(db, constants.DB_PRODUCTS), productPayload);
-
-      return;
-    } catch (error: any) {
-      setError(error?.message);
-
-      return;
+    } catch (err: any) {
+      throw err;
     }
   };
 
   const deleteDoc = async (id: string): Promise<void> => {
     try {
-      setError(null);
-
       const docRef = doc(db, constants.DB_PRODUCTS, id);
 
       await setDoc(
@@ -144,17 +135,13 @@ export const useProduct = () => {
       );
 
       return;
-    } catch (error: any) {
-      setError(error?.message);
-
-      return;
+    } catch (err: any) {
+      throw err;
     }
   };
 
   const updateDoc = async (payload: IUpdateProduct): Promise<void> => {
     try {
-      setError(null);
-
       const docRef = doc(db, constants.DB_PRODUCTS, payload.id);
 
       await setDoc(
@@ -169,14 +156,12 @@ export const useProduct = () => {
       );
 
       return;
-    } catch (error: any) {
-      setError(error?.message);
-
-      return;
+    } catch (err: any) {
+      throw err;
     }
   };
 
-  return { error, documents, createDoc, deleteDoc, updateDoc, getProductDetails };
+  return { documents, createDoc, deleteDoc, updateDoc, getProductDetails };
 };
 
 export default useProduct;

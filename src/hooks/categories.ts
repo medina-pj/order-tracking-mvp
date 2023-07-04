@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Friday June 9th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 2nd 2023, 12:51:44 pm
+ * Last Modified time: July 4th 2023, 7:47:27 pm
  * ---------------------------------------------
  */
 
@@ -32,7 +32,6 @@ export interface ICategory extends ISaveCategory, IUpdateCategory {
 }
 
 const useCategory = () => {
-  const [error, setError] = useState<any>(null);
   const [documents, setDocuments] = useState<ICategory[]>([]);
 
   useEffect(() => {
@@ -61,8 +60,6 @@ const useCategory = () => {
 
   const createDoc = async (payload: ISaveCategory): Promise<void> => {
     try {
-      setError(null);
-
       const categoryPayload: CategorySchema = {
         name: payload.name,
         description: payload?.description || '',
@@ -74,17 +71,13 @@ const useCategory = () => {
       await addDoc(collection(db, constants.DB_CATEGORIES), categoryPayload);
 
       return;
-    } catch (error: any) {
-      setError(error?.message);
-
-      return;
+    } catch (err: any) {
+      throw err;
     }
   };
 
   const deleteDoc = async (id: string): Promise<void> => {
     try {
-      setError(null);
-
       const docRef = doc(db, constants.DB_CATEGORIES, id);
 
       await setDoc(
@@ -97,17 +90,13 @@ const useCategory = () => {
       );
 
       return;
-    } catch (error: any) {
-      setError(error?.message);
-
-      return;
+    } catch (err: any) {
+      throw err;
     }
   };
 
   const updateDoc = async (payload: IUpdateCategory): Promise<void> => {
     try {
-      setError(null);
-
       const docRef = doc(db, constants.DB_CATEGORIES, payload.id);
 
       await setDoc(
@@ -121,14 +110,12 @@ const useCategory = () => {
       );
 
       return;
-    } catch (error: any) {
-      setError(error?.message);
-
-      return;
+    } catch (err: any) {
+      throw err;
     }
   };
 
-  return { error, documents, createDoc, deleteDoc, updateDoc };
+  return { documents, createDoc, deleteDoc, updateDoc };
 };
 
 export default useCategory;

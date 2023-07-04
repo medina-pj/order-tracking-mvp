@@ -5,7 +5,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: June 29th 2023, 6:46:39 pm
+ * Last Modified time: July 4th 2023, 7:55:32 pm
  * ---------------------------------------------
  */
 
@@ -33,56 +33,48 @@ import Button from '@/components/Button';
 
 export default function Product() {
   const { documents: categories } = useCategory();
-  const { error, documents, createDoc, deleteDoc } = useProduct();
+  const { documents, createDoc, deleteDoc } = useProduct();
 
+  const [error, setError] = useState('');
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [price, setPrice] = useState(0);
-  const [note, setNote] = useState('');
   const [category, setCategory] = useState('');
 
   const createProduct = async () => {
-    if (!name || !category || !price) {
-      alert('Name, Price & Category is required.');
-      return;
+    try {
+      setError('');
+
+      if (!name || !category) {
+        alert('Name & Category is required.');
+        return;
+      }
+
+      await createDoc({ name, description, categoryId: category });
+
+      setName('');
+      setDescription('');
+      setCategory('');
+    } catch (err: any) {
+      setError(err?.message);
     }
-
-    await createDoc({ name, description, price, note, categoryId: category });
-
-    if (error) {
-      alert('Error occured.');
-      return;
-    }
-
-    setName('');
-    setPrice(0);
-    setDescription('');
-    setNote('');
-    setCategory('');
   };
 
   const deleteProduct = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this record?')) return;
+    try {
+      setError('');
 
-    await deleteDoc(id);
+      if (!confirm('Are you sure you want to delete this record?')) return;
 
-    if (error) {
-      alert('Error occured.');
-      return;
+      await deleteDoc(id);
+    } catch (err: any) {
+      setError(err?.message);
     }
   };
 
-  console.log({
-    products: documents,
-    categories,
-  });
-
   return (
-    <Container style={{ marginTop: '2rem' }}>
+    <Container style={{ marginTop: '2rem', marginBottom: '2rem' }}>
       <InputField label='Name' value={name} onChange={setName} />
-      <InputField label='Price' value={price} onChange={setPrice} type='number' />
       <InputField label='Description' value={description} onChange={setDescription} />
-      <InputField label='Note' value={note} onChange={setNote} />
       <FormControl fullWidth style={{ marginBottom: '20px' }}>
         <InputLabel id='category-select'>Category</InputLabel>
         <Select
@@ -100,7 +92,7 @@ export default function Product() {
         </Select>
       </FormControl>
       <Button label='Save Product' onClick={createProduct} />
-
+      <p>{error}</p>
       <TableContainer>
         <Table>
           <TableHead>
@@ -108,6 +100,7 @@ export default function Product() {
               <TableCell>#</TableCell>
               <TableCell>Name</TableCell>
               <TableCell>Description</TableCell>
+              <TableCell>Category</TableCell>
               <TableCell align='right'></TableCell>
             </TableRow>
           </TableHead>
@@ -117,12 +110,10 @@ export default function Product() {
                 <TableCell>{i + 1}</TableCell>
                 <TableCell>{doc?.name}</TableCell>
                 <TableCell>{doc?.description}</TableCell>
+                <TableCell>{doc?.category?.name}</TableCell>
                 <TableCell align='right'>
-                  <IconButton>
-                    <DeleteForeverIcon
-                      style={{ color: '#ea6655' }}
-                      onClick={() => deleteProduct(doc.id)}
-                    />
+                  <IconButton onClick={() => deleteProduct(doc.id)}>
+                    <DeleteForeverIcon style={{ color: '#ea6655' }} />
                   </IconButton>
                 </TableCell>
               </TableRow>
