@@ -4,40 +4,44 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
- * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
- * Last Modified time: July 2nd 2023, 12:55:28 pm
+ * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
+ * Last Modified time: July 4th 2023, 9:30:06 pm
  * ---------------------------------------------
  */
 
-import { useState } from 'react';
-import { Container, Grid, MenuItem, Select, TextField, Button, FormControl } from '@mui/material';
+// import { useState } from 'react';
+import {
+  Container,
+  // Grid, MenuItem, Select, TextField, Button, FormControl
+} from '@mui/material';
 
-import useOrder from '@/hooks/orders';
-import OrderCard from '@/components/OrderCard';
+// import useOrder from '@/hooks/orders';
+// import OrderCard from '@/components/OrderCard';
 
-import { OrderStatus } from '@/types/schema/order';
+// import { OrderStatus } from '@/types/schema/order';
 
-import moment from 'moment-timezone';
-import { useRouter } from 'next/navigation';
-moment.tz.setDefault('Asia/Manila');
+// import moment from 'moment-timezone';
+// import { useRouter } from 'next/navigation';
+// moment.tz.setDefault('Asia/Manila');
 
 export default function Dashboard() {
-  const { error, documents, searchOrder } = useOrder();
-  const [startDate, setStartDate] = useState(moment());
-  const [endDate, setEndDate] = useState(moment());
-  const [status, setStatus] = useState('default');
+  // const { error, documents, searchOrder } = useOrder();
+  // const [startDate, setStartDate] = useState(moment());
+  // const [endDate, setEndDate] = useState(moment());
+  // const [status, setStatus] = useState('default');
 
-  console.log({
-    orders: documents,
-  });
+  // console.log({
+  //   orders: documents,
+  // });
 
-  const onSearchOrder = async () => {
-    await searchOrder({ startDate, endDate, status: status === 'default' ? '' : status });
-  };
+  // const onSearchOrder = async () => {
+  //   await searchOrder({ startDate, endDate, status: status === 'default' ? '' : status });
+  // };
 
   return (
     <Container style={{ marginTop: '2rem', marginBottom: '2rem' }}>
-      <Grid container direction='column'>
+      {'ONGOING DEVELOPMENT'}
+      {/* <Grid container direction='column'>
         <Grid xs={12}>
           <TextField
             label='Filter Start Date'
@@ -84,7 +88,8 @@ export default function Dashboard() {
               sx={{
                 marginBottom: '20px',
                 backgroundColor: '#eeeeee',
-              }}>
+              }}
+            >
               <MenuItem value='default'>Filter Status</MenuItem>
               <MenuItem value={OrderStatus.COMPLETED}>Completed</MenuItem>
               <MenuItem value={OrderStatus.RECEIVED}>Received</MenuItem>
@@ -96,7 +101,12 @@ export default function Dashboard() {
         </Grid>
 
         <Grid xs={12}>
-          <Button variant='contained' fullWidth onClick={onSearchOrder} style={{ marginBottom: '30px' }}>
+          <Button
+            variant='contained'
+            fullWidth
+            onClick={onSearchOrder}
+            style={{ marginBottom: '30px' }}
+          >
             Search
           </Button>
         </Grid>
@@ -106,7 +116,7 @@ export default function Dashboard() {
             <OrderCard key={i} orderDetails={order} />
           ))}
         </Grid>
-      </Grid>
+      </Grid> */}
     </Container>
   );
 }

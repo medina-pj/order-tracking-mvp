@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 2nd 2023, 7:45:44 am
+ * Last Modified time: July 3rd 2023, 9:44:01 pm
  * ---------------------------------------------
  */
 
@@ -83,8 +83,6 @@ const useOrder = () => {
     if (status) {
       queries.push(where('status', '==', status));
     }
-
-    console.log({ queries });
 
     let ref = collection(db, constants.DB_ORDERS);
     let qry = query(ref, ...queries, orderBy('createdAt', 'desc'));
