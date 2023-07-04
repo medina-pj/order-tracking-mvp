@@ -68,9 +68,14 @@ const NavBar = () => {
               {'Orders'}
             </Typography>
           </MenuItem>
-          <MenuItem key={'Products'} onClick={handleCloseNavMenu}>
-            <Typography textAlign='center' component='a' href='/products'>
-              {'Products'}
+          <MenuItem key={'Store Products'} onClick={handleCloseNavMenu}>
+            <Typography textAlign='center' component='a' href='/stores/products'>
+              {'Store Products'}
+            </Typography>
+          </MenuItem>
+          <MenuItem key={'Tables'} onClick={handleCloseNavMenu}>
+            <Typography textAlign='center' component='a' href='/stores/tables'>
+              {'Tables'}
             </Typography>
           </MenuItem>
           <MenuItem key={'Stores'} onClick={handleCloseNavMenu}>
@@ -78,9 +83,9 @@ const NavBar = () => {
               {'Stores'}
             </Typography>
           </MenuItem>
-          <MenuItem key={'Tables'} onClick={handleCloseNavMenu}>
-            <Typography textAlign='center' component='a' href='/tables'>
-              {'Tables'}
+          <MenuItem key={'Products'} onClick={handleCloseNavMenu}>
+            <Typography textAlign='center' component='a' href='/products'>
+              {'Products'}
             </Typography>
           </MenuItem>
           <MenuItem key={'Category'} onClick={handleCloseNavMenu}>

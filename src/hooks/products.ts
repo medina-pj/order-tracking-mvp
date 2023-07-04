@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 4th 2023, 7:51:47 pm
+ * Last Modified time: July 4th 2023, 10:15:28 pm
  * ---------------------------------------------
  */
 
@@ -101,7 +101,9 @@ export const useProduct = () => {
         return () => unsub();
       }
     })();
-  }, [categories, fetchCategoryDetails]);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [categories]);
 
   const createDoc = async (payload: ISaveProduct): Promise<void> => {
     try {

@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Monday July 3rd 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 4th 2023, 9:15:21 pm
+ * Last Modified time: July 4th 2023, 10:15:44 pm
  * ---------------------------------------------
  */
 
@@ -74,7 +74,9 @@ const useStoreTable = () => {
         return () => unsub();
       }
     })();
-  }, [getStoreDetails, stores]);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stores]);
 
   const createDoc = async (payload: ISaveStoreTable): Promise<void> => {
     try {

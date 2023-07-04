@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Sunday July 2nd 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 3rd 2023, 9:34:35 pm
+ * Last Modified time: July 4th 2023, 10:18:22 pm
  * ---------------------------------------------
  */
 
@@ -19,11 +19,12 @@ import {
   addDoc,
   documentId,
   getDocs,
+  doc,
+  setDoc,
 } from 'firebase/firestore';
 
 import { db } from '@/config/firebase';
 import constants from '@/utils/constants';
-import useCategory from './categories';
 import useProduct from './products';
 import { StoreProductSchema } from '@/types/schema/store';
 import useStore from './store';
@@ -74,7 +75,6 @@ const useStoreProduct = () => {
   const { getProductDetails, documents: products } = useProduct();
   const { getStoreDetails, documents: stores } = useStore();
 
-  const [error, setError] = useState<any>(null);
   const [documents, setDocuments] = useState<IStoreProduct[]>([]);
 
   const fetchAddOns = useCallback(
@@ -109,8 +109,6 @@ const useStoreProduct = () => {
         let ref = collection(db, constants.DB_STORE_PRODUCT);
         let qry = query(ref, where('isArchived', '==', false));
 
-        //FIXME: FETCH ONLY STORES PRODUCTS
-
         //will invoke everytime database is updated in the cloud
         const unsub = onSnapshot(qry, async snapshot => {
           let results: IStoreProduct[] = [];
@@ -137,12 +135,12 @@ const useStoreProduct = () => {
         return () => unsub();
       }
     })();
-  }, [fetchAddOns, getProductDetails, getStoreDetails, products, stores]);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [products, stores]);
 
   const createDoc = async (payload: ISaveStoreProduct): Promise<void> => {
     try {
-      setError(null);
-
       const isAddOn = payload.isAddOn || false;
       const addOns = payload.addOns || [];
 
@@ -154,7 +152,7 @@ const useStoreProduct = () => {
         isAddOn: isAddOn,
         addOns: isAddOn ? [] : addOns,
         productAbbrev: payload.productAbbrev,
-        note: payload.note,
+        note: payload.note || '',
         createdAt: moment().toDate().getTime(),
         updatedAt: moment().toDate().getTime(),
         isArchived: false,
@@ -163,14 +161,29 @@ const useStoreProduct = () => {
       await addDoc(collection(db, constants.DB_STORE_PRODUCT), productPayload);
 
       return;
-    } catch (error: any) {
-      setError(error?.message);
-
-      return;
+    } catch (err: any) {
+      throw err;
     }
   };
 
-  return { createDoc, documents, error };
+  const deleteDoc = async (id: string): Promise<void> => {
+    try {
+      const docRef = doc(db, constants.DB_STORE_PRODUCT, id);
+
+      await setDoc(
+        docRef,
+        {
+          isArchived: true,
+          updatedAt: moment().toDate().getTime(),
+        },
+        { merge: true }
+      );
+    } catch (err: any) {
+      throw err;
+    }
+  };
+
+  return { createDoc, deleteDoc, documents };
 };
 
 export default useStoreProduct;
