@@ -4,15 +4,14 @@
  * ---------------------------------------------
  * Author: Rovelin Enriquez
  * Date:   Sunday July 2nd 2023
- * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
- * Last Modified time: July 2nd 2023, 5:12:56 pm
+ * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
+ * Last Modified time: July 4th 2023, 9:13:50 pm
  * ---------------------------------------------
  */
 
 import { useEffect, useState } from 'react';
 
 import useAdminAccount from '@/hooks/adminAccount';
-import useAuth from '@/hooks/auth';
 import useStore, { IStore } from '@/hooks/store';
 
 import {
@@ -32,10 +31,10 @@ import MultipleSelectChip from '@/components/MultipleSelect';
 import { SelectChangeEvent } from '@mui/material/Select';
 
 export default function Stores() {
-  const { userInfo } = useAuth();
-  const { error: storeError, documents: stores, createDoc, deleteDoc } = useStore();
-  const { error: userError, documents: users } = useAdminAccount(userInfo!);
+  const { documents: stores, createDoc, deleteDoc } = useStore();
+  const { documents: users } = useAdminAccount();
 
+  const [error, setError] = useState('');
   const [name, setName] = useState('');
   const [location, setLocation] = useState('');
   const [contactNumber, setContactNumber] = useState('');
@@ -50,38 +49,40 @@ export default function Stores() {
   }, [users]);
 
   const createStore = async () => {
-    if (!name) {
-      alert('Store name is required.');
-      return;
+    try {
+      if (!name) {
+        alert('Store name is required.');
+        return;
+      }
+
+      setError('');
+
+      const payload = {
+        name,
+        location,
+        contactNumber,
+        staff,
+      };
+      await createDoc(payload);
+
+      setName('');
+      setLocation('');
+      setContactNumber('');
+      setStaff([]);
+    } catch (err: any) {
+      setError(err?.message);
     }
-
-    const payload = {
-      name,
-      location,
-      contactNumber,
-      staff,
-    };
-    await createDoc(payload);
-
-    if (storeError) {
-      alert('Error occured.');
-      return;
-    }
-
-    setName('');
-    setLocation('');
-    setContactNumber('');
-    setStaff([]);
   };
 
   const deleteStore = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this record?')) return;
+    try {
+      setError('');
 
-    await deleteDoc(id);
+      if (!confirm('Are you sure you want to delete this record?')) return;
 
-    if (storeError) {
-      alert('Error occured.');
-      return;
+      await deleteDoc(id);
+    } catch (err: any) {
+      setError(err?.message);
     }
   };
 
@@ -89,6 +90,7 @@ export default function Stores() {
     const {
       target: { value },
     } = event;
+
     setStaff(
       // On autofill we get a stringified value.
       typeof value === 'string' ? value.split(',') : value
@@ -123,8 +125,14 @@ export default function Stores() {
         <InputField label='Name' value={name} onChange={setName} />
         <InputField label='Location' value={location} onChange={setLocation} />
         <InputField label='Contact Number' value={contactNumber} onChange={setContactNumber} />
-        <MultipleSelectChip label='Staff' value={staff} onChange={handleStaffChange} options={staffOptions} />
+        <MultipleSelectChip
+          label='Staff'
+          value={staff}
+          onChange={handleStaffChange}
+          options={staffOptions}
+        />
         <Button label='Save Store' onClick={createStore} />
+        <p>{error}</p>
       </Container>
       <TableContainer>
         <Table>

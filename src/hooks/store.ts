@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Friday June 9th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 2nd 2023, 9:08:51 pm
+ * Last Modified time: July 4th 2023, 9:07:43 pm
  * ---------------------------------------------
  */
 
@@ -34,7 +34,6 @@ export interface IStore extends ISaveStore, IUpdateStore {
 }
 
 const useStore = () => {
-  const [error, setError] = useState<any>(null);
   const [documents, setDocuments] = useState<IStore[]>([]);
 
   useEffect(() => {
@@ -74,8 +73,6 @@ const useStore = () => {
 
   const createDoc = async (payload: ISaveStore): Promise<void> => {
     try {
-      setError(null);
-
       const storePayload: StoreSchema = {
         name: payload.name,
         location: payload?.location || '',
@@ -89,17 +86,13 @@ const useStore = () => {
       await addDoc(collection(db, constants.DB_STORE), storePayload);
 
       return;
-    } catch (error: any) {
-      setError(error?.message);
-
-      return;
+    } catch (err: any) {
+      throw err;
     }
   };
 
   const deleteDoc = async (id: string): Promise<void> => {
     try {
-      setError(null);
-
       const docRef = doc(db, constants.DB_STORE, id);
 
       await setDoc(
@@ -112,17 +105,13 @@ const useStore = () => {
       );
 
       return;
-    } catch (error: any) {
-      setError(error?.message);
-
-      return;
+    } catch (err: any) {
+      throw err;
     }
   };
 
   const updateDoc = async (payload: IUpdateStore): Promise<void> => {
     try {
-      setError(null);
-
       const docRef = doc(db, constants.DB_STORE, payload.id);
 
       await setDoc(
@@ -138,14 +127,12 @@ const useStore = () => {
       );
 
       return;
-    } catch (error: any) {
-      setError(error?.message);
-
-      return;
+    } catch (err: any) {
+      throw err;
     }
   };
 
-  return { error, documents, createDoc, deleteDoc, updateDoc, getStoreDetails };
+  return { documents, createDoc, deleteDoc, updateDoc, getStoreDetails };
 };
 
 export default useStore;

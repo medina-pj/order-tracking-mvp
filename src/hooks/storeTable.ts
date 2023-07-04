@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Monday July 3rd 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 3rd 2023, 9:38:21 pm
+ * Last Modified time: July 4th 2023, 9:15:21 pm
  * ---------------------------------------------
  */
 
@@ -44,7 +44,6 @@ export interface IStoreTable {
 
 const useStoreTable = () => {
   const { documents: stores, getStoreDetails } = useStore();
-  const [error, setError] = useState<any>(null);
   const [documents, setDocuments] = useState<IStoreTable[]>([]);
 
   useEffect(() => {
@@ -52,8 +51,6 @@ const useStoreTable = () => {
       if (stores.length) {
         let ref = collection(db, constants.DB_STORE_TABLE);
         let qry = query(ref, where('isArchived', '==', false));
-
-        //FIXME: FETCH ONLY STORES TABLES
 
         //will invoke everytime database is updated in the cloud
         const unsub = onSnapshot(qry, async snapshot => {
@@ -81,8 +78,6 @@ const useStoreTable = () => {
 
   const createDoc = async (payload: ISaveStoreTable): Promise<void> => {
     try {
-      setError(null);
-
       const tablePayload: StoreTableSchema = {
         storeId: payload.storeId,
         name: payload.name,
@@ -94,15 +89,13 @@ const useStoreTable = () => {
       };
 
       await addDoc(collection(db, constants.DB_STORE_TABLE), tablePayload);
-    } catch (error: any) {
-      setError(error?.message);
+    } catch (err: any) {
+      throw err;
     }
   };
 
   const updateDoc = async (payload: IUpdateStoreTable): Promise<void> => {
     try {
-      setError(null);
-
       const docRef = doc(db, constants.DB_STORE_TABLE, payload.id);
 
       await setDoc(
@@ -115,15 +108,13 @@ const useStoreTable = () => {
         },
         { merge: true }
       );
-    } catch (error: any) {
-      setError(error?.message);
+    } catch (err: any) {
+      throw err;
     }
   };
 
   const deleteDoc = async (id: string): Promise<void> => {
     try {
-      setError(null);
-
       const docRef = doc(db, constants.DB_STORE_TABLE, id);
 
       await setDoc(
@@ -134,12 +125,12 @@ const useStoreTable = () => {
         },
         { merge: true }
       );
-    } catch (error: any) {
-      setError(error?.message);
+    } catch (err: any) {
+      throw err;
     }
   };
 
-  return { error, documents, createDoc, updateDoc, deleteDoc };
+  return { documents, createDoc, updateDoc, deleteDoc };
 };
 
 export default useStoreTable;

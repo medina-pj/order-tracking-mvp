@@ -4,16 +4,19 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Sunday June 11th 2023
- * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
- * Last Modified time: July 2nd 2023, 4:53:22 pm
+ * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
+ * Last Modified time: July 4th 2023, 9:23:46 pm
  * ---------------------------------------------
  */
 
 import { useState } from 'react';
-import useTable from '@/hooks/tables';
 import {
   Container,
+  FormControl,
   IconButton,
+  InputLabel,
+  MenuItem,
+  Select,
   Table,
   TableBody,
   TableCell,
@@ -25,53 +28,72 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 
 import InputField from '@/components/TextField';
 import Button from '@/components/Button';
+import useStoreTable from '@/hooks/storeTable';
+import useStore from '@/hooks/store';
 
 export default function Tables() {
-  const { error, documents, createDoc, deleteDoc } = useTable();
+  const { documents: stores } = useStore();
+  const { documents, createDoc, deleteDoc } = useStoreTable();
 
+  const [error, setError] = useState('');
+  const [store, setStore] = useState('');
   const [name, setName] = useState('');
+  const [capacity, setCapacity] = useState(0);
 
   const createTable = async () => {
-    if (!name) {
-      alert('Name & Description is required.');
-      return;
+    try {
+      if (!name) {
+        alert('Name is required.');
+        return;
+      }
+
+      await createDoc({ storeId: store, name, capacity });
+      setName('');
+      setCapacity(0);
+    } catch (err: any) {
+      setError(err?.message);
     }
-
-    await createDoc({ name });
-
-    if (error) {
-      alert('Error occured.');
-      return;
-    }
-
-    setName('');
   };
 
   const deleteTable = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this record?')) return;
-
-    await deleteDoc(id);
-
-    if (error) {
-      alert('Error occured.');
-      return;
+    try {
+      if (!confirm('Are you sure you want to delete this record?')) return;
+      await deleteDoc(id);
+    } catch (err: any) {
+      setError(err?.message);
     }
   };
-
-  console.log({
-    categories: documents,
-  });
 
   return (
     <Container style={{ marginTop: '2rem' }}>
       <InputField label='Name' value={name} onChange={setName} />
+      <InputField label='Capacity' value={capacity} onChange={setCapacity} />
+      <FormControl fullWidth style={{ marginBottom: '20px' }}>
+        <InputLabel id='store-select'>Store</InputLabel>
+        <Select
+          labelId='store-select'
+          id='store-select-id'
+          value={store}
+          label='Select Store'
+          onChange={e => setStore(e.target.value)}
+        >
+          {stores.map(store => (
+            <MenuItem key={store.id} value={store.id}>
+              {store.name}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
       <Button label='Save Table' onClick={createTable} />
+      <p>{error}</p>
       <TableContainer>
         <Table>
           <TableHead>
             <TableRow>
               <TableCell>#</TableCell>
               <TableCell>Name</TableCell>
+              <TableCell>Capacity</TableCell>
+              <TableCell>Store</TableCell>
               <TableCell align='right'></TableCell>
             </TableRow>
           </TableHead>
@@ -80,6 +102,8 @@ export default function Tables() {
               <TableRow key={i}>
                 <TableCell>{i + 1}</TableCell>
                 <TableCell>{doc?.name}</TableCell>
+                <TableCell>{doc?.capacity}</TableCell>
+                <TableCell>{doc?.store?.name}</TableCell>
                 <TableCell align='right'>
                   <IconButton onClick={() => deleteTable(doc.id)}>
                     <DeleteForeverIcon style={{ color: '#ea6655' }} />
