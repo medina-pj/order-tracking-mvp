@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Monday July 3rd 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 4th 2023, 10:15:44 pm
+ * Last Modified time: July 6th 2023, 11:25:16 pm
  * ---------------------------------------------
  */
 
@@ -16,12 +16,11 @@ import { collection, query, onSnapshot, where, addDoc, setDoc, doc } from 'fireb
 import { db } from '@/config/firebase';
 import constants from '@/utils/constants';
 import { StoreTableSchema } from '@/types/schema/store';
-import useStore from './store';
+import StoreService from '@/services/stores';
 
 export interface ISaveStoreTable {
   name: string;
   storeId: string;
-  capacity?: number;
 }
 
 export interface IUpdateStoreTable extends ISaveStoreTable {
@@ -43,47 +42,43 @@ export interface IStoreTable {
 }
 
 const useStoreTable = () => {
-  const { documents: stores, getStoreDetails } = useStore();
   const [documents, setDocuments] = useState<IStoreTable[]>([]);
 
   useEffect(() => {
     (async function () {
-      if (stores.length) {
-        let ref = collection(db, constants.DB_STORE_TABLE);
-        let qry = query(ref, where('isArchived', '==', false));
+      let ref = collection(db, constants.DB_STORE_TABLE);
+      let qry = query(ref, where('isArchived', '==', false));
 
-        //will invoke everytime database is updated in the cloud
-        const unsub = onSnapshot(qry, async snapshot => {
-          let results: IStoreTable[] = [];
+      //will invoke everytime database is updated in the cloud
+      const unsub = onSnapshot(qry, async snapshot => {
+        let results: IStoreTable[] = [];
 
-          for (const doc of snapshot.docs) {
-            results.push({
-              id: doc.id,
-              store: getStoreDetails(doc.data()?.storeId),
-              name: doc.data()?.name,
-              isAvailable: doc.data()?.isAvailable,
-              capacity: doc.data()?.capacity,
-              createdAt: moment(doc.data()?.createdAt).format('MMM DD, YYYY hh:mma'),
-              updatedAt: moment(doc.data()?.updatedAt).format('MMM DD, YYYY hh:mma'),
-            });
-          }
+        for (const doc of snapshot.docs) {
+          const storeDetails = await StoreService.fetchStore(doc.data()?.storeId);
 
-          setDocuments(results);
-        });
+          results.push({
+            id: doc.id,
+            store: storeDetails,
+            name: doc.data()?.name,
+            isAvailable: doc.data()?.isAvailable,
+            capacity: doc.data()?.capacity,
+            createdAt: moment(doc.data()?.createdAt).format('MMM DD, YYYY hh:mma'),
+            updatedAt: moment(doc.data()?.updatedAt).format('MMM DD, YYYY hh:mma'),
+          });
+        }
 
-        return () => unsub();
-      }
+        setDocuments(results);
+      });
+
+      return () => unsub();
     })();
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stores]);
+  }, []);
 
   const createDoc = async (payload: ISaveStoreTable): Promise<void> => {
     try {
       const tablePayload: StoreTableSchema = {
         storeId: payload.storeId,
         name: payload.name,
-        capacity: payload.capacity || 0,
         isAvailble: true,
         createdAt: moment().toDate().getTime(),
         updatedAt: moment().toDate().getTime(),
@@ -104,7 +99,6 @@ const useStoreTable = () => {
         docRef,
         {
           name: payload.name,
-          capacity: payload.capacity,
           isAvailble: payload.isAvailable,
           updatedAt: moment().toDate().getTime(),
         },

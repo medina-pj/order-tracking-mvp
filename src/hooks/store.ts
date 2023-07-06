@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Friday June 9th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 4th 2023, 9:07:43 pm
+ * Last Modified time: July 6th 2023, 11:24:10 pm
  * ---------------------------------------------
  */
 
@@ -61,15 +61,6 @@ const useStore = () => {
 
     return () => unsub();
   }, []);
-
-  const getStoreDetails = (id: string) => {
-    const store: IStore | undefined = documents.find((d: any) => d.id === id);
-
-    return {
-      id,
-      name: store?.name,
-    };
-  };
 
   const createDoc = async (payload: ISaveStore): Promise<void> => {
     try {
@@ -132,7 +123,7 @@ const useStore = () => {
     }
   };
 
-  return { documents, createDoc, deleteDoc, updateDoc, getStoreDetails };
+  return { documents, createDoc, deleteDoc, updateDoc };
 };
 
 export default useStore;

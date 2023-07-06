@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Sunday July 2nd 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 3rd 2023, 10:50:45 pm
+ * Last Modified time: July 6th 2023, 9:31:44 pm
  * ---------------------------------------------
  */
 
@@ -28,7 +28,7 @@ import { useEffect, useState } from 'react';
 import { UserSchema } from '@/types/schema/user';
 import useAuth from './auth';
 
-export interface IAdminSignUp {
+export interface ICreateAccount {
   username: string;
   password: string;
   name: string;
@@ -36,7 +36,7 @@ export interface IAdminSignUp {
   userType?: string;
 }
 
-export interface IAdminUpdate {
+export interface IUpdateAccount {
   id: string;
   name: string;
   contactNumber: string;
@@ -80,7 +80,7 @@ const useAdminAccount = () => {
     }
   }, [userInfo]);
 
-  const createAccount = async (payload: IAdminSignUp): Promise<void> => {
+  const createAccount = async (payload: ICreateAccount): Promise<void> => {
     try {
       if (userInfo !== null && userInfo?.userType === 'admin') {
         // create firebase auth account
@@ -116,7 +116,7 @@ const useAdminAccount = () => {
     }
   };
 
-  const updateAccount = async (payload: IAdminUpdate): Promise<void> => {
+  const updateAccount = async (payload: IUpdateAccount): Promise<void> => {
     try {
       if (userInfo !== null && userInfo?.userType === 'admin') {
         const docRef = doc(db, constants.DB_ADMINS, payload.id);

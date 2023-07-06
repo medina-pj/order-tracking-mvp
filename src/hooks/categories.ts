@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Friday June 9th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 4th 2023, 7:47:27 pm
+ * Last Modified time: July 6th 2023, 10:01:55 pm
  * ---------------------------------------------
  */
 
@@ -19,6 +19,7 @@ import constants from '@/utils/constants';
 
 export interface ISaveCategory {
   name: string;
+  sequence: number;
   description?: string;
 }
 
@@ -46,6 +47,7 @@ const useCategory = () => {
         results.push({
           id: doc.id,
           name: doc.data()?.name,
+          sequence: doc.data()?.sequence,
           description: doc.data()?.description,
           createdAt: moment(doc.data()?.createdAt).format('MMM DD, YYYY hh:mma'),
           updatedAt: moment(doc.data()?.updatedAt).format('MMM DD, YYYY hh:mma'),
@@ -62,6 +64,7 @@ const useCategory = () => {
     try {
       const categoryPayload: CategorySchema = {
         name: payload.name,
+        sequence: payload.sequence,
         description: payload?.description || '',
         createdAt: moment().toDate().getTime(),
         updatedAt: moment().toDate().getTime(),
