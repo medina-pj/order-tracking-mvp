@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 6th 2023, 11:06:51 pm
+ * Last Modified time: July 8th 2023, 1:48:09 pm
  * ---------------------------------------------
  */
 
@@ -17,10 +17,9 @@ import { db } from '@/config/firebase';
 import { ProductSchema } from '@/types/schema/product';
 import constants from '@/utils/constants';
 import generateNanoId from '@/utils/generateNanoId';
-import ProductService from '@/services/products';
+import ProductService, { ISubMenu } from '@/services/products';
 
 export interface ISaveProduct {
-  id?: string;
   categoryId: string;
   storeId: string;
   productAbbrev: string;
@@ -56,15 +55,9 @@ export interface IProduct {
   isAvailable: boolean;
   description: string;
   note: string;
-  subMenu: string[];
+  subMenu: ISubMenu[];
   createdAt: string;
   updatedAt: string;
-  // subMenu: {
-  //   productCode: string;
-  //   productAbbrev: string;
-  //   productName: string;
-  //   price: string;
-  // }[];
 }
 
 export const useProduct = () => {

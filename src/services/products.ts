@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Thursday July 6th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 6th 2023, 11:03:17 pm
+ * Last Modified time: July 8th 2023, 1:52:27 pm
  * ---------------------------------------------
  */
 import moment from 'moment-timezone';
@@ -17,6 +17,15 @@ import CategoryService from './categories';
 import StoreService from './stores';
 import { IProduct } from '@/hooks/products';
 
+export interface ISubMenu {
+  productId: string;
+  productCode: string;
+  productName: string;
+  productAbbrev: string;
+  price: number;
+  isAvailable: boolean;
+}
+
 const ProductService = {
   fetchProducts: async (ids: string[], populateReferences = false): Promise<IProduct[]> => {
     try {
@@ -29,10 +38,15 @@ const ProductService = {
       for (const doc of qrySnapshot.docs) {
         let category = doc.data()?.categoryId;
         let store = doc.data()?.storeId;
+        let subMenu = doc.data()?.subMenu;
 
         if (populateReferences) {
           category = await CategoryService.fetchCategory(category);
           store = await StoreService.fetchStore(store);
+        }
+
+        if (!doc.data()?.isAddons && subMenu.length && populateReferences) {
+          subMenu = await ProductService.fetchSubMenu(subMenu);
         }
 
         result.push({
@@ -47,7 +61,7 @@ const ProductService = {
           isAddons: doc.data()?.isAddons,
           description: doc.data()?.description,
           note: doc.data()?.note,
-          subMenu: doc.data()?.subMenu,
+          subMenu,
           createdAt: moment(doc.data()?.createdAt).format('MMM DD, YYYY hh:mma'),
           updatedAt: moment(doc.data()?.updatedAt).format('MMM DD, YYYY hh:mma'),
         });
@@ -91,35 +105,32 @@ const ProductService = {
     }
   },
 
-  fetchProductByProductCodes: async (productCodes: string[]): Promise<ProductSchema[]> => {
+  fetchSubMenu: async (groupProductIds: string[]): Promise<ISubMenu[]> => {
     try {
-      let result: ProductSchema[] = [];
-      const ref = collection(db, constants.DB_PRODUCTS);
+      let result: ISubMenu[] = [];
+      const ref = collection(db, constants.DB_GROUPED_PRODUCT);
       const qry = query(
         ref,
         where('isArchived', '==', false),
-        where('productCode', 'in', productCodes)
+        where(documentId(), 'in', groupProductIds)
       );
 
       const qrySnapshot = await getDocs(qry);
 
       for (const doc of qrySnapshot.docs) {
-        result.push({
-          id: doc.id,
-          productCode: doc.data()?.productCode,
-          categoryId: doc.data()?.categoryId,
-          storeId: doc.data()?.storeId,
-          productAbbrev: doc.data()?.productAbbrev,
-          name: doc.data()?.name,
-          price: doc.data()?.price,
-          isAvailable: doc.data()?.isAvailable,
-          isAddons: doc.data()?.isAddons,
-          description: doc.data()?.description,
-          note: doc.data()?.note,
-          subMenu: doc.data()?.subMenu,
-          createdAt: doc.data()?.createdAt,
-          updatedAt: doc.data()?.createdAt,
-        });
+        const productIds = doc.data()?.products.map((d: any) => d.productId);
+        const products = await ProductService.fetchProducts(productIds);
+
+        const productDetails = products.map((d: any) => ({
+          productId: d.id,
+          productCode: d.productCode,
+          productName: d.productName,
+          productAbbrev: d.productAbbrev,
+          price: d.price,
+          isAvailable: d.isAvailable,
+        }));
+
+        result.push(...productDetails);
       }
 
       return result;

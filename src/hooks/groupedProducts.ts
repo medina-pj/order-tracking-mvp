@@ -1,0 +1,144 @@
+/*
+ * ---------------------------------------------
+ * Author: PJ Medina
+ * Date:   Saturday June 10th 2023
+ * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
+ * Last Modified time: July 8th 2023, 1:46:03 pm
+ * ---------------------------------------------
+ */
+
+import { useState, useEffect } from 'react';
+import moment from 'moment-timezone';
+moment.tz.setDefault('Asia/Manila');
+
+import { collection, query, onSnapshot, where, addDoc, doc, setDoc } from 'firebase/firestore';
+
+import { db } from '@/config/firebase';
+import { GroupedProductSchema } from '@/types/schema/product';
+import constants from '@/utils/constants';
+import generateNanoId from '@/utils/generateNanoId';
+import ProductService, { ISubMenu } from '@/services/products';
+
+export interface ISaveGroupedProduct {
+  name: string;
+  sequence: number;
+  description: string;
+  products: {
+    productId: string;
+    price: number;
+  }[];
+}
+
+export interface IUpdateGroupedProduct extends ISaveGroupedProduct {
+  id: string;
+}
+
+export interface IGroupedProduct {
+  id: string;
+  groupedProductCode: string;
+  name: string;
+  sequence: number;
+  description: string;
+  products: ISubMenu[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export const useGroupedProduct = () => {
+  const [documents, setDocuments] = useState<IGroupedProduct[]>([]);
+
+  useEffect(() => {
+    (async function () {
+      let ref = collection(db, constants.DB_GROUPED_PRODUCT);
+      let qry = query(ref, where('isArchived', '==', false));
+
+      //will invoke everytime database is updated in the cloud
+      const unsub = onSnapshot(qry, async snapshot => {
+        let results: IGroupedProduct[] = [];
+
+        for (const doc of snapshot.docs) {
+          const productIds = doc.data()?.products.map((d: any) => d.productId);
+          const productDetails = await ProductService.fetchProducts(productIds);
+
+          results.push({
+            id: doc.id,
+            groupedProductCode: doc.data()?.groupedProductCode,
+            name: doc.data()?.name,
+            sequence: doc.data()?.sequence,
+            description: doc.data()?.description,
+            products: await ProductService.fetchSubMenu([doc.id]),
+            createdAt: moment(doc.data()?.createdAt).format('MMM DD, YYYY hh:mma'),
+            updatedAt: moment(doc.data()?.updatedAt).format('MMM DD, YYYY hh:mma'),
+          });
+        }
+
+        setDocuments(results);
+      });
+
+      return () => unsub();
+    })();
+  }, []);
+
+  const createDoc = async (payload: ISaveGroupedProduct): Promise<void> => {
+    try {
+      const productPayload: GroupedProductSchema = {
+        groupedProductCode: generateNanoId(8),
+        name: payload.name,
+        description: payload.description,
+        sequence: payload.sequence,
+        products: payload.products,
+        isArchived: false,
+        createdAt: moment().toDate().getTime(),
+        updatedAt: moment().toDate().getTime(),
+      };
+
+      await addDoc(collection(db, constants.DB_GROUPED_PRODUCT), productPayload);
+    } catch (err: any) {
+      throw err;
+    }
+  };
+
+  const deleteDoc = async (id: string): Promise<void> => {
+    try {
+      const docRef = doc(db, constants.DB_GROUPED_PRODUCT, id);
+
+      await setDoc(
+        docRef,
+        {
+          isArchived: true,
+          updatedAt: moment().toDate().getTime(),
+        },
+        { merge: true }
+      );
+
+      return;
+    } catch (err: any) {
+      throw err;
+    }
+  };
+
+  const updateDoc = async (payload: IUpdateGroupedProduct): Promise<void> => {
+    try {
+      const docRef = doc(db, constants.DB_GROUPED_PRODUCT, payload.id);
+
+      await setDoc(
+        docRef,
+        {
+          name: payload.name,
+          description: payload.description,
+          sequence: payload.sequence,
+          products: payload.products,
+        },
+        { merge: true }
+      );
+
+      return;
+    } catch (err: any) {
+      throw err;
+    }
+  };
+
+  return { documents, createDoc, deleteDoc, updateDoc };
+};
+
+export default useGroupedProduct;
