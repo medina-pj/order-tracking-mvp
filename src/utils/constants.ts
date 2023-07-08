@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Friday June 9th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 8th 2023, 1:21:17 pm
+ * Last Modified time: July 8th 2023, 4:26:00 pm
  * ---------------------------------------------
  */
 
@@ -17,10 +17,8 @@ const constants = {
   DB_CATEGORIES: 'categories',
   DB_PRODUCTS: 'products',
   DB_ORDERS: 'orders',
-  DB_TABLES: 'tables',
   DB_ADMINS: 'admins',
   DB_STORE: 'stores',
-  DB_STORE_PRODUCT: 'store_products',
   DB_STORE_TABLE: 'store_table',
   DB_GROUPED_PRODUCT: 'grouped_products',
 };

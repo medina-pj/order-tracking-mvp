@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 8th 2023, 1:48:09 pm
+ * Last Modified time: July 8th 2023, 4:10:11 pm
  * ---------------------------------------------
  */
 
@@ -83,7 +83,7 @@ export const useProduct = () => {
   const createDoc = async (payload: ISaveProduct): Promise<void> => {
     try {
       const productPayload: ProductSchema = {
-        productCode: generateNanoId(8),
+        productCode: generateNanoId(),
         categoryId: payload.categoryId,
         storeId: payload.categoryId,
         productAbbrev: payload.productAbbrev,

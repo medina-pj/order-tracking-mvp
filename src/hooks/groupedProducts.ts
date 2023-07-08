@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 8th 2023, 1:46:03 pm
+ * Last Modified time: July 8th 2023, 4:10:20 pm
  * ---------------------------------------------
  */
 
@@ -82,7 +82,7 @@ export const useGroupedProduct = () => {
   const createDoc = async (payload: ISaveGroupedProduct): Promise<void> => {
     try {
       const productPayload: GroupedProductSchema = {
-        groupedProductCode: generateNanoId(8),
+        groupedProductCode: generateNanoId(),
         name: payload.name,
         description: payload.description,
         sequence: payload.sequence,

@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 8th 2023, 2:39:23 pm
+ * Last Modified time: July 8th 2023, 4:17:45 pm
  * ---------------------------------------------
  */
 
@@ -22,7 +22,8 @@ export enum OrderStatusEnum {
   CANCELLED = 'cancelled',
 }
 
-export type CartAddOnsSchema = {
+export type TCartAddOns = {
+  id: string; //use uuid() in fe to generate an id
   productId: string;
   productCode: string;
   productName: string;
@@ -32,7 +33,8 @@ export type CartAddOnsSchema = {
   voided: boolean; // default false
 };
 
-export type CartItemsSchema = {
+export type TCartItems = {
+  id: string; //use uuid() in fe to generate an id
   productId: string;
   productCode: string;
   productName: string;
@@ -40,19 +42,24 @@ export type CartItemsSchema = {
   price: number;
   quantity: number;
   notes: number;
-  addOns: CartAddOnsSchema[];
+  addOns: TCartAddOns[];
   voided: boolean; // default false
 };
 
-export type OrderHistorySchema = {
+export type TOrderHistory = {
   action: string;
   actor: string;
   timestamp: number;
 };
 
-export type DiscountSchema = {
+export type TDiscount = {
   type: string;
   amount: number;
+};
+
+export type TOrderData = {
+  orderedOnline?: boolean;
+  onlineOrderPlatform?: string;
 };
 
 export type OrderSchema = {
@@ -64,15 +71,11 @@ export type OrderSchema = {
   customerNotes: string;
   type: OrderTypeEnum;
   status: OrderStatusEnum;
-  items: CartItemsSchema[];
-  history: OrderHistorySchema[];
-  discount: DiscountSchema[];
-  data: {
-    orderedOnline?: boolean;
-    onlineOrderPlatform?: string;
-  };
+  items: TCartItems[];
+  history: TOrderHistory[];
+  discount: TDiscount[];
+  data: TOrderData;
   orderPaid: boolean;
   createdAt?: number;
   updatedAt?: number;
-  isArchived?: boolean;
 };

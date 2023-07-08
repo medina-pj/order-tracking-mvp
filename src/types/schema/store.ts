@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Saturday July 1st 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 6th 2023, 11:07:22 pm
+ * Last Modified time: July 8th 2023, 4:27:12 pm
  * ---------------------------------------------
  */
 
@@ -23,7 +23,7 @@ export type StoreTableSchema = {
   storeId: string;
   name: string;
   isAvailble: boolean;
-  createdAt: number;
-  updatedAt: number;
-  isArchived: boolean;
+  createdAt?: number;
+  updatedAt?: number;
+  isArchived?: boolean;
 };
