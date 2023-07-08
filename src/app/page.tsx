@@ -4,8 +4,8 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
- * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 3rd 2023, 9:58:53 pm
+ * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
+ * Last Modified time: July 8th 2023, 12:00:15 pm
  * ---------------------------------------------
  */
 
@@ -13,7 +13,7 @@ import { useState } from 'react';
 import { Container } from '@mui/material';
 import Button from '@/components/Button';
 import InputField from '@/components/TextField';
-
+import Image from 'next/image';
 import useAuth from '@/hooks/auth';
 
 import { useRouter } from 'next/navigation';
@@ -46,11 +46,23 @@ export default function Login() {
 
   return (
     <Container style={{ marginTop: '2rem', marginBottom: '2rem' }}>
-      <p>Login Popsi App</p>
+      <div>
+        <Image
+          src={'/popsilog.jpeg'}
+          alt='popsi'
+          width={200}
+          height={200}
+          style={{ display: 'block', marginLeft: 'auto', marginRight: 'auto' }}
+        />
+      </div>
+
       <InputField label='Username' value={username} onChange={setUsername} />
       <InputField label='Password' value={password} onChange={setPassword} type='password' />
-      <Button label='Login' onClick={onLogin} />
-      <p>{error}</p>
+
+      <div style={{ marginTop: '15px' }}>
+        <Button label='Login' onClick={onLogin} />
+        <p>{error}</p>
+      </div>
     </Container>
   );
 }

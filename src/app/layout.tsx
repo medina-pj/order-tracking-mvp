@@ -2,15 +2,16 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Saturday July 1st 2023
- * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 2nd 2023, 8:43:35 am
+ * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
+ * Last Modified time: July 6th 2023, 11:40:54 pm
  * ---------------------------------------------
  */
 
 import AuthWrapper from '@/components/AuthWrapper';
-import { Inter } from 'next/font/google';
 
-const inter = Inter({ subsets: ['latin'] });
+import { Jost } from 'next/font/google';
+
+const jost = Jost({ subsets: ['latin'] });
 
 export const metadata = {
   title: 'Create Next App',
@@ -20,7 +21,7 @@ export const metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang='en'>
-      <body className={inter.className} style={{ margin: 0, padding: 0 }}>
+      <body className={jost.className} style={{ margin: 0, padding: 0 }}>
         <AuthWrapper>{children}</AuthWrapper>
       </body>
     </html>

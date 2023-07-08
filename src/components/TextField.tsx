@@ -2,8 +2,8 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Sunday June 11th 2023
- * Last Modified by: PJ Medina - <paulo@healthnow.ph>
- * Last Modified time: June 24th 2023, 10:55:17 pm
+ * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
+ * Last Modified time: July 7th 2023, 9:04:25 pm
  * ---------------------------------------------
  */
 
@@ -26,16 +26,27 @@ const InputField = ({
   };
 
   return (
-    <TextField
-      size='small'
-      label={label}
-      fullWidth={true}
-      variant='outlined'
-      type={type}
-      style={style}
-      value={value}
-      onChange={e => onChange(e.target.value)}
-    />
+    <>
+      <p style={{ marginBottom: '5px', fontSize: '18px' }}>{label}</p>
+      <TextField
+        size='medium'
+        fullWidth={true}
+        variant='filled'
+        type={type}
+        style={style}
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        InputProps={{
+          hiddenLabel: true,
+          disableUnderline: true,
+          style: {
+            fontSize: '18px',
+            fontFamily: 'inherit',
+            borderRadius: '4px',
+          },
+        }}
+      />
+    </>
   );
 };
 

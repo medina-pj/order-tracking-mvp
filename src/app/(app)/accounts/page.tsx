@@ -4,8 +4,8 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
- * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 3rd 2023, 10:53:57 pm
+ * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
+ * Last Modified time: July 8th 2023, 11:38:24 am
  * ---------------------------------------------
  */
 
@@ -13,22 +13,11 @@ import moment from 'moment-timezone';
 moment.tz.setDefault('Asia/Manila');
 
 import { useState } from 'react';
-import {
-  Container,
-  MenuItem,
-  Select,
-  FormControl,
-  TableContainer,
-  TableHead,
-  Table,
-  TableCell,
-  TableRow,
-  TableBody,
-  InputLabel,
-} from '@mui/material';
+import { Container, TableContainer, TableHead, Table, TableCell, TableRow, TableBody } from '@mui/material';
 
 import InputField from '@/components/TextField';
 import Button from '@/components/Button';
+import DropdownField from '@/components/Dropdown';
 import useAdminAccount from '@/hooks/adminAccount';
 
 export default function ManageAccount() {
@@ -79,19 +68,16 @@ export default function ManageAccount() {
       />
       <InputField label='Name' value={name} onChange={setName} />
       <InputField label='Contact Number' value={contactNumber} onChange={setContactNumber} />
-      <FormControl fullWidth style={{ marginBottom: '20px' }}>
-        <InputLabel id='category-select'>User Type</InputLabel>
-        <Select
-          labelId='user-type-select'
-          id='user-type-select-id'
-          value={userType}
-          label='Select user type'
-          onChange={e => setUserType(e.target.value)}
-        >
-          <MenuItem value={'staff'}>Staff</MenuItem>
-          <MenuItem value={'admin'}>Admin</MenuItem>
-        </Select>
-      </FormControl>
+
+      <DropdownField
+        label='User Type'
+        value={userType}
+        onChange={setUserType}
+        options={[
+          { value: 'staff', label: 'Staff' },
+          { value: 'admin', label: 'Admin' },
+        ]}
+      />
       <Button label='Create Account' onClick={onCreateAccount} />
       <p>{error}</p>
 

@@ -3,7 +3,7 @@
  * Author: Rovelin Enriquez
  * Date:   Sunday July 2nd 2023
  * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
- * Last Modified time: July 2nd 2023, 4:19:39 pm
+ * Last Modified time: July 7th 2023, 8:43:04 pm
  * ---------------------------------------------
  */
 
@@ -51,16 +51,22 @@ export default function MultipleSelectChip({
   const theme = useTheme();
 
   return (
-    <div>
+    <div style={{ marginBottom: '20px' }}>
+      <p style={{ marginBottom: '5px', fontSize: '18px' }}>{label}</p>
       <FormControl style={{ marginBottom: '0.5rem', minWidth: '100%' }}>
-        <InputLabel id='multi-select-label'>{label}</InputLabel>
+        {/* <InputLabel id='multi-select-label'>{}</InputLabel> */}
         <Select
           labelId='multi-select-label'
           id='multi-select'
           multiple
           value={value}
           onChange={onChange}
-          input={<OutlinedInput id='select-multiple' label={label} />}
+          input={
+            <OutlinedInput
+              id='select-multiple'
+              // label={label}
+            />
+          }
           renderValue={selected => (
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
               {selected.map(value => (

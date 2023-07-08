@@ -30,7 +30,7 @@ const NavBar = () => {
   console.log(userInfo);
 
   return (
-    <AppBar position='sticky'>
+    <AppBar position='sticky' style={{ height: '60px', backgroundColor: '#101932' }}>
       <Toolbar variant='dense'>
         <IconButton
           size='large'
@@ -38,8 +38,7 @@ const NavBar = () => {
           aria-controls='menu-appbar'
           aria-haspopup='true'
           onClick={handleOpenNavMenu}
-          color='inherit'
-        >
+          color='inherit'>
           <MenuIcon />
         </IconButton>
         <Menu
@@ -56,8 +55,7 @@ const NavBar = () => {
             horizontal: 'right',
           }}
           open={Boolean(anchorElNav)}
-          onClose={handleCloseNavMenu}
-        >
+          onClose={handleCloseNavMenu}>
           <MenuItem key={'Home'} onClick={handleCloseNavMenu}>
             <Typography textAlign='center' component='a' href='/dashboard'>
               Home

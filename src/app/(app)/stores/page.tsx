@@ -4,8 +4,8 @@
  * ---------------------------------------------
  * Author: Rovelin Enriquez
  * Date:   Sunday July 2nd 2023
- * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 4th 2023, 9:13:50 pm
+ * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
+ * Last Modified time: July 7th 2023, 8:44:37 pm
  * ---------------------------------------------
  */
 
@@ -29,8 +29,10 @@ import InputField from '@/components/TextField';
 import Button from '@/components/Button';
 import MultipleSelectChip from '@/components/MultipleSelect';
 import { SelectChangeEvent } from '@mui/material/Select';
+import { useRouter } from 'next/navigation';
 
 export default function Stores() {
+  const router = useRouter();
   const { documents: stores, createDoc, deleteDoc } = useStore();
   const { documents: users } = useAdminAccount();
 
@@ -122,16 +124,12 @@ export default function Stores() {
   return (
     <>
       <Container style={{ marginTop: '2rem' }}>
+        <p style={{ fontSize: '28px' }}>Create Store</p>
         <InputField label='Name' value={name} onChange={setName} />
         <InputField label='Location' value={location} onChange={setLocation} />
         <InputField label='Contact Number' value={contactNumber} onChange={setContactNumber} />
-        <MultipleSelectChip
-          label='Staff'
-          value={staff}
-          onChange={handleStaffChange}
-          options={staffOptions}
-        />
-        <Button label='Save Store' onClick={createStore} />
+        <MultipleSelectChip label='Staff' value={staff} onChange={handleStaffChange} options={staffOptions} />
+        <Button label='Save' onClick={createStore} />
         <p>{error}</p>
       </Container>
       <TableContainer>
@@ -145,7 +143,7 @@ export default function Stores() {
           </TableHead>
           <TableBody>
             {stores.map((store, i: number) => (
-              <TableRow key={i}>
+              <TableRow key={i} onClick={() => router.push('/stores/' + store.id)}>
                 <TableCell>{i + 1}</TableCell>
                 <TableCell>{renderStoreCell(store)}</TableCell>
                 <TableCell align='right'>
