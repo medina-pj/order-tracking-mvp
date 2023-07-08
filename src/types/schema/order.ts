@@ -3,39 +3,45 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 2nd 2023, 8:14:20 am
+ * Last Modified time: July 8th 2023, 2:39:23 pm
  * ---------------------------------------------
  */
 
-export enum OrderStatus {
-  RECEIVED = 'received',
+export enum OrderTypeEnum {
+  DINE_IN = 'dine_in',
+  TAKE_OUT = 'take_out',
+}
+
+export enum OrderStatusEnum {
+  NEW = 'new',
   DECLINED = 'declined',
-  PROCESSING = 'processing',
+  CONFIRMED = 'confirmed',
+  PREPARING = 'preparing',
   SERVED = 'served',
   COMPLETED = 'completed',
-  CANCEL = 'cancelled',
+  CANCELLED = 'cancelled',
 }
 
 export type CartAddOnsSchema = {
-  storeProductId: string;
+  productId: string;
   productCode: string;
   productName: string;
   productAbbrev: string;
   price: number;
   quantity: number;
+  voided: boolean; // default false
 };
 
 export type CartItemsSchema = {
-  storeProductId: string;
+  productId: string;
   productCode: string;
   productName: string;
   productAbbrev: string;
   price: number;
   quantity: number;
-  notes?: number;
-  addOns?: CartAddOnsSchema[];
-  createdAt?: number;
-  updatedAt?: number;
+  notes: number;
+  addOns: CartAddOnsSchema[];
+  voided: boolean; // default false
 };
 
 export type OrderHistorySchema = {
@@ -44,21 +50,28 @@ export type OrderHistorySchema = {
   timestamp: number;
 };
 
+export type DiscountSchema = {
+  type: string;
+  amount: number;
+};
+
 export type OrderSchema = {
   id?: string;
   orderId: string;
+  storeId: string;
+  tableId: string;
   notes: string;
   customerNotes: string;
+  type: OrderTypeEnum;
+  status: OrderStatusEnum;
   items: CartItemsSchema[];
   history: OrderHistorySchema[];
-  table: string;
-  type: 'dine_in' | 'take_out' | 'ordered_online';
-  status: 'received' | 'declined' | 'processing' | 'served' | 'completed' | 'cancel';
-  orderPaid: boolean;
-  discount?: number;
+  discount: DiscountSchema[];
   data: {
+    orderedOnline?: boolean;
     onlineOrderPlatform?: string;
   };
+  orderPaid: boolean;
   createdAt?: number;
   updatedAt?: number;
   isArchived?: boolean;
