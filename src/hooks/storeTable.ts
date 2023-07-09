@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Monday July 3rd 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 6th 2023, 11:25:16 pm
+ * Last Modified time: July 9th 2023, 11:14:53 am
  * ---------------------------------------------
  */
 
@@ -31,7 +31,6 @@ export interface IUpdateStoreTable extends ISaveStoreTable {
 export interface IStoreTable {
   id: string;
   name: string;
-  capacity: number;
   isAvailable: boolean;
   store: {
     id?: string;
@@ -61,7 +60,6 @@ const useStoreTable = () => {
             store: storeDetails,
             name: doc.data()?.name,
             isAvailable: doc.data()?.isAvailable,
-            capacity: doc.data()?.capacity,
             createdAt: moment(doc.data()?.createdAt).format('MMM DD, YYYY hh:mma'),
             updatedAt: moment(doc.data()?.updatedAt).format('MMM DD, YYYY hh:mma'),
           });
@@ -79,7 +77,7 @@ const useStoreTable = () => {
       const tablePayload: StoreTableSchema = {
         storeId: payload.storeId,
         name: payload.name,
-        isAvailble: true,
+        isAvailable: true,
         createdAt: moment().toDate().getTime(),
         updatedAt: moment().toDate().getTime(),
         isArchived: false,
@@ -99,7 +97,7 @@ const useStoreTable = () => {
         docRef,
         {
           name: payload.name,
-          isAvailble: payload.isAvailable,
+          isAvailable: payload.isAvailable,
           updatedAt: moment().toDate().getTime(),
         },
         { merge: true }

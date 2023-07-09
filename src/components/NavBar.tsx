@@ -38,7 +38,8 @@ const NavBar = () => {
           aria-controls='menu-appbar'
           aria-haspopup='true'
           onClick={handleOpenNavMenu}
-          color='inherit'>
+          color='inherit'
+        >
           <MenuIcon />
         </IconButton>
         <Menu
@@ -55,7 +56,8 @@ const NavBar = () => {
             horizontal: 'right',
           }}
           open={Boolean(anchorElNav)}
-          onClose={handleCloseNavMenu}>
+          onClose={handleCloseNavMenu}
+        >
           <MenuItem key={'Home'} onClick={handleCloseNavMenu}>
             <Typography textAlign='center' component='a' href='/dashboard'>
               Home
@@ -66,9 +68,14 @@ const NavBar = () => {
               {'Orders'}
             </Typography>
           </MenuItem>
-          <MenuItem key={'Store Products'} onClick={handleCloseNavMenu}>
-            <Typography textAlign='center' component='a' href='/stores/products'>
-              {'Store Products'}
+          <MenuItem key={'Products'} onClick={handleCloseNavMenu}>
+            <Typography textAlign='center' component='a' href='/products'>
+              {'Products'}
+            </Typography>
+          </MenuItem>
+          <MenuItem key={'Category'} onClick={handleCloseNavMenu}>
+            <Typography textAlign='center' component='a' href='/category'>
+              {'Category'}
             </Typography>
           </MenuItem>
           <MenuItem key={'Tables'} onClick={handleCloseNavMenu}>
@@ -79,16 +86,6 @@ const NavBar = () => {
           <MenuItem key={'Stores'} onClick={handleCloseNavMenu}>
             <Typography textAlign='center' component='a' href='/stores'>
               {'Stores'}
-            </Typography>
-          </MenuItem>
-          <MenuItem key={'Products'} onClick={handleCloseNavMenu}>
-            <Typography textAlign='center' component='a' href='/products'>
-              {'Products'}
-            </Typography>
-          </MenuItem>
-          <MenuItem key={'Category'} onClick={handleCloseNavMenu}>
-            <Typography textAlign='center' component='a' href='/category'>
-              {'Category'}
             </Typography>
           </MenuItem>
           <MenuItem key={'Accounts'} onClick={handleCloseNavMenu}>
