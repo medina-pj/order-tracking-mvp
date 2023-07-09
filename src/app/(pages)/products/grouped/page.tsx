@@ -5,7 +5,7 @@
  * Author: PJ Medina
  * Date:   Tuesday July 4th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 9th 2023, 1:24:09 pm
+ * Last Modified time: July 9th 2023, 1:28:18 pm
  * ---------------------------------------------
  */
 
@@ -97,7 +97,9 @@ export default function Products() {
       return;
     }
 
-    setProducts((prevDocs: any) => prevDocs.splice(index, 1));
+    const updatedItems = [...products];
+    updatedItems.splice(index, 1);
+    setProducts(updatedItems);
   };
 
   return (
@@ -154,10 +156,7 @@ export default function Products() {
       <InputField label='Price' value={price} onChange={setPrice} />
       <Button label='Add Product' onClick={onAddProduct} />
 
-      <Button label='Save Product' onClick={onCreateGroupedProduct} />
-      <p>{error}</p>
-
-      <TableContainer>
+      <TableContainer style={{ marginBottom: '2rem' }}>
         <Table>
           <TableHead>
             <TableRow>
@@ -189,6 +188,9 @@ export default function Products() {
           </TableBody>
         </Table>
       </TableContainer>
+
+      <Button label='Save Product' onClick={onCreateGroupedProduct} />
+      <p>{error}</p>
     </Container>
   );
 }
