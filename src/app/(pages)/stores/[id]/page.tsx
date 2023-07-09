@@ -2,8 +2,8 @@
  * ---------------------------------------------
  * Author: Rovelin Enriquez
  * Date:   Thursday July 6th 2023
- * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
- * Last Modified time: July 7th 2023, 8:49:29 pm
+ * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
+ * Last Modified time: July 9th 2023, 11:20:03 am
  * ---------------------------------------------
  */
 
@@ -91,9 +91,8 @@ export default function ViewStore() {
     }
   };
 
-  // console.log('params:', params);
   return (
-    <Container style={{ marginTop: '2rem' }}>
+    <Container style={{ marginTop: '2rem', marginBottom: '2rem' }}>
       <p style={{ fontSize: '28px' }}>Update Store</p>
       <InputField label='Name' value={name} onChange={setName} />
       <InputField label='Location' value={location} onChange={setLocation} />

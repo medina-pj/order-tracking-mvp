@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Thursday July 6th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 6th 2023, 10:48:43 pm
+ * Last Modified time: July 9th 2023, 11:45:17 am
  * ---------------------------------------------
  */
 import moment from 'moment-timezone';
@@ -18,6 +18,9 @@ const StoreService = {
   fetchStores: async (ids: string[]): Promise<StoreSchema[]> => {
     try {
       let result: StoreSchema[] = [];
+
+      if (!ids.length) return result;
+
       const ref = collection(db, constants.DB_STORE);
       const qry = query(ref, where('isArchived', '==', false), where(documentId(), 'in', ids));
 

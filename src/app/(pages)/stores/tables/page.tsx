@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Sunday July 9th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 9th 2023, 11:15:39 am
+ * Last Modified time: July 9th 2023, 11:19:51 am
  * ---------------------------------------------
  */
 
@@ -72,7 +72,7 @@ export default function Tables() {
   };
 
   return (
-    <Container style={{ marginTop: '2rem' }}>
+    <Container style={{ marginTop: '2rem', marginBottom: '2rem' }}>
       <InputField label='Name' value={name} onChange={setName} />
       <FormControl fullWidth style={{ marginBottom: '20px' }}>
         <InputLabel id='store-select'>Store</InputLabel>

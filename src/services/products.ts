@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Thursday July 6th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 8th 2023, 1:52:27 pm
+ * Last Modified time: July 9th 2023, 11:44:56 am
  * ---------------------------------------------
  */
 import moment from 'moment-timezone';
@@ -30,6 +30,9 @@ const ProductService = {
   fetchProducts: async (ids: string[], populateReferences = false): Promise<IProduct[]> => {
     try {
       let result: IProduct[] = [];
+
+      if (!ids.length) return result;
+
       const ref = collection(db, constants.DB_PRODUCTS);
       const qry = query(ref, where('isArchived', '==', false), where(documentId(), 'in', ids));
 
@@ -45,7 +48,7 @@ const ProductService = {
           store = await StoreService.fetchStore(store);
         }
 
-        if (!doc.data()?.isAddons && subMenu.length && populateReferences) {
+        if (!doc.data()?.isAddOns && subMenu.length && populateReferences) {
           subMenu = await ProductService.fetchSubMenu(subMenu);
         }
 
@@ -58,7 +61,7 @@ const ProductService = {
           name: doc.data()?.name,
           price: doc.data()?.price,
           isAvailable: doc.data()?.isAvailable,
-          isAddons: doc.data()?.isAddons,
+          isAddOns: doc.data()?.isAddOns,
           description: doc.data()?.description,
           note: doc.data()?.note,
           subMenu,
@@ -90,7 +93,7 @@ const ProductService = {
           name: doc.data()?.name,
           price: doc.data()?.price,
           isAvailable: doc.data()?.isAvailable,
-          isAddons: doc.data()?.isAddons,
+          isAddOns: doc.data()?.isAddOns,
           description: doc.data()?.description,
           note: doc.data()?.note,
           subMenu: doc.data()?.subMenu,

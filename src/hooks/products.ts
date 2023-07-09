@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 8th 2023, 4:10:11 pm
+ * Last Modified time: July 9th 2023, 11:49:17 am
  * ---------------------------------------------
  */
 
@@ -25,7 +25,7 @@ export interface ISaveProduct {
   productAbbrev: string;
   name: string;
   price: number;
-  isAddons: boolean;
+  isAddOns: boolean;
   description: string;
   note: string;
   subMenu: string[];
@@ -51,7 +51,7 @@ export interface IProduct {
   productAbbrev: string;
   name: string;
   price: number;
-  isAddons: boolean;
+  isAddOns: boolean;
   isAvailable: boolean;
   description: string;
   note: string;
@@ -85,14 +85,14 @@ export const useProduct = () => {
       const productPayload: ProductSchema = {
         productCode: generateNanoId(),
         categoryId: payload.categoryId,
-        storeId: payload.categoryId,
+        storeId: payload.storeId,
         productAbbrev: payload.productAbbrev,
         name: payload.name,
         price: payload.price,
         description: payload?.description || '',
         note: payload?.note || '',
         subMenu: payload?.subMenu || [],
-        isAddons: payload.isAddons,
+        isAddOns: payload.isAddOns,
         isAvailable: true,
         isArchived: false,
         createdAt: moment().toDate().getTime(),
@@ -132,7 +132,7 @@ export const useProduct = () => {
         docRef,
         {
           categoryId: payload.categoryId,
-          storeId: payload.categoryId,
+          storeId: payload.storeId,
           productAbbrev: payload.productAbbrev,
           name: payload.name,
           price: payload.price,
@@ -140,8 +140,8 @@ export const useProduct = () => {
           note: payload.note,
           subMenu: payload.subMenu,
           updatedAt: moment().toDate().getTime(),
-          isAddons: payload.isAddons,
-          isAvailable: payload.isAddons,
+          isAddOns: payload.isAddOns,
+          isAvailable: payload.isAvailable,
         },
         { merge: true }
       );

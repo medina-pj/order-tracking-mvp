@@ -5,7 +5,7 @@
  * Author: PJ Medina
  * Date:   Tuesday July 4th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 4th 2023, 10:34:47 pm
+ * Last Modified time: July 9th 2023, 11:45:32 am
  * ---------------------------------------------
  */
 
@@ -30,48 +30,55 @@ import {
   TableRow,
 } from '@mui/material';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-
-import useProduct from '@/hooks/products';
-import useStore from '@/hooks/store';
 import InputField from '@/components/TextField';
-import useStoreProduct from '@/hooks/storeProducts';
 import Button from '@/components/Button';
+
+import useStore from '@/hooks/store';
+import useProduct, { ISaveProduct } from '@/hooks/products';
+import useCategory from '@/hooks/categories';
 
 export default function Products() {
   const { documents: stores } = useStore();
-  const { documents: products } = useProduct();
-  const { documents: storeProducts, createDoc, deleteDoc } = useStoreProduct();
+  const { documents: categories } = useCategory();
+  const { documents, createDoc, deleteDoc } = useProduct();
 
   const [error, setError] = useState('');
   const [store, setStore] = useState('');
-  const [product, setProduct] = useState('');
+  const [category, setCategory] = useState('');
+  const [name, setName] = useState('');
   const [productAbbrev, setProductAbbrev] = useState('');
+  const [note, setNote] = useState('');
+  const [description, setDescription] = useState('');
   const [price, setPrice] = useState(0);
-  const [isAddOn, setIsAddOn] = useState(false);
-  const [addOns, setAddOns] = useState<string[]>([]);
+  const [isAddOns, setIsAddOns] = useState(false);
 
   const onCreateProduct = async () => {
     try {
-      if (!store || !product || !productAbbrev || !price) {
+      if (!store || !category || !name || !productAbbrev || !price) {
         alert('Input all required fields.');
         return;
       }
 
-      const payload = {
+      const payload: ISaveProduct = {
+        categoryId: category,
         storeId: store,
-        productId: product,
-        productAbbrev,
+        productAbbrev: productAbbrev,
+        name,
         price,
-        isAddOn,
-        addOns,
+        isAddOns,
+        description,
+        note,
+        subMenu: [],
       };
 
       await createDoc(payload);
 
+      setName('');
       setProductAbbrev('');
+      setNote('');
+      setDescription('');
       setPrice(0);
-      setIsAddOn(false);
-      setAddOns([]);
+      setIsAddOns(false);
     } catch (err: any) {
       setError(err?.message);
     }
@@ -86,18 +93,18 @@ export default function Products() {
     }
   };
 
-  console.log({ storeProducts });
+  // console.log({ storeProducts });
 
-  const handleAddOnChange = (event: SelectChangeEvent<typeof addOns>) => {
-    const {
-      target: { value },
-    } = event;
+  // const handleAddOnChange = (event: SelectChangeEvent<typeof addOns>) => {
+  //   const {
+  //     target: { value },
+  //   } = event;
 
-    setAddOns(
-      // On autofill we get a stringified value.
-      typeof value === 'string' ? value.split(',') : value
-    );
-  };
+  //   setAddOns(
+  //     // On autofill we get a stringified value.
+  //     typeof value === 'string' ? value.split(',') : value
+  //   );
+  // };
 
   return (
     <Container style={{ marginTop: '2rem', marginBottom: '2rem' }}>
@@ -118,29 +125,32 @@ export default function Products() {
         </Select>
       </FormControl>
       <FormControl fullWidth style={{ marginBottom: '10px' }}>
-        <InputLabel id='product-select'>Product</InputLabel>
+        <InputLabel id='category-select'>Category</InputLabel>
         <Select
-          labelId='product-select'
-          id='product-select-id'
-          value={product}
-          label='Select Product'
-          onChange={e => setProduct(e.target.value)}
+          labelId='category-select'
+          id='category-select-id'
+          value={category}
+          label='Select Category'
+          onChange={e => setCategory(e.target.value)}
         >
-          {products.map(product => (
-            <MenuItem key={product.id} value={product.id}>
-              {product.name}
+          {categories.map(category => (
+            <MenuItem key={category.id} value={category.id}>
+              {category.name}
             </MenuItem>
           ))}
         </Select>
       </FormControl>
+      <InputField label='Name' value={name} onChange={setName} />
       <InputField label='Abbreviation' value={productAbbrev} onChange={setProductAbbrev} />
       <InputField label='Price' value={price} onChange={setPrice} />
+      <InputField label='Description' value={description} onChange={setDescription} />
+      <InputField label='Note' value={note} onChange={setNote} />
       <FormControlLabel
-        control={<Checkbox checked={isAddOn} onChange={() => setIsAddOn(prev => !prev)} />}
+        control={<Checkbox checked={isAddOns} onChange={() => setIsAddOns(prev => !prev)} />}
         label='Is Add-on'
       />
 
-      {isAddOn && (
+      {/* {isAddOn && (
         <FormControl style={{ marginBottom: '20px', minWidth: '100%' }}>
           <InputLabel id='add-ons-label'>Add-Ons</InputLabel>
           <Select
@@ -168,12 +178,12 @@ export default function Products() {
             ))}
           </Select>
         </FormControl>
-      )}
+      )} */}
 
       <Button label='Save Product' onClick={onCreateProduct} />
       <p>{error}</p>
 
-      <TableContainer>
+      {/* <TableContainer>
         <Table>
           <TableHead>
             <TableRow>
@@ -202,7 +212,7 @@ export default function Products() {
             ))}
           </TableBody>
         </Table>
-      </TableContainer>
+      </TableContainer> */}
     </Container>
   );
 }

@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 8th 2023, 1:11:23 pm
+ * Last Modified time: July 9th 2023, 11:38:37 am
  * ---------------------------------------------
  */
 
@@ -26,7 +26,7 @@ export type ProductSchema = {
   name: string;
   price: number;
   isAvailable: boolean; //default is true
-  isAddons: boolean; //default is false
+  isAddOns: boolean; //default is false
   description: string;
   note: string;
   subMenu: string[]; //array of productCode

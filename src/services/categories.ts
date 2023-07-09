@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Thursday July 6th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 6th 2023, 11:07:53 pm
+ * Last Modified time: July 9th 2023, 11:45:13 am
  * ---------------------------------------------
  */
 import moment from 'moment-timezone';
@@ -18,6 +18,9 @@ const CategoryService = {
   fetchCategories: async (ids: string[]): Promise<CategorySchema[]> => {
     try {
       let result: CategorySchema[] = [];
+
+      if (!ids.length) return result;
+
       const ref = collection(db, constants.DB_CATEGORIES);
       const qry = query(ref, where('isArchived', '==', false), where(documentId(), 'in', ids));
 
