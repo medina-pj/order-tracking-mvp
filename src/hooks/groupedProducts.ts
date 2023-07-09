@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 8th 2023, 4:10:20 pm
+ * Last Modified time: July 9th 2023, 12:09:05 pm
  * ---------------------------------------------
  */
 
@@ -18,9 +18,11 @@ import { GroupedProductSchema } from '@/types/schema/product';
 import constants from '@/utils/constants';
 import generateNanoId from '@/utils/generateNanoId';
 import ProductService, { ISubMenu } from '@/services/products';
+import StoreService from '@/services/stores';
 
 export interface ISaveGroupedProduct {
   name: string;
+  storeId: string;
   sequence: number;
   description: string;
   products: {
@@ -35,6 +37,10 @@ export interface IUpdateGroupedProduct extends ISaveGroupedProduct {
 
 export interface IGroupedProduct {
   id: string;
+  store: {
+    id?: string;
+    name?: string;
+  };
   groupedProductCode: string;
   name: string;
   sequence: number;
@@ -57,11 +63,9 @@ export const useGroupedProduct = () => {
         let results: IGroupedProduct[] = [];
 
         for (const doc of snapshot.docs) {
-          const productIds = doc.data()?.products.map((d: any) => d.productId);
-          const productDetails = await ProductService.fetchProducts(productIds);
-
           results.push({
             id: doc.id,
+            store: await StoreService.fetchStore(doc.data()?.storeId),
             groupedProductCode: doc.data()?.groupedProductCode,
             name: doc.data()?.name,
             sequence: doc.data()?.sequence,
@@ -83,6 +87,7 @@ export const useGroupedProduct = () => {
     try {
       const productPayload: GroupedProductSchema = {
         groupedProductCode: generateNanoId(),
+        storeId: payload.storeId,
         name: payload.name,
         description: payload.description,
         sequence: payload.sequence,

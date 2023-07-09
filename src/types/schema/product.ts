@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 9th 2023, 11:38:37 am
+ * Last Modified time: July 9th 2023, 12:05:54 pm
  * ---------------------------------------------
  */
 
@@ -42,6 +42,7 @@ export type TAddOnProduct = {
 
 export type GroupedProductSchema = {
   id?: string;
+  storeId: string;
   groupedProductCode: string;
   name: string;
   sequence: number;

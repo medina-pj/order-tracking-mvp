@@ -68,6 +68,11 @@ const NavBar = () => {
               {'Orders'}
             </Typography>
           </MenuItem>
+          <MenuItem key={'Grouped-Products'} onClick={handleCloseNavMenu}>
+            <Typography textAlign='center' component='a' href='/products/grouped'>
+              {'Grouped Products'}
+            </Typography>
+          </MenuItem>
           <MenuItem key={'Products'} onClick={handleCloseNavMenu}>
             <Typography textAlign='center' component='a' href='/products'>
               {'Products'}

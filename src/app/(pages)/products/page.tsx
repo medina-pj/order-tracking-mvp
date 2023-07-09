@@ -5,7 +5,7 @@
  * Author: PJ Medina
  * Date:   Tuesday July 4th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 9th 2023, 11:45:32 am
+ * Last Modified time: July 9th 2023, 11:58:55 am
  * ---------------------------------------------
  */
 
@@ -183,7 +183,7 @@ export default function Products() {
       <Button label='Save Product' onClick={onCreateProduct} />
       <p>{error}</p>
 
-      {/* <TableContainer>
+      <TableContainer>
         <Table>
           <TableHead>
             <TableRow>
@@ -191,17 +191,19 @@ export default function Products() {
               <TableCell>Name</TableCell>
               <TableCell>Abbrev</TableCell>
               <TableCell>Price</TableCell>
+              <TableCell>Category</TableCell>
               <TableCell>Store</TableCell>
               <TableCell align='right'></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {storeProducts.map((doc: any, i: number) => (
+            {documents.map((doc: any, i: number) => (
               <TableRow key={i}>
                 <TableCell>{i + 1}</TableCell>
-                <TableCell>{doc?.product?.name}</TableCell>
+                <TableCell>{doc?.name}</TableCell>
                 <TableCell>{doc?.productAbbrev}</TableCell>
                 <TableCell>{doc?.price}</TableCell>
+                <TableCell>{doc?.category?.name}</TableCell>
                 <TableCell>{doc?.store?.name}</TableCell>
                 <TableCell align='right'>
                   <IconButton onClick={() => deleteProduct(doc.id)}>
@@ -212,7 +214,7 @@ export default function Products() {
             ))}
           </TableBody>
         </Table>
-      </TableContainer> */}
+      </TableContainer>
     </Container>
   );
 }
