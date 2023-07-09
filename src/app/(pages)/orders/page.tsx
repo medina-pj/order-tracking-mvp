@@ -5,7 +5,7 @@
  * Author: PJ Medina
  * Date:   Sunday July 9th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 9th 2023, 10:36:54 pm
+ * Last Modified time: July 9th 2023, 11:14:51 pm
  * ---------------------------------------------
  */
 
@@ -40,12 +40,13 @@ import ButtonField from '@/components/Button';
 import useStore from '@/hooks/store';
 import useProduct, { IProduct } from '@/hooks/products';
 import numeral from 'numeral';
-// import OrderQuantityButton from '@/components/OrderQuantityButton';
 import { ISubMenu } from '@/services/products';
-import { TCartAddOns, TCartItems } from '@/types/schema/order';
+import { OrderTypeEnum, TCartAddOns, TCartItems } from '@/types/schema/order';
 
 import { Button, ButtonGroup } from '@mui/material';
 import { produce } from 'immer';
+import useStoreTable from '@/hooks/storeTable';
+import DropdownField from '@/components/Dropdown';
 
 interface ProductDetailsProps {
   product: any;
@@ -67,6 +68,7 @@ const ProductDetails = ({ product, style, item, cartItems, setCartItems }: Produ
     if (!item && !product?.isAddOns) {
       setCartItems((prev: any) =>
         prev.concat({
+          product: product, // remove when creating order
           id: uuidv4(),
           productId: product.id,
           productCode: product.productCode,
@@ -246,36 +248,52 @@ const MenuCard = ({
 export default function Order() {
   const { documents: stores } = useStore();
   const { documents: products } = useProduct();
+  const { documents: tables } = useStoreTable();
 
   const [error, setError] = useState('');
   const [store, setStore] = useState('');
+  const [table, setTable] = useState('');
+  const [type, setType] = useState('dine_in');
+  const [note, setNote] = useState('');
   const [cartEntries, setCartEntries] = useState<TCartItems[]>([]);
   const [cartItems, setCartItems] = useState<TCartItems[]>([]);
 
   const onAddToCart = () => {
-    console.log(cartEntries);
+    setCartItems((prev: any) => prev.concat(cartEntries));
+    setCartEntries([]);
   };
+
+  console.log({
+    cartEntries,
+    cartItems,
+  });
 
   return (
     <Container style={{ marginTop: '2rem', marginBottom: '2rem' }}>
-      <FormControl fullWidth style={{ marginBottom: '10px' }}>
-        <InputLabel id='store-select'>Store</InputLabel>
-        <Select
-          labelId='store-select'
-          id='store-select-id'
-          value={store}
-          label='Select Store'
-          onChange={e => {
-            setStore(e.target.value);
-          }}>
-          {stores.map(store => (
-            <MenuItem key={store.id} value={store.id}>
-              {store.name}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-
+      <DropdownField
+        label='Store'
+        value={store}
+        onChange={(e: any) => setStore(e.target.value)}
+        options={stores.map(store => ({ value: store.id, label: store.name }))}
+      />
+      <DropdownField
+        label='Table'
+        value={table}
+        onChange={(e: any) => setTable(e.target.value)}
+        options={tables
+          .filter((d: any) => d.store.id === store)
+          .map(table => ({ value: table.id, label: table.name }))}
+      />
+      <DropdownField
+        label='Order Type'
+        value={type}
+        onChange={(e: any) => setType(e.target.value)}
+        options={[
+          { value: OrderTypeEnum.DINE_IN, label: 'Dine In' },
+          { value: OrderTypeEnum.TAKE_OUT, label: 'Take Out' },
+        ]}
+      />
+      <InputField label='Note' value={note} onChange={setNote} />
       <div>
         <Accordion style={{ border: 'none', boxShadow: 'none' }}>
           <AccordionSummary
@@ -295,7 +313,7 @@ export default function Order() {
           </AccordionDetails>
         </Accordion>
 
-        <Accordion>
+        <Accordion style={{ border: 'none', boxShadow: 'none' }}>
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
             aria-controls='panel2a-content'
@@ -303,10 +321,9 @@ export default function Order() {
             <Typography>Cart</Typography>
           </AccordionSummary>
           <AccordionDetails>
-            <Typography>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus ex, sit
-              amet blandit leo lobortis eget.
-            </Typography>
+            {cartItems.map((d: TCartItems, index: number) => (
+              <MenuCard key={index} product={d.product} cartItems={cartItems} setCartItems={setCartItems} />
+            ))}
           </AccordionDetails>
         </Accordion>
       </div>

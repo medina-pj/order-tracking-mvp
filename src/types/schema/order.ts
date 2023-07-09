@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 8th 2023, 4:17:45 pm
+ * Last Modified time: July 9th 2023, 11:13:58 pm
  * ---------------------------------------------
  */
 
@@ -44,6 +44,7 @@ export type TCartItems = {
   notes: number;
   addOns: TCartAddOns[];
   voided: boolean; // default false
+  product?: any; // don't save to db; this is used in adding/modifying cart items
 };
 
 export type TOrderHistory = {
