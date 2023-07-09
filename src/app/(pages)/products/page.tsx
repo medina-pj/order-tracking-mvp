@@ -5,24 +5,12 @@
  * Author: PJ Medina
  * Date:   Tuesday July 4th 2023
  * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
- * Last Modified time: July 9th 2023, 3:27:20 pm
+ * Last Modified time: July 9th 2023, 5:33:11 pm
  * ---------------------------------------------
  */
 
 import { useState, useEffect } from 'react';
-import {
-  Checkbox,
-  Container,
-  FormControlLabel,
-  IconButton,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-} from '@mui/material';
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import { Checkbox, Container, FormControlLabel } from '@mui/material';
 import InputField from '@/components/TextField';
 import Button from '@/components/Button';
 
@@ -33,6 +21,7 @@ import DropdownField from '@/components/Dropdown';
 import useGroupedProduct from '@/hooks/groupedProducts';
 import MultipleSelectChip from '@/components/MultipleSelect';
 import { SelectChangeEvent } from '@mui/material/Select';
+import TableComponent from '@/components/Table';
 
 export default function Products() {
   const { documents: stores } = useStore();
@@ -148,38 +137,15 @@ export default function Products() {
       <Button label='Save Product' onClick={onCreateProduct} />
       <p>{error}</p>
 
-      <TableContainer>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>#</TableCell>
-              <TableCell>Name</TableCell>
-              <TableCell>Abbrev</TableCell>
-              <TableCell>Price</TableCell>
-              <TableCell>Category</TableCell>
-              <TableCell>Store</TableCell>
-              <TableCell align='right'></TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {documents.map((doc: any, i: number) => (
-              <TableRow key={i}>
-                <TableCell>{i + 1}</TableCell>
-                <TableCell>{doc?.name}</TableCell>
-                <TableCell>{doc?.productAbbrev}</TableCell>
-                <TableCell>{doc?.price}</TableCell>
-                <TableCell>{doc?.category?.name}</TableCell>
-                <TableCell>{doc?.store?.name}</TableCell>
-                <TableCell align='right'>
-                  <IconButton onClick={() => deleteProduct(doc.id)}>
-                    <DeleteForeverIcon style={{ color: '#ea6655' }} />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <TableComponent
+        label='Product List'
+        rows={documents.map(doc => ({
+          id: doc.id,
+          label: `${doc?.name}(${doc?.productAbbrev}) - P${doc?.price}`,
+          subLabel: doc?.store?.name,
+        }))}
+        onDelete={deleteProduct}
+      />
     </Container>
   );
 }

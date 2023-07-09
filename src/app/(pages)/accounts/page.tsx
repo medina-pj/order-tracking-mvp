@@ -5,7 +5,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
- * Last Modified time: July 9th 2023, 2:13:04 pm
+ * Last Modified time: July 9th 2023, 4:38:55 pm
  * ---------------------------------------------
  */
 
@@ -13,12 +13,13 @@ import moment from 'moment-timezone';
 moment.tz.setDefault('Asia/Manila');
 
 import { useState } from 'react';
-import { Container, TableContainer, TableHead, Table, TableCell, TableRow, TableBody } from '@mui/material';
+import { Container } from '@mui/material';
 
 import InputField from '@/components/TextField';
 import Button from '@/components/Button';
 import DropdownField from '@/components/Dropdown';
 import useAdminAccount from '@/hooks/adminAccount';
+import TableComponent from '@/components/Table';
 
 export default function ManageAccount() {
   const { documents, createAccount } = useAdminAccount();
@@ -81,30 +82,13 @@ export default function ManageAccount() {
       <Button label='Create Account' onClick={onCreateAccount} />
       <p>{error}</p>
 
-      <TableContainer>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>#</TableCell>
-              <TableCell>Username</TableCell>
-              <TableCell>Name</TableCell>
-              <TableCell>Contact</TableCell>
-              <TableCell>Type</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {documents.map((doc: any, i: number) => (
-              <TableRow key={i}>
-                <TableCell>{i + 1}</TableCell>
-                <TableCell>{doc?.name}</TableCell>
-                <TableCell>{doc?.username}</TableCell>
-                <TableCell>{doc?.contactNumber}</TableCell>
-                <TableCell>{doc?.userType}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <TableComponent
+        label='User List'
+        rows={documents.map(doc => ({
+          label: doc.name,
+          subLabel: doc.userType + ' - ' + doc.contactNumber,
+        }))}
+      />
     </Container>
   );
 }

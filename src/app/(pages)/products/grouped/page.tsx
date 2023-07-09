@@ -5,22 +5,13 @@
  * Author: PJ Medina
  * Date:   Tuesday July 4th 2023
  * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
- * Last Modified time: July 9th 2023, 2:49:09 pm
+ * Last Modified time: July 9th 2023, 6:27:05 pm
  * ---------------------------------------------
  */
 
 import { useState } from 'react';
-import {
-  Container,
-  IconButton,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-} from '@mui/material';
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import { Container } from '@mui/material';
+
 import InputField from '@/components/TextField';
 import Button from '@/components/Button';
 
@@ -30,11 +21,12 @@ import useProduct from '@/hooks/products';
 import { TAddOnProduct } from '@/types/schema/product';
 import useGroupedProduct, { ISaveGroupedProduct } from '@/hooks/groupedProducts';
 import DropdownField from '@/components/Dropdown';
+import TableComponent from '@/components/Table';
 
 export default function Products() {
   const { documents: stores } = useStore();
   const { documents: productsDocs } = useProduct();
-  const { createDoc } = useGroupedProduct();
+  const { documents, createDoc, deleteDoc } = useGroupedProduct();
 
   const [error, setError] = useState('');
   const [store, setStore] = useState('');
@@ -68,6 +60,18 @@ export default function Products() {
       setProducts([]);
       setSelectedProduct('');
       setPrice(0);
+    } catch (err: any) {
+      setError(err?.message);
+    }
+  };
+
+  const deleteGroupProduct = async (id: string) => {
+    try {
+      setError('');
+
+      if (!confirm('Are you sure you want to delete this record?')) return;
+
+      await deleteDoc(id);
     } catch (err: any) {
       setError(err?.message);
     }
@@ -134,41 +138,35 @@ export default function Products() {
       <InputField label='Price' value={price} onChange={setPrice} />
       <Button label='Add Product' onClick={onAddProduct} />
 
-      <TableContainer style={{ marginBottom: '2rem' }}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>#</TableCell>
-              <TableCell>Abbrev</TableCell>
-              <TableCell>Name</TableCell>
-              <TableCell>Price</TableCell>
-              <TableCell align='right'></TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {products.map((doc: any, i: number) => {
-              const productDetails = productsDocs.find((d: any) => d.id === doc.productId);
+      <TableComponent
+        rows={products.map((product, index) => {
+          const productDetails = productsDocs.find((d: any) => d.id === product.productId);
 
-              return (
-                <TableRow key={i}>
-                  <TableCell>{i + 1}</TableCell>
-                  <TableCell>{productDetails?.productAbbrev}</TableCell>
-                  <TableCell>{productDetails?.name}</TableCell>
-                  <TableCell>{doc?.price}</TableCell>
-                  <TableCell align='right'>
-                    <IconButton onClick={() => onRemoveProduct(i)}>
-                      <DeleteForeverIcon style={{ color: '#ea6655' }} />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
+          return {
+            id: index,
+            label: `${productDetails?.name} (${productDetails?.productAbbrev})`,
+            subLabel: `P${product?.price}`,
+          };
+        })}
+        onDelete={onRemoveProduct}
+      />
 
-      <Button label='Save Product' onClick={onCreateGroupedProduct} />
+      <Button label='Save Group Product' onClick={onCreateGroupedProduct} />
       <p>{error}</p>
+      <TableComponent
+        label='Group Product List'
+        rows={documents.map(doc => {
+          const totalCost = doc?.products.reduce((cur, acc) => cur + Number(acc.price), 0);
+          return {
+            id: doc?.id,
+            label: `${doc?.name} - P${totalCost}`,
+            subLabel: doc?.description,
+            labelList: 'Products',
+            list: doc.products.map(prod => `${prod.name}(${prod.productAbbrev}) - P${prod.price}`),
+          };
+        })}
+        onDelete={deleteGroupProduct}
+      />
     </Container>
   );
 }

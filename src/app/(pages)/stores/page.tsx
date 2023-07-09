@@ -4,32 +4,23 @@
  * ---------------------------------------------
  * Author: Rovelin Enriquez
  * Date:   Sunday July 2nd 2023
- * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 9th 2023, 10:58:12 am
+ * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
+ * Last Modified time: July 9th 2023, 4:50:52 pm
  * ---------------------------------------------
  */
 
 import { useEffect, useState } from 'react';
 
 import useAdminAccount from '@/hooks/adminAccount';
-import useStore, { IStore } from '@/hooks/store';
+import useStore from '@/hooks/store';
 
-import {
-  Container,
-  IconButton,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-} from '@mui/material';
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import { Container } from '@mui/material';
 import InputField from '@/components/TextField';
 import Button from '@/components/Button';
 import MultipleSelectChip from '@/components/MultipleSelect';
 import { SelectChangeEvent } from '@mui/material/Select';
 import { useRouter } from 'next/navigation';
+import TableComponent from '@/components/Table';
 
 export default function Stores() {
   const router = useRouter();
@@ -76,6 +67,7 @@ export default function Stores() {
     }
   };
 
+  const selectStore = (id: string) => router.push('/stores/' + id);
   const deleteStore = async (id: string) => {
     try {
       setError('');
@@ -99,28 +91,6 @@ export default function Stores() {
     );
   };
 
-  const renderStoreCell = (store: IStore) => {
-    let staffNames = 'None';
-    if (store?.staff?.length) {
-      const userStaff = users
-        //filter current users that are staff of current store
-        .filter(user => store.staff?.find(staff => staff === user.id))
-        .map(user => user?.name);
-      staffNames = userStaff.join(', ');
-    }
-    return (
-      <>
-        <p>
-          <b>{store?.name}</b>
-          <br />
-          {store?.location} - {store?.contactNumber}
-          <br />
-          <a style={{ color: 'gray' }}>Staff: {staffNames}</a>
-        </p>
-      </>
-    );
-  };
-
   return (
     <>
       <Container style={{ marginTop: '2rem', marginBottom: '2rem' }}>
@@ -128,39 +98,20 @@ export default function Stores() {
         <InputField label='Name' value={name} onChange={setName} />
         <InputField label='Location' value={location} onChange={setLocation} />
         <InputField label='Contact Number' value={contactNumber} onChange={setContactNumber} />
-        <MultipleSelectChip
-          label='Staff'
-          value={staff}
-          onChange={handleStaffChange}
-          options={staffOptions}
-        />
+        <MultipleSelectChip label='Staff' value={staff} onChange={handleStaffChange} options={staffOptions} />
         <Button label='Save' onClick={createStore} />
         <p>{error}</p>
       </Container>
-      <TableContainer>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>#</TableCell>
-              <TableCell>Stores</TableCell>
-              <TableCell align='right'></TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {stores.map((store, i: number) => (
-              <TableRow key={i} onClick={() => router.push('/stores/' + store.id)}>
-                <TableCell>{i + 1}</TableCell>
-                <TableCell>{renderStoreCell(store)}</TableCell>
-                <TableCell align='right'>
-                  <IconButton onClick={() => deleteStore(store.id)}>
-                    <DeleteForeverIcon style={{ color: '#ea6655' }} />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <TableComponent
+        label='Store List'
+        rows={stores.map(store => ({
+          id: store.id,
+          label: store.name,
+          subLabel: `${store?.location} - ${store?.contactNumber}`,
+        }))}
+        onDelete={deleteStore}
+        onSelect={selectStore}
+      />
     </>
   );
 }

@@ -4,27 +4,18 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Sunday June 11th 2023
- * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 9th 2023, 10:58:01 am
+ * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
+ * Last Modified time: July 9th 2023, 5:23:07 pm
  * ---------------------------------------------
  */
 
 import { useState } from 'react';
 import useCategory from '@/hooks/categories';
-import {
-  Container,
-  IconButton,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-} from '@mui/material';
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import { Container } from '@mui/material';
 
 import InputField from '@/components/TextField';
 import Button from '@/components/Button';
+import TableComponent from '@/components/Table';
 
 export default function Category() {
   const { documents, createDoc, deleteDoc } = useCategory();
@@ -70,33 +61,15 @@ export default function Category() {
       <InputField label='Sequence' value={sequence} onChange={setSequence} />
       <Button label='Save Category' onClick={createCategory} />
       <p>{error}</p>
-      <TableContainer>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>#</TableCell>
-              <TableCell>Name</TableCell>
-              <TableCell>Description</TableCell>
-              <TableCell align='right'></TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {documents.map((doc: any, i: number) => (
-              <TableRow key={i}>
-                <TableCell>{i + 1}</TableCell>
-                <TableCell>{doc?.name}</TableCell>
-                <TableCell>{doc?.description}</TableCell>
-                <TableCell>{doc?.sequence}</TableCell>
-                <TableCell align='right'>
-                  <IconButton onClick={() => deleteCategory(doc.id)}>
-                    <DeleteForeverIcon style={{ color: '#ea6655' }} />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <TableComponent
+        label='Category List'
+        rows={documents.map(doc => ({
+          id: doc?.id,
+          label: doc?.name,
+          subLabel: doc?.description,
+        }))}
+        onDelete={deleteCategory}
+      />
     </Container>
   );
 }
