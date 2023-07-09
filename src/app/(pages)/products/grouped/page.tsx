@@ -4,19 +4,15 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Tuesday July 4th 2023
- * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 9th 2023, 1:28:18 pm
+ * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
+ * Last Modified time: July 9th 2023, 2:49:09 pm
  * ---------------------------------------------
  */
 
 import { useState } from 'react';
 import {
   Container,
-  FormControl,
   IconButton,
-  InputLabel,
-  MenuItem,
-  Select,
   Table,
   TableBody,
   TableCell,
@@ -33,6 +29,7 @@ import useProduct from '@/hooks/products';
 
 import { TAddOnProduct } from '@/types/schema/product';
 import useGroupedProduct, { ISaveGroupedProduct } from '@/hooks/groupedProducts';
+import DropdownField from '@/components/Dropdown';
 
 export default function Products() {
   const { documents: stores } = useStore();
@@ -104,55 +101,36 @@ export default function Products() {
 
   return (
     <Container style={{ marginTop: '2rem', marginBottom: '2rem' }}>
-      <FormControl fullWidth style={{ marginBottom: '10px' }}>
-        <InputLabel id='store-select'>Store</InputLabel>
-        <Select
-          labelId='store-select'
-          id='store-select-id'
-          value={store}
-          label='Select Store'
-          onChange={e => {
-            setProducts([]);
-            setSelectedProduct('');
-            setPrice(0);
-            setStore(e.target.value);
-          }}
-        >
-          {stores.map(store => (
-            <MenuItem key={store.id} value={store.id}>
-              {store.name}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+      <DropdownField
+        label='Store'
+        value={store}
+        onChange={(e: any) => {
+          setProducts([]);
+          setSelectedProduct('');
+          setPrice(0);
+          setStore(e.target.value);
+        }}
+        options={stores.map(store => ({ label: store.name, value: store.id }))}
+      />
       <InputField label='Name' value={name} onChange={setName} />
       <InputField label='Sequence' value={sequence} onChange={setSequence} />
       <InputField label='Description' value={description} onChange={setDescription} />
-      <FormControl fullWidth style={{ marginBottom: '10px' }}>
-        <InputLabel id='products-select'>Store Products</InputLabel>
-        <Select
-          labelId='products-select'
-          id='products-select-id'
-          value={selectedProduct}
-          label='Select Store Product'
-          onChange={e => {
-            const productDetails = productsDocs.find((d: any) => d.id === e.target.value);
-            setPrice(productDetails?.price as number);
-            setSelectedProduct(productDetails?.id as string);
-          }}
-        >
-          {productsDocs
-            // filter store add-ons products
-            .filter((d: any) => d.store.id === store && d.isAddOns)
-            // filter out selected add-ons products
-            .filter((d: any) => !products.find((p: any) => d.id === p.productId))
-            .map(product => (
-              <MenuItem key={product.id} value={product.id}>
-                {product.productAbbrev} - {product.name}
-              </MenuItem>
-            ))}
-        </Select>
-      </FormControl>
+      <DropdownField
+        label='Store Products'
+        value={selectedProduct}
+        onChange={(e: any) => {
+          const productDetails = productsDocs.find((d: any) => d.id === e.target.value);
+          setPrice(productDetails?.price as number);
+          setSelectedProduct(productDetails?.id as string);
+        }}
+        options={productsDocs
+          // filter store add-ons products
+          .filter((d: any) => d.store.id === store && d.isAddOns)
+          // filter out selected add-ons products
+          .filter((d: any) => !products.find((p: any) => d.id === p.productId))
+          .map(product => ({ value: product.id, label: product.productAbbrev + ' - ' + product.name }))}
+      />
+
       <InputField label='Price' value={price} onChange={setPrice} />
       <Button label='Add Product' onClick={onAddProduct} />
 

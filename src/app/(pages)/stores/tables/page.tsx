@@ -2,8 +2,8 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Sunday July 9th 2023
- * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 9th 2023, 11:19:51 am
+ * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
+ * Last Modified time: July 9th 2023, 2:40:02 pm
  * ---------------------------------------------
  */
 
@@ -21,11 +21,7 @@
 import { useState } from 'react';
 import {
   Container,
-  FormControl,
   IconButton,
-  InputLabel,
-  MenuItem,
-  Select,
   Table,
   TableBody,
   TableCell,
@@ -39,6 +35,7 @@ import InputField from '@/components/TextField';
 import Button from '@/components/Button';
 import useStoreTable from '@/hooks/storeTable';
 import useStore from '@/hooks/store';
+import DropdownField from '@/components/Dropdown';
 
 export default function Tables() {
   const { documents: stores } = useStore();
@@ -74,22 +71,12 @@ export default function Tables() {
   return (
     <Container style={{ marginTop: '2rem', marginBottom: '2rem' }}>
       <InputField label='Name' value={name} onChange={setName} />
-      <FormControl fullWidth style={{ marginBottom: '20px' }}>
-        <InputLabel id='store-select'>Store</InputLabel>
-        <Select
-          labelId='store-select'
-          id='store-select-id'
-          value={store}
-          label='Select Store'
-          onChange={e => setStore(e.target.value)}
-        >
-          {stores.map(store => (
-            <MenuItem key={store.id} value={store.id}>
-              {store.name}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+      <DropdownField
+        label='Select Store'
+        value={store}
+        onChange={(e: any) => setStore(e.target.value)}
+        options={stores.map(store => ({ label: store.name, value: store.id }))}
+      />
       <Button label='Save Table' onClick={createTable} />
       <p>{error}</p>
       <TableContainer>

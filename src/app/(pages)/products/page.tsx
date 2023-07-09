@@ -4,8 +4,8 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Tuesday July 4th 2023
- * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 9th 2023, 11:58:55 am
+ * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
+ * Last Modified time: July 9th 2023, 2:42:00 pm
  * ---------------------------------------------
  */
 
@@ -13,15 +13,8 @@ import { useState } from 'react';
 import {
   Checkbox,
   Container,
-  FormControl,
   FormControlLabel,
   IconButton,
-  InputLabel,
-  ListItemText,
-  MenuItem,
-  OutlinedInput,
-  Select,
-  SelectChangeEvent,
   Table,
   TableBody,
   TableCell,
@@ -36,6 +29,7 @@ import Button from '@/components/Button';
 import useStore from '@/hooks/store';
 import useProduct, { ISaveProduct } from '@/hooks/products';
 import useCategory from '@/hooks/categories';
+import DropdownField from '@/components/Dropdown';
 
 export default function Products() {
   const { documents: stores } = useStore();
@@ -108,38 +102,19 @@ export default function Products() {
 
   return (
     <Container style={{ marginTop: '2rem', marginBottom: '2rem' }}>
-      <FormControl fullWidth style={{ marginBottom: '10px' }}>
-        <InputLabel id='store-select'>Store</InputLabel>
-        <Select
-          labelId='store-select'
-          id='store-select-id'
-          value={store}
-          label='Select Store'
-          onChange={e => setStore(e.target.value)}
-        >
-          {stores.map(store => (
-            <MenuItem key={store.id} value={store.id}>
-              {store.name}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
-      <FormControl fullWidth style={{ marginBottom: '10px' }}>
-        <InputLabel id='category-select'>Category</InputLabel>
-        <Select
-          labelId='category-select'
-          id='category-select-id'
-          value={category}
-          label='Select Category'
-          onChange={e => setCategory(e.target.value)}
-        >
-          {categories.map(category => (
-            <MenuItem key={category.id} value={category.id}>
-              {category.name}
-            </MenuItem>
-          ))}
-        </Select>
-      </FormControl>
+      <DropdownField
+        label='Store'
+        value={store}
+        onChange={(e: any) => setStore(e.target.value)}
+        options={stores.map(store => ({ value: store.id, label: store.name }))}
+      />
+      <DropdownField
+        label='Category'
+        value={category}
+        onChange={(e: any) => setCategory(e.target.value)}
+        options={categories.map(category => ({ value: category.id, label: category.name }))}
+      />
+
       <InputField label='Name' value={name} onChange={setName} />
       <InputField label='Abbreviation' value={productAbbrev} onChange={setProductAbbrev} />
       <InputField label='Price' value={price} onChange={setPrice} />
