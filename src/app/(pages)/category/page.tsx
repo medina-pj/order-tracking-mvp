@@ -5,7 +5,7 @@
  * Author: PJ Medina
  * Date:   Sunday June 11th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 4th 2023, 7:50:36 pm
+ * Last Modified time: July 9th 2023, 10:58:01 am
  * ---------------------------------------------
  */
 
@@ -30,6 +30,7 @@ export default function Category() {
   const { documents, createDoc, deleteDoc } = useCategory();
   const [error, setError] = useState('');
   const [name, setName] = useState('');
+  const [sequence, setSequence] = useState(0);
   const [description, setDescription] = useState('');
 
   const createCategory = async () => {
@@ -41,7 +42,7 @@ export default function Category() {
         return;
       }
 
-      await createDoc({ name, description });
+      await createDoc({ name, description, sequence });
 
       setName('');
       setDescription('');
@@ -63,9 +64,10 @@ export default function Category() {
   };
 
   return (
-    <Container style={{ marginTop: '2rem' }}>
+    <Container style={{ marginTop: '2rem', marginBottom: '2rem' }}>
       <InputField label='Name' value={name} onChange={setName} />
       <InputField label='Description' value={description} onChange={setDescription} />
+      <InputField label='Sequence' value={sequence} onChange={setSequence} />
       <Button label='Save Category' onClick={createCategory} />
       <p>{error}</p>
       <TableContainer>
@@ -84,6 +86,7 @@ export default function Category() {
                 <TableCell>{i + 1}</TableCell>
                 <TableCell>{doc?.name}</TableCell>
                 <TableCell>{doc?.description}</TableCell>
+                <TableCell>{doc?.sequence}</TableCell>
                 <TableCell align='right'>
                   <IconButton onClick={() => deleteCategory(doc.id)}>
                     <DeleteForeverIcon style={{ color: '#ea6655' }} />

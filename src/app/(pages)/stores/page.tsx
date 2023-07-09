@@ -4,8 +4,8 @@
  * ---------------------------------------------
  * Author: Rovelin Enriquez
  * Date:   Sunday July 2nd 2023
- * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
- * Last Modified time: July 7th 2023, 8:44:37 pm
+ * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
+ * Last Modified time: July 9th 2023, 10:58:12 am
  * ---------------------------------------------
  */
 
@@ -123,12 +123,17 @@ export default function Stores() {
 
   return (
     <>
-      <Container style={{ marginTop: '2rem' }}>
+      <Container style={{ marginTop: '2rem', marginBottom: '2rem' }}>
         <p style={{ fontSize: '28px' }}>Create Store</p>
         <InputField label='Name' value={name} onChange={setName} />
         <InputField label='Location' value={location} onChange={setLocation} />
         <InputField label='Contact Number' value={contactNumber} onChange={setContactNumber} />
-        <MultipleSelectChip label='Staff' value={staff} onChange={handleStaffChange} options={staffOptions} />
+        <MultipleSelectChip
+          label='Staff'
+          value={staff}
+          onChange={handleStaffChange}
+          options={staffOptions}
+        />
         <Button label='Save' onClick={createStore} />
         <p>{error}</p>
       </Container>

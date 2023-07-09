@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Friday June 9th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 6th 2023, 10:01:55 pm
+ * Last Modified time: July 9th 2023, 10:48:10 am
  * ---------------------------------------------
  */
 
@@ -11,7 +11,16 @@ import { useState, useEffect } from 'react';
 import moment from 'moment-timezone';
 moment.tz.setDefault('Asia/Manila');
 
-import { collection, query, onSnapshot, where, addDoc, doc, setDoc } from 'firebase/firestore';
+import {
+  collection,
+  query,
+  onSnapshot,
+  where,
+  addDoc,
+  doc,
+  setDoc,
+  orderBy,
+} from 'firebase/firestore';
 
 import { db } from '@/config/firebase';
 import { CategorySchema } from '@/types/schema/product';
@@ -37,7 +46,7 @@ const useCategory = () => {
 
   useEffect(() => {
     let ref = collection(db, constants.DB_CATEGORIES);
-    let qry = query(ref, where('isArchived', '==', false));
+    let qry = query(ref, where('isArchived', '==', false), orderBy('sequence'));
 
     //will invoke everytime database is updated in the cloud
     const unsub = onSnapshot(qry, async snapshot => {
