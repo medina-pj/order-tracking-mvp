@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Thursday July 6th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 9th 2023, 11:44:56 am
+ * Last Modified time: July 9th 2023, 4:47:17 pm
  * ---------------------------------------------
  */
 import moment from 'moment-timezone';
@@ -20,7 +20,7 @@ import { IProduct } from '@/hooks/products';
 export interface ISubMenu {
   productId: string;
   productCode: string;
-  productName: string;
+  name: string;
   productAbbrev: string;
   price: number;
   isAvailable: boolean;
@@ -127,7 +127,7 @@ const ProductService = {
         const productDetails = products.map((d: any) => ({
           productId: d.id,
           productCode: d.productCode,
-          productName: d.productName,
+          name: d.name,
           productAbbrev: d.productAbbrev,
           price: d.price,
           isAvailable: d.isAvailable,

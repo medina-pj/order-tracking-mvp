@@ -20,6 +20,7 @@
     "eslint": "8.42.0",
     "eslint-config-next": "13.4.4",
     "firebase": "^9.22.2",
+    "immutable": "^4.3.0",
     "moment": "^2.29.4",
     "moment-timezone": "^0.5.43",
     "next": "13.4.4",
