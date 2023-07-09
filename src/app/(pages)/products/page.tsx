@@ -5,11 +5,11 @@
  * Author: PJ Medina
  * Date:   Tuesday July 4th 2023
  * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
- * Last Modified time: July 9th 2023, 2:42:00 pm
+ * Last Modified time: July 9th 2023, 3:27:20 pm
  * ---------------------------------------------
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Checkbox,
   Container,
@@ -30,10 +30,14 @@ import useStore from '@/hooks/store';
 import useProduct, { ISaveProduct } from '@/hooks/products';
 import useCategory from '@/hooks/categories';
 import DropdownField from '@/components/Dropdown';
+import useGroupedProduct from '@/hooks/groupedProducts';
+import MultipleSelectChip from '@/components/MultipleSelect';
+import { SelectChangeEvent } from '@mui/material/Select';
 
 export default function Products() {
   const { documents: stores } = useStore();
   const { documents: categories } = useCategory();
+  const { documents: sub_menu } = useGroupedProduct();
   const { documents, createDoc, deleteDoc } = useProduct();
 
   const [error, setError] = useState('');
@@ -45,6 +49,15 @@ export default function Products() {
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState(0);
   const [isAddOns, setIsAddOns] = useState(false);
+  const [subMenu, setSubMenu] = useState<string[]>([]);
+  const [subMenuOptions, setSubMenuOptions] = useState<{ label: string; value: string }[]>([]);
+
+  useEffect(() => {
+    if (sub_menu) {
+      const subMenuOption = sub_menu.map(submenu => ({ label: submenu.name!, value: submenu.id! }));
+      setSubMenuOptions(subMenuOption);
+    }
+  }, [sub_menu]);
 
   const onCreateProduct = async () => {
     try {
@@ -62,7 +75,7 @@ export default function Products() {
         isAddOns,
         description,
         note,
-        subMenu: [],
+        subMenu: isAddOns ? [] : subMenu,
       };
 
       await createDoc(payload);
@@ -87,18 +100,16 @@ export default function Products() {
     }
   };
 
-  // console.log({ storeProducts });
+  const handleSubMenuChange = (event: SelectChangeEvent<typeof subMenu>) => {
+    const {
+      target: { value },
+    } = event;
 
-  // const handleAddOnChange = (event: SelectChangeEvent<typeof addOns>) => {
-  //   const {
-  //     target: { value },
-  //   } = event;
-
-  //   setAddOns(
-  //     // On autofill we get a stringified value.
-  //     typeof value === 'string' ? value.split(',') : value
-  //   );
-  // };
+    setSubMenu(
+      // On autofill we get a stringified value.
+      typeof value === 'string' ? value.split(',') : value
+    );
+  };
 
   return (
     <Container style={{ marginTop: '2rem', marginBottom: '2rem' }}>
@@ -125,35 +136,14 @@ export default function Products() {
         label='Is Add-on'
       />
 
-      {/* {isAddOn && (
-        <FormControl style={{ marginBottom: '20px', minWidth: '100%' }}>
-          <InputLabel id='add-ons-label'>Add-Ons</InputLabel>
-          <Select
-            labelId='add-ons-label'
-            id='add-ons'
-            multiple
-            value={addOns}
-            onChange={handleAddOnChange}
-            input={<OutlinedInput label='Add-Ons' />}
-            renderValue={selected => selected.join(', ')}
-            MenuProps={{
-              PaperProps: {
-                style: {
-                  maxHeight: 48 * 4.5 + 8,
-                  width: 250,
-                },
-              },
-            }}
-          >
-            {storeProducts.map(d => (
-              <MenuItem key={d.id} value={d.productAbbrev}>
-                <Checkbox checked={addOns.indexOf(d.productAbbrev as string) > -1} />
-                <ListItemText primary={`${d?.product?.name} (${d?.productAbbrev})`} />
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      )} */}
+      {!isAddOns && (
+        <MultipleSelectChip
+          label='Sub-Menu'
+          value={subMenu}
+          onChange={handleSubMenuChange}
+          options={subMenuOptions}
+        />
+      )}
 
       <Button label='Save Product' onClick={onCreateProduct} />
       <p>{error}</p>
