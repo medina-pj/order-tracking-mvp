@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Thursday July 6th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 9th 2023, 4:47:17 pm
+ * Last Modified time: July 9th 2023, 9:17:45 pm
  * ---------------------------------------------
  */
 import moment from 'moment-timezone';
@@ -24,6 +24,7 @@ export interface ISubMenu {
   productAbbrev: string;
   price: number;
   isAvailable: boolean;
+  isAddOns: boolean;
 }
 
 const ProductService = {
@@ -112,11 +113,7 @@ const ProductService = {
     try {
       let result: ISubMenu[] = [];
       const ref = collection(db, constants.DB_GROUPED_PRODUCT);
-      const qry = query(
-        ref,
-        where('isArchived', '==', false),
-        where(documentId(), 'in', groupProductIds)
-      );
+      const qry = query(ref, where('isArchived', '==', false), where(documentId(), 'in', groupProductIds));
 
       const qrySnapshot = await getDocs(qry);
 
@@ -131,6 +128,7 @@ const ProductService = {
           productAbbrev: d.productAbbrev,
           price: d.price,
           isAvailable: d.isAvailable,
+          isAddOns: true,
         }));
 
         result.push(...productDetails);
