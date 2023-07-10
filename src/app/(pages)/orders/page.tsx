@@ -5,7 +5,7 @@
  * Author: PJ Medina
  * Date:   Sunday July 9th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 9th 2023, 11:14:51 pm
+ * Last Modified time: July 11th 2023, 1:40:39 am
  * ---------------------------------------------
  */
 
@@ -15,11 +15,14 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  Box,
   Card,
   CardActions,
   CardContent,
+  CardHeader,
   Container,
   FormControl,
+  Grid,
   IconButton,
   InputLabel,
   MenuItem,
@@ -34,6 +37,7 @@ import {
 } from '@mui/material';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import InputField from '@/components/TextField';
 import ButtonField from '@/components/Button';
 
@@ -54,9 +58,33 @@ interface ProductDetailsProps {
   style?: any;
   cartItems?: any;
   setCartItems?: any;
+  withDeleteBtn?: boolean;
 }
 
-const ProductDetails = ({ product, style, item, cartItems, setCartItems }: ProductDetailsProps) => {
+const ProductDetails = ({
+  product,
+  style,
+  item,
+  cartItems,
+  setCartItems,
+  withDeleteBtn,
+}: ProductDetailsProps) => {
+  const styles: any = {
+    qntyButton: {
+      outline: 'none',
+      color: 'grey',
+      borderColor: 'grey',
+      fontSize: '0.75rem',
+    },
+    removeButton: {
+      outline: 'none',
+      color: '#EF6262',
+      borderColor: '#EF6262',
+      textTransform: 'none',
+      fontSize: '0.75rem',
+    },
+  };
+
   let itemDetails = item;
 
   if (product?.isAddOns) {
@@ -167,19 +195,45 @@ const ProductDetails = ({ product, style, item, cartItems, setCartItems }: Produ
 
   return (
     <div style={style}>
-      <Typography sx={{ fontSize: 12 }} color='text.secondary'>
-        {product?.productAbbrev}
-      </Typography>
-      <Typography sx={{ fontSize: 16 }}>{product?.name}</Typography>
-      <Typography sx={{ fontSize: 14 }} component='div' gutterBottom>
-        P{numeral(product?.price).format('P0,0.00')}
-      </Typography>
+      <Grid container spacing={2}>
+        <Grid item xs={12}>
+          <Typography sx={{ fontSize: 12 }} color='text.secondary' gutterBottom>
+            {product?.productAbbrev}
+          </Typography>
+          <Typography sx={{ fontSize: 16 }}>{product?.name}</Typography>
+          <Typography sx={{ fontSize: 14 }} color='text.secondary' component='div'>
+            P{numeral(product?.price).format('P0,0.00')}
+          </Typography>
+        </Grid>
 
-      <ButtonGroup size='small'>
-        <Button onClick={onAddQuantity}>+</Button>
-        {itemDetails?.quantity && <Button>{itemDetails?.quantity || 0}</Button>}
-        {itemDetails?.quantity && <Button onClick={onDeductQuantity}>-</Button>}
-      </ButtonGroup>
+        <Grid item xs={6} display='flex' alignItems='center' justifyContent='flex-start'>
+          <Box>
+            <ButtonGroup size='small'>
+              <Button style={styles.qntyButton} onClick={onAddQuantity}>
+                +
+              </Button>
+              {itemDetails?.quantity && (
+                <Button style={styles.qntyButton}>{itemDetails?.quantity || 0}</Button>
+              )}
+              {itemDetails?.quantity && (
+                <Button style={styles.qntyButton} onClick={onDeductQuantity}>
+                  -
+                </Button>
+              )}
+            </ButtonGroup>
+          </Box>
+        </Grid>
+
+        {withDeleteBtn && (
+          <Grid item xs={6}>
+            <Box display='flex' justifyContent='flex-end'>
+              <Button style={styles.removeButton} onClick={onAddQuantity} variant='outlined'>
+                Remove
+              </Button>
+            </Box>
+          </Grid>
+        )}
+      </Grid>
     </div>
   );
 };
@@ -209,7 +263,7 @@ const MenuCard = ({
   }
 
   return (
-    <Card style={{ marginBottom: '0.75rem' }} variant='outlined'>
+    <Card style={{ marginBottom: '1rem' }} variant='outlined'>
       <CardContent>
         <ProductDetails
           product={product}
@@ -219,14 +273,16 @@ const MenuCard = ({
         />
         {product?.subMenu.length > 0 && itemExist && (
           <div>
-            <Typography sx={{ fontSize: 14, marginBottom: '1rem', marginTop: '1rem' }} color='text.secondary'>
+            <Typography
+              sx={{ fontWeight: '600', fontSize: 14, marginBottom: '0.5rem', marginTop: '1.5rem' }}
+              color='text.secondary'>
               Add-Ons:
             </Typography>
             {product?.subMenu.map((sm: ISubMenu, index: number) => {
               return (
                 <ProductDetails
                   key={index}
-                  style={{ marginBottom: '0.5rem' }}
+                  style={{ marginBottom: '1rem' }}
                   product={sm}
                   item={itemExist}
                   cartItems={cartItems}
@@ -237,7 +293,71 @@ const MenuCard = ({
           </div>
         )}
 
-        <Typography sx={{ fontSize: 14, marginBottom: '1rem', marginTop: '1rem' }} color='text.secondary'>
+        <Typography sx={{ fontSize: 14, marginTop: '0.5rem' }} color='text.secondary'>
+          Sub Total: P{numeral(subTotal).format('P0,00.00')}
+        </Typography>
+      </CardContent>
+    </Card>
+  );
+};
+
+const CartItemCard = ({
+  product,
+  cartItems,
+  setCartItems,
+}: {
+  product: IProduct;
+  cartItems: TCartItems[];
+  setCartItems: any;
+}) => {
+  let subTotal = 0;
+  const itemExist = cartItems.find((d: any) => d.productId === product.id);
+
+  if (itemExist) {
+    const qnty = itemExist.quantity;
+    const price = itemExist.price;
+
+    const addOnsTotal = itemExist.addOns.reduce((acc: number, curr: TCartAddOns) => {
+      acc += curr.price * curr.quantity * qnty;
+      return acc;
+    }, 0);
+
+    subTotal = Number(qnty) * Number(price) + Number(addOnsTotal);
+  }
+
+  return (
+    <Card style={{ marginBottom: '1rem' }} variant='outlined'>
+      <CardContent>
+        <ProductDetails
+          product={product}
+          item={itemExist}
+          cartItems={cartItems}
+          setCartItems={setCartItems}
+          withDeleteBtn
+        />
+        {product?.subMenu.length > 0 && itemExist && (
+          <div>
+            <Typography
+              sx={{ fontWeight: '600', fontSize: 14, marginBottom: '0.5rem', marginTop: '1.5rem' }}
+              color='text.secondary'>
+              Add-Ons:
+            </Typography>
+            {product?.subMenu.map((sm: ISubMenu, index: number) => {
+              return (
+                <ProductDetails
+                  key={index}
+                  style={{ marginBottom: '1rem' }}
+                  product={sm}
+                  item={itemExist}
+                  cartItems={cartItems}
+                  setCartItems={setCartItems}
+                />
+              );
+            })}
+          </div>
+        )}
+
+        <Typography sx={{ fontSize: 14, marginTop: '0.5rem' }} color='text.secondary'>
           Sub Total: P{numeral(subTotal).format('P0,00.00')}
         </Typography>
       </CardContent>
@@ -295,7 +415,7 @@ export default function Order() {
       />
       <InputField label='Note' value={note} onChange={setNote} />
       <div>
-        <Accordion style={{ border: 'none', boxShadow: 'none' }}>
+        <Accordion style={{ border: 'none', boxShadow: 'none' }} expanded={true}>
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
             aria-controls='panel1a-content'
@@ -313,7 +433,7 @@ export default function Order() {
           </AccordionDetails>
         </Accordion>
 
-        <Accordion style={{ border: 'none', boxShadow: 'none' }}>
+        <Accordion style={{ border: 'none', boxShadow: 'none' }} expanded={true}>
           <AccordionSummary
             expandIcon={<ExpandMoreIcon />}
             aria-controls='panel2a-content'
@@ -322,7 +442,12 @@ export default function Order() {
           </AccordionSummary>
           <AccordionDetails>
             {cartItems.map((d: TCartItems, index: number) => (
-              <MenuCard key={index} product={d.product} cartItems={cartItems} setCartItems={setCartItems} />
+              <CartItemCard
+                key={index}
+                product={d.product}
+                cartItems={cartItems}
+                setCartItems={setCartItems}
+              />
             ))}
           </AccordionDetails>
         </Accordion>
