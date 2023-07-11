@@ -5,7 +5,7 @@
  * Author: PJ Medina
  * Date:   Sunday July 9th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 11th 2023, 9:44:04 pm
+ * Last Modified time: July 11th 2023, 10:37:00 pm
  * ---------------------------------------------
  */
 
@@ -326,22 +326,23 @@ const MenuCard = ({
 };
 
 const CartItemCard = ({
-  product,
+  cartItemId,
   cartItems,
   setCartItems,
 }: {
-  product: IProduct;
+  cartItemId: string;
   cartItems: TCartItems[];
   setCartItems: any;
 }) => {
   let subTotal = 0;
-  const itemExist = cartItems.find((d: any) => d.productId === product.id);
 
-  if (itemExist) {
-    const qnty = itemExist.quantity;
-    const price = itemExist.price;
+  const item = cartItems.find((d: any) => d.id === cartItemId);
 
-    const addOnsTotal = itemExist.addOns.reduce((acc: number, curr: TCartAddOns) => {
+  if (item) {
+    const qnty = item.quantity;
+    const price = item.price;
+
+    const addOnsTotal = item.addOns.reduce((acc: number, curr: TCartAddOns) => {
       acc += curr.price * curr.quantity * qnty;
       return acc;
     }, 0);
@@ -353,13 +354,13 @@ const CartItemCard = ({
     <Card style={{ marginBottom: '1rem' }} variant='outlined'>
       <CardContent>
         <ProductDetails
-          product={product}
-          item={itemExist}
+          product={item?.product}
+          item={item}
           cartItems={cartItems}
           setCartItems={setCartItems}
           withDeleteBtn
         />
-        {product?.subMenu.length > 0 && itemExist && (
+        {item?.product?.subMenu.length > 0 && item && (
           <div>
             <Typography
               sx={{
@@ -372,13 +373,13 @@ const CartItemCard = ({
               color='text.secondary'>
               Add-Ons:
             </Typography>
-            {product?.subMenu.map((sm: ISubMenu, index: number) => {
+            {item.product?.subMenu.map((sm: ISubMenu, index: number) => {
               return (
                 <ProductDetails
                   key={index}
                   style={{ marginBottom: '1rem' }}
                   product={sm}
-                  item={itemExist}
+                  item={item}
                   cartItems={cartItems}
                   setCartItems={setCartItems}
                 />
@@ -543,7 +544,7 @@ export default function Order() {
                 {cartItems.map((d: TCartItems, index: number) => (
                   <CartItemCard
                     key={index}
-                    product={d.product}
+                    cartItemId={d.id}
                     cartItems={cartItems}
                     setCartItems={setCartItems}
                   />
