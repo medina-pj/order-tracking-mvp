@@ -5,11 +5,11 @@
  * Author: PJ Medina
  * Date:   Sunday July 9th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 11th 2023, 1:40:39 am
+ * Last Modified time: July 11th 2023, 9:44:04 pm
  * ---------------------------------------------
  */
 
-import { useState } from 'react';
+import { CSSProperties, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import {
   Accordion,
@@ -17,27 +17,14 @@ import {
   AccordionSummary,
   Box,
   Card,
-  CardActions,
   CardContent,
-  CardHeader,
   Container,
-  FormControl,
+  FormControlLabel,
   Grid,
-  IconButton,
-  InputLabel,
-  MenuItem,
-  Select,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Typography,
 } from '@mui/material';
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
+import Checkbox from '@mui/material/Checkbox';
 import InputField from '@/components/TextField';
 import ButtonField from '@/components/Button';
 
@@ -51,6 +38,7 @@ import { Button, ButtonGroup } from '@mui/material';
 import { produce } from 'immer';
 import useStoreTable from '@/hooks/storeTable';
 import DropdownField from '@/components/Dropdown';
+import useOrder, { ICreateOrder } from '@/hooks/orders';
 
 interface ProductDetailsProps {
   product: any;
@@ -61,6 +49,12 @@ interface ProductDetailsProps {
   withDeleteBtn?: boolean;
 }
 
+const globalStyles: { [key: string]: CSSProperties } = {
+  typography: {
+    fontFamily: 'inherit',
+  },
+};
+
 const ProductDetails = ({
   product,
   style,
@@ -69,7 +63,7 @@ const ProductDetails = ({
   setCartItems,
   withDeleteBtn,
 }: ProductDetailsProps) => {
-  const styles: any = {
+  const productDetailStyle: any = {
     qntyButton: {
       outline: 'none',
       color: 'grey',
@@ -193,15 +187,34 @@ const ProductDetails = ({
     }
   };
 
+  const onRemoveOrder = () => {
+    if (!window.confirm('Are you sure you want to remove this item?')) {
+      return;
+    }
+
+    setCartItems(
+      produce(cartItems, (draftState: any) => {
+        const index = draftState.findIndex((obj: any) => obj.id === item.id);
+
+        if (index !== -1) {
+          draftState.splice(index, 1);
+        }
+      })
+    );
+  };
+
   return (
     <div style={style}>
       <Grid container spacing={2}>
         <Grid item xs={12}>
-          <Typography sx={{ fontSize: 12 }} color='text.secondary' gutterBottom>
+          <Typography sx={{ ...globalStyles.typography, fontSize: 12 }} color='text.secondary' gutterBottom>
             {product?.productAbbrev}
           </Typography>
-          <Typography sx={{ fontSize: 16 }}>{product?.name}</Typography>
-          <Typography sx={{ fontSize: 14 }} color='text.secondary' component='div'>
+          <Typography sx={{ ...globalStyles.typography, fontSize: 16 }}>{product?.name}</Typography>
+          <Typography
+            sx={{ ...globalStyles.typography, fontSize: 14 }}
+            color='text.secondary'
+            component='div'>
             P{numeral(product?.price).format('P0,0.00')}
           </Typography>
         </Grid>
@@ -209,14 +222,14 @@ const ProductDetails = ({
         <Grid item xs={6} display='flex' alignItems='center' justifyContent='flex-start'>
           <Box>
             <ButtonGroup size='small'>
-              <Button style={styles.qntyButton} onClick={onAddQuantity}>
+              <Button style={productDetailStyle.qntyButton} onClick={onAddQuantity}>
                 +
               </Button>
               {itemDetails?.quantity && (
-                <Button style={styles.qntyButton}>{itemDetails?.quantity || 0}</Button>
+                <Button style={productDetailStyle.qntyButton}>{itemDetails?.quantity || 0}</Button>
               )}
               {itemDetails?.quantity && (
-                <Button style={styles.qntyButton} onClick={onDeductQuantity}>
+                <Button style={productDetailStyle.qntyButton} onClick={onDeductQuantity}>
                   -
                 </Button>
               )}
@@ -227,7 +240,10 @@ const ProductDetails = ({
         {withDeleteBtn && (
           <Grid item xs={6}>
             <Box display='flex' justifyContent='flex-end'>
-              <Button style={styles.removeButton} onClick={onAddQuantity} variant='outlined'>
+              <Button
+                style={{ ...globalStyles.typography, ...productDetailStyle.removeButton }}
+                onClick={onRemoveOrder}
+                variant='outlined'>
                 Remove
               </Button>
             </Box>
@@ -274,7 +290,13 @@ const MenuCard = ({
         {product?.subMenu.length > 0 && itemExist && (
           <div>
             <Typography
-              sx={{ fontWeight: '600', fontSize: 14, marginBottom: '0.5rem', marginTop: '1.5rem' }}
+              sx={{
+                ...globalStyles.typography,
+                fontWeight: '600',
+                fontSize: 14,
+                marginBottom: '0.5rem',
+                marginTop: '1.5rem',
+              }}
               color='text.secondary'>
               Add-Ons:
             </Typography>
@@ -293,7 +315,9 @@ const MenuCard = ({
           </div>
         )}
 
-        <Typography sx={{ fontSize: 14, marginTop: '0.5rem' }} color='text.secondary'>
+        <Typography
+          sx={{ ...globalStyles.typography, fontSize: 14, marginTop: '0.5rem' }}
+          color='text.secondary'>
           Sub Total: P{numeral(subTotal).format('P0,00.00')}
         </Typography>
       </CardContent>
@@ -338,7 +362,13 @@ const CartItemCard = ({
         {product?.subMenu.length > 0 && itemExist && (
           <div>
             <Typography
-              sx={{ fontWeight: '600', fontSize: 14, marginBottom: '0.5rem', marginTop: '1.5rem' }}
+              sx={{
+                ...globalStyles.typography,
+                fontWeight: '600',
+                fontSize: 14,
+                marginBottom: '0.5rem',
+                marginTop: '1.5rem',
+              }}
               color='text.secondary'>
               Add-Ons:
             </Typography>
@@ -357,7 +387,9 @@ const CartItemCard = ({
           </div>
         )}
 
-        <Typography sx={{ fontSize: 14, marginTop: '0.5rem' }} color='text.secondary'>
+        <Typography
+          sx={{ ...globalStyles.typography, fontSize: 14, marginTop: '0.5rem' }}
+          color='text.secondary'>
           Sub Total: P{numeral(subTotal).format('P0,00.00')}
         </Typography>
       </CardContent>
@@ -369,27 +401,88 @@ export default function Order() {
   const { documents: stores } = useStore();
   const { documents: products } = useProduct();
   const { documents: tables } = useStoreTable();
+  const { createOrder } = useOrder();
 
   const [error, setError] = useState('');
   const [store, setStore] = useState('');
   const [table, setTable] = useState('');
-  const [type, setType] = useState('dine_in');
-  const [note, setNote] = useState('');
+  const [type, setType] = useState<OrderTypeEnum>(OrderTypeEnum.DINE_IN);
+  const [notes, setNotes] = useState('');
+  const [orderPaid, setOrderPaid] = useState(false);
   const [cartEntries, setCartEntries] = useState<TCartItems[]>([]);
   const [cartItems, setCartItems] = useState<TCartItems[]>([]);
 
   const onAddToCart = () => {
-    setCartItems((prev: any) => prev.concat(cartEntries));
-    setCartEntries([]);
+    if (cartEntries.length) {
+      setCartItems((prev: any) => prev.concat(cartEntries));
+      setCartEntries([]);
+    }
   };
 
-  console.log({
-    cartEntries,
-    cartItems,
-  });
+  const onCreateOrder = async () => {
+    try {
+      if (!store || !table || !type || !cartItems.length) {
+        alert('Input required fields.');
+        return;
+      }
+
+      if (!window.confirm('Sure na?')) {
+        return;
+      }
+
+      const cart = cartItems.map((d: TCartItems) => ({
+        id: d.id,
+        productId: d.productId,
+        productCode: d.productCode,
+        productName: d.productName,
+        productAbbrev: d.productAbbrev,
+        price: d.price,
+        quantity: d.quantity,
+        notes: d.notes,
+        addOns: d.addOns,
+        voided: d.voided,
+      }));
+
+      const payload: ICreateOrder = {
+        storeId: store,
+        tableId: table,
+        notes,
+        customerNotes: '',
+        type,
+        cartItems: cart,
+        orderPaid,
+      };
+
+      await createOrder(payload);
+
+      setTable('');
+      setNotes('');
+      setOrderPaid(false);
+      setCartEntries([]);
+      setCartItems([]);
+
+      alert('Order created.');
+    } catch (err: any) {
+      setError(err?.message);
+    }
+  };
+
+  const total = cartItems.reduce((acc: any, curr: any) => {
+    const qnty = curr.quantity;
+    const price = curr.price;
+
+    const addOnsTotal = curr.addOns.reduce((acc: number, curr: TCartAddOns) => {
+      acc += curr.price * curr.quantity * qnty;
+      return acc;
+    }, 0);
+
+    acc += Number(qnty) * Number(price) + Number(addOnsTotal);
+
+    return acc;
+  }, 0);
 
   return (
-    <Container style={{ marginTop: '2rem', marginBottom: '2rem' }}>
+    <Container style={{ marginTop: '2rem', marginBottom: '5rem' }}>
       <DropdownField
         label='Store'
         value={store}
@@ -413,16 +506,17 @@ export default function Order() {
           { value: OrderTypeEnum.TAKE_OUT, label: 'Take Out' },
         ]}
       />
-      <InputField label='Note' value={note} onChange={setNote} />
+      <InputField label='Notes' value={notes} onChange={setNotes} />
       <div>
-        <Accordion style={{ border: 'none', boxShadow: 'none' }} expanded={true}>
+        <Accordion style={{ border: 'none', boxShadow: 'none' }} defaultExpanded={true}>
           <AccordionSummary
+            style={{ padding: 0 }}
             expandIcon={<ExpandMoreIcon />}
             aria-controls='panel1a-content'
             id='panel1a-header'>
-            <Typography>Menu</Typography>
+            <Typography style={{ ...globalStyles.typography, fontSize: '18px' }}>Menu</Typography>
           </AccordionSummary>
-          <AccordionDetails>
+          <AccordionDetails style={{ padding: 0 }}>
             {products
               .filter((d: IProduct) => !d.isAddOns)
               .map((d: IProduct, index: number) => (
@@ -433,24 +527,69 @@ export default function Order() {
           </AccordionDetails>
         </Accordion>
 
-        <Accordion style={{ border: 'none', boxShadow: 'none' }} expanded={true}>
+        <Accordion style={{ border: 'none', boxShadow: 'none' }} defaultExpanded={true}>
           <AccordionSummary
+            style={{ padding: 0 }}
             expandIcon={<ExpandMoreIcon />}
             aria-controls='panel2a-content'
             id='panel2a-header'>
-            <Typography>Cart</Typography>
+            <Typography sx={{ ...globalStyles.typography, marginBottom: '1.5rem', fontSize: '18px' }}>
+              Cart
+            </Typography>
           </AccordionSummary>
-          <AccordionDetails>
-            {cartItems.map((d: TCartItems, index: number) => (
-              <CartItemCard
-                key={index}
-                product={d.product}
-                cartItems={cartItems}
-                setCartItems={setCartItems}
-              />
-            ))}
+          <AccordionDetails style={{ padding: 0 }}>
+            {cartItems.length ? (
+              <>
+                {cartItems.map((d: TCartItems, index: number) => (
+                  <CartItemCard
+                    key={index}
+                    product={d.product}
+                    cartItems={cartItems}
+                    setCartItems={setCartItems}
+                  />
+                ))}
+
+                <Box>
+                  <FormControlLabel
+                    control={<Checkbox checked={orderPaid} onChange={() => setOrderPaid(prev => !prev)} />}
+                    label='Paid Order'
+                  />
+                </Box>
+
+                <Box display='flex' alignItems='center' justifyContent='flex-start'>
+                  <Typography
+                    sx={{
+                      ...globalStyles.typography,
+                      fontSize: 18,
+                      marginBottom: '1rem',
+                      marginTop: '1rem',
+                    }}
+                    color='text.secondary'>
+                    Total: P{numeral(total).format('0,0.00')}
+                  </Typography>
+                </Box>
+
+                <ButtonField label='Create Order' onClick={onCreateOrder} />
+              </>
+            ) : (
+              <Box display='flex' alignItems='center' justifyContent='center'>
+                <Typography
+                  sx={{ ...globalStyles.typography, fontSize: 18, marginBottom: '1.5rem' }}
+                  color='text.secondary'>
+                  {`Cart Is Empty :(`}
+                </Typography>
+              </Box>
+            )}
           </AccordionDetails>
         </Accordion>
+
+        <Box display='flex' alignItems='center' justifyContent='center'>
+          <Typography
+            sx={{ ...globalStyles.typography, fontSize: 12, marginBottom: '1.5rem' }}
+            color='text.secondary'>
+            {error}
+          </Typography>
+        </Box>
       </div>
     </Container>
   );

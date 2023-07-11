@@ -2,8 +2,8 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Sunday June 11th 2023
- * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
- * Last Modified time: July 9th 2023, 3:29:03 pm
+ * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
+ * Last Modified time: July 11th 2023, 9:05:22 pm
  * ---------------------------------------------
  */
 
@@ -15,8 +15,8 @@ const ButtonField = ({ label, onClick }: { label: string; onClick: any }) => {
     marginBottom: '10px',
     marginTop: '20px',
     backgroundColor: '#101932',
-    height: '60px',
-    fontSize: '18px',
+    height: '50px',
+    fontSize: '16px',
     textTransform: 'none',
     fontFamily: 'inherit',
   };

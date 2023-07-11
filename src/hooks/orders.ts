@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 9th 2023, 3:30:08 pm
+ * Last Modified time: July 11th 2023, 9:26:56 pm
  * ---------------------------------------------
  */
 
@@ -45,11 +45,11 @@ export interface ICreateOrder {
   storeId: string;
   tableId: string;
   notes: string;
-  customerNotes: string;
+  customerNotes?: string;
   type: OrderTypeEnum;
-  discount: TDiscount[];
-  items: TCartItems[];
-  data: TOrderData;
+  discount?: TDiscount[];
+  cartItems: TCartItems[];
+  data?: TOrderData;
   orderPaid: boolean;
 }
 
@@ -68,7 +68,7 @@ export interface IOrder {
   customerNotes: string;
   type: OrderTypeEnum;
   status: OrderStatusEnum;
-  items: TCartItems[];
+  cartItems: TCartItems[];
   history: TOrderHistory[];
   discount: TDiscount[];
   data: TOrderData;
@@ -117,7 +117,7 @@ const useOrder = () => {
           customerNotes: doc.data().customerNotes,
           type: doc.data().type,
           status: doc.data().status,
-          items: doc.data().items,
+          cartItems: doc.data().cartItems,
           history: doc.data().history,
           orderPaid: doc.data().orderPaid,
           discount: doc.data().discount,
@@ -194,11 +194,11 @@ const useOrder = () => {
         notes: payload?.notes || '',
         customerNotes: payload?.customerNotes || '',
         type: payload.type,
-        items: payload.items,
+        cartItems: payload.cartItems,
         status: OrderStatusEnum.CONFIRMED,
         orderPaid: payload.orderPaid,
         discount: payload?.discount || [],
-        data: payload.data,
+        data: payload.data || {},
         history: [
           {
             action: 'order_received_and_confirmed',
@@ -209,6 +209,10 @@ const useOrder = () => {
         createdAt: moment().toDate().getTime(),
         updatedAt: moment().toDate().getTime(),
       };
+
+      console.log({
+        orderPayload,
+      });
 
       await addDoc(collection(db, constants.DB_ORDERS), orderPayload);
     } catch (err: any) {

@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 9th 2023, 11:13:58 pm
+ * Last Modified time: July 11th 2023, 9:26:31 pm
  * ---------------------------------------------
  */
 
@@ -72,11 +72,11 @@ export type OrderSchema = {
   customerNotes: string;
   type: OrderTypeEnum;
   status: OrderStatusEnum;
-  items: TCartItems[];
+  cartItems: TCartItems[];
   history: TOrderHistory[];
   discount: TDiscount[];
-  data: TOrderData;
   orderPaid: boolean;
+  data?: TOrderData;
   createdAt?: number;
   updatedAt?: number;
 };
