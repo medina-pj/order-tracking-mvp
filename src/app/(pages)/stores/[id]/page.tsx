@@ -2,32 +2,36 @@
  * ---------------------------------------------
  * Author: Rovelin Enriquez
  * Date:   Thursday July 6th 2023
- * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 9th 2023, 11:20:03 am
+ * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
+ * Last Modified time: July 12th 2023, 10:15:47 pm
  * ---------------------------------------------
  */
 
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Container } from '@mui/material';
 import { useParams, useRouter } from 'next/navigation';
+import { Container } from '@mui/material';
 import { SelectChangeEvent } from '@mui/material/Select';
-import InputField from '@/components/TextField';
 
+import InputField from '@/components/TextField';
 import MultipleSelectChip from '@/components/MultipleSelect';
 import Button from '@/components/Button';
+
 import useAdminAccount from '@/hooks/adminAccount';
 import useStore from '@/hooks/store';
+import StoreService from '@/services/stores';
 
 export default function ViewStore() {
-  const { id: storeId } = useParams();
+  const { id } = useParams();
   const router = useRouter();
 
   const { documents: users } = useAdminAccount();
-  const { documents: stores, updateDoc } = useStore();
+  const { updateDoc } = useStore();
 
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
   const [name, setName] = useState('');
   const [location, setLocation] = useState('');
   const [contactNumber, setContactNumber] = useState('');
@@ -35,16 +39,19 @@ export default function ViewStore() {
   const [staffOptions, setStaffOptions] = useState<{ label: string; value: string }[]>([]);
 
   useEffect(() => {
-    if (stores.length) {
-      const currentStore = stores.find(store => store.id === storeId);
-      if (currentStore) {
-        setName(currentStore?.name);
-        setLocation(currentStore?.location || '');
-        setContactNumber(currentStore?.contactNumber || '');
-        setStaff(currentStore?.staff || []);
-      }
+    try {
+      (async function () {
+        const currentStore = await StoreService.fetchStore(id);
+        setName(currentStore.name);
+        setLocation(currentStore.location);
+        setContactNumber(currentStore.contactNumber);
+        setStaff(currentStore.staff);
+      })();
+    } catch (error) {
+      alert('Error. Failed to load data.');
+      router.back();
     }
-  }, [stores, storeId]);
+  }, [id]);
 
   useEffect(() => {
     if (users) {
@@ -66,45 +73,36 @@ export default function ViewStore() {
 
   const updateStore = async () => {
     try {
-      if (!name) {
-        alert('Store name is required.');
-        return;
-      }
+      if (!name) throw new Error('Store name is required.');
 
-      setError('');
+      setIsLoading(true);
+      const payload = {
+        id,
+        name,
+        location,
+        contactNumber,
+        staff,
+      };
 
-      if (storeId) {
-        const payload = {
-          id: storeId,
-          name,
-          location,
-          contactNumber,
-          staff,
-        };
-
-        await updateDoc(payload);
-        alert('Store successfully updated.');
-        router.back();
-      } else setError('Invalid store');
+      await updateDoc(payload);
+      alert('Store successfully updated.');
+      setIsLoading(false);
+      router.back();
     } catch (err: any) {
       setError(err?.message);
+      setIsLoading(false);
     }
   };
 
   return (
     <Container style={{ marginTop: '2rem', marginBottom: '2rem' }}>
-      <p style={{ fontSize: '28px' }}>Update Store</p>
+      <p style={{ fontSize: '22px' }}>Update Store</p>
       <InputField label='Name' value={name} onChange={setName} />
       <InputField label='Location' value={location} onChange={setLocation} />
       <InputField label='Contact Number' value={contactNumber} onChange={setContactNumber} />
-      <MultipleSelectChip
-        label='Staff'
-        value={staff}
-        onChange={handleStaffChange}
-        options={staffOptions}
-      />
-      <Button label='Update' onClick={updateStore} />
-      <p>{error}</p>
+      <MultipleSelectChip label='Staff' value={staff} onChange={handleStaffChange} options={staffOptions} />
+      <Button loading={isLoading} label='Update' onClick={updateStore} />
+      <i style={{ color: 'red' }}>{error}</i>
     </Container>
   );
 }

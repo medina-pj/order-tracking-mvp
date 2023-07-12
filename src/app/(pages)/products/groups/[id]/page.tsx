@@ -1,15 +1,15 @@
-'use client';
-
 /*
  * ---------------------------------------------
- * Author: PJ Medina
- * Date:   Tuesday July 4th 2023
+ * Author: Rovelin Enriquez
+ * Date:   Wednesday July 12th 2023
  * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
- * Last Modified time: July 9th 2023, 6:27:05 pm
+ * Last Modified time: July 12th 2023, 10:41:57 pm
  * ---------------------------------------------
  */
+'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useParams, useRouter } from 'next/navigation';
 import { Container } from '@mui/material';
 
 import InputField from '@/components/TextField';
@@ -19,32 +19,55 @@ import useStore from '@/hooks/store';
 import useProduct from '@/hooks/products';
 
 import { TAddOnProduct } from '@/types/schema/product';
-import useGroupedProduct, { ISaveGroupedProduct } from '@/hooks/groupedProducts';
+import useGroupedProduct, { ISaveGroupedProduct, IUpdateGroupedProduct } from '@/hooks/groupedProducts';
 import DropdownField from '@/components/Dropdown';
 import TableComponent from '@/components/Table';
+import GroupedProductService from '@/services/groupedProducts';
 
 export default function Products() {
+  const { id } = useParams();
+  const router = useRouter();
+
   const { documents: stores } = useStore();
   const { documents: productsDocs } = useProduct();
-  const { documents, createDoc, deleteDoc } = useGroupedProduct();
+  const { updateDoc } = useGroupedProduct();
 
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
   const [store, setStore] = useState('');
   const [name, setName] = useState('');
   const [sequence, setSequence] = useState(0);
   const [description, setDescription] = useState('');
   const [products, setProducts] = useState<TAddOnProduct[]>([]);
+
   const [selectedProduct, setSelectedProduct] = useState('');
   const [price, setPrice] = useState(0);
 
-  const onCreateGroupedProduct = async () => {
+  useEffect(() => {
     try {
-      if (!store || !name || !products.length) {
-        alert('Input all required fields.');
-        return;
-      }
+      (async function () {
+        const currentProduct = await GroupedProductService.fetchGroupProduct(id);
 
-      const payload: ISaveGroupedProduct = {
+        setStore(currentProduct.storeId);
+        setName(currentProduct.name);
+        setSequence(currentProduct.sequence);
+        setDescription(currentProduct.description);
+        setProducts(currentProduct.products);
+      })();
+    } catch (error) {
+      alert('Error. Failed to load data.');
+      router.back();
+    }
+  }, [id]);
+
+  const onUpdateGroupedProduct = async () => {
+    try {
+      if (!store || !name || !products.length) throw new Error('Store, name and products are required.');
+
+      setIsLoading(true);
+      const payload: IUpdateGroupedProduct = {
+        id,
         storeId: store,
         name,
         sequence,
@@ -52,34 +75,19 @@ export default function Products() {
         products,
       };
 
-      await createDoc(payload);
-
-      setName('');
-      setSequence(0);
-      setDescription('');
-      setProducts([]);
-      setSelectedProduct('');
-      setPrice(0);
+      await updateDoc(payload);
+      setIsLoading(false);
+      alert('Product successfully updated.');
+      router.back();
     } catch (err: any) {
       setError(err?.message);
-    }
-  };
-
-  const deleteGroupProduct = async (id: string) => {
-    try {
-      setError('');
-
-      if (!confirm('Are you sure you want to delete this record?')) return;
-
-      await deleteDoc(id);
-    } catch (err: any) {
-      setError(err?.message);
+      setIsLoading(false);
     }
   };
 
   const onAddProduct = () => {
     if (!selectedProduct || !price) {
-      alert('Product and price is required.');
+      setError('Product and price are required.');
       return;
     }
 
@@ -106,14 +114,9 @@ export default function Products() {
   return (
     <Container style={{ marginTop: '2rem', marginBottom: '2rem' }}>
       <DropdownField
+        disabled={true}
         label='Store'
         value={store}
-        onChange={(e: any) => {
-          setProducts([]);
-          setSelectedProduct('');
-          setPrice(0);
-          setStore(e.target.value);
-        }}
         options={stores.map(store => ({ label: store.name, value: store.id }))}
       />
       <InputField label='Name' value={name} onChange={setName} />
@@ -136,7 +139,7 @@ export default function Products() {
       />
 
       <InputField label='Price' value={price} onChange={setPrice} />
-      <Button label='Add Product' onClick={onAddProduct} />
+      <Button disabled={price && selectedProduct ? false : true} label='Add Product' onClick={onAddProduct} />
 
       <TableComponent
         rows={products.map((product, index) => {
@@ -151,22 +154,8 @@ export default function Products() {
         onDelete={onRemoveProduct}
       />
 
-      <Button label='Save Group Product' onClick={onCreateGroupedProduct} />
-      <p>{error}</p>
-      <TableComponent
-        label='Group Product List'
-        rows={documents.map(doc => {
-          const totalCost = doc?.products.reduce((cur, acc) => cur + Number(acc.price), 0);
-          return {
-            id: doc?.id,
-            label: `${doc?.name} - P${totalCost}`,
-            subLabel: doc?.description,
-            labelList: 'Products',
-            list: doc.products.map(prod => `${prod.name}(${prod.productAbbrev}) - P${prod.price}`),
-          };
-        })}
-        onDelete={deleteGroupProduct}
-      />
+      <Button loading={isLoading} label='Update' onClick={onUpdateGroupedProduct} />
+      <i style={{ color: 'red' }}>{error}</i>
     </Container>
   );
 }

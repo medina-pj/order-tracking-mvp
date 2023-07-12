@@ -3,7 +3,7 @@
  * Author: Rovelin Enriquez
  * Date:   Sunday July 9th 2023
  * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
- * Last Modified time: July 9th 2023, 6:25:37 pm
+ * Last Modified time: July 12th 2023, 8:22:57 pm
  * ---------------------------------------------
  */
 
@@ -56,7 +56,7 @@ const TableComponent = ({
 
   return (
     <>
-      {label && <p style={{ fontSize: '28px', textAlign: 'center' }}>{label}</p>}
+      {label && <p style={{ fontSize: '22px', textAlign: 'center' }}>{label}</p>}
       <TableContainer>
         <Table>
           <TableHead>

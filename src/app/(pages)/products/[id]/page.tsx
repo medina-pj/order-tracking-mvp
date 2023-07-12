@@ -1,36 +1,38 @@
-'use client';
-
 /*
  * ---------------------------------------------
- * Author: PJ Medina
- * Date:   Tuesday July 4th 2023
+ * Author: Rovelin Enriquez
+ * Date:   Wednesday July 12th 2023
  * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
- * Last Modified time: July 12th 2023, 10:24:38 pm
+ * Last Modified time: July 12th 2023, 10:44:06 pm
  * ---------------------------------------------
  */
+'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { Checkbox, Container, FormControlLabel } from '@mui/material';
+import { SelectChangeEvent } from '@mui/material/Select';
+
 import InputField from '@/components/TextField';
 import Button from '@/components/Button';
+import DropdownField from '@/components/Dropdown';
+import MultipleSelectChip from '@/components/MultipleSelect';
 
 import useStore from '@/hooks/store';
-import useProduct, { ISaveProduct } from '@/hooks/products';
+import useProduct, { IUpdateProduct } from '@/hooks/products';
 import useCategory from '@/hooks/categories';
-import DropdownField from '@/components/Dropdown';
 import useGroupedProduct from '@/hooks/groupedProducts';
-import MultipleSelectChip from '@/components/MultipleSelect';
-import { SelectChangeEvent } from '@mui/material/Select';
-import TableComponent from '@/components/Table';
+import ProductService from '@/services/products';
 
-export default function Products() {
+export default function ViewProduct() {
+  const { id } = useParams();
   const router = useRouter();
 
   const { documents: stores } = useStore();
   const { documents: categories } = useCategory();
   const { documents: sub_menu } = useGroupedProduct();
-  const { documents, createDoc, deleteDoc } = useProduct();
+
+  const { updateDoc } = useProduct();
 
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -45,6 +47,29 @@ export default function Products() {
   const [isAddOns, setIsAddOns] = useState(false);
   const [subMenu, setSubMenu] = useState<string[]>([]);
   const [subMenuOptions, setSubMenuOptions] = useState<{ label: string; value: string }[]>([]);
+  const [isAvailable, setIsAvailable] = useState(true);
+
+  useEffect(() => {
+    try {
+      (async function () {
+        const currentProduct = await ProductService.fetchProduct(id);
+
+        setStore(currentProduct.storeId);
+        setCategory(currentProduct.categoryId);
+        setName(currentProduct.name);
+        setProductAbbrev(currentProduct.productAbbrev);
+        setPrice(currentProduct.price);
+        setDescription(currentProduct.description);
+        setNote(currentProduct.note);
+        setSubMenu(currentProduct.subMenu);
+        setIsAddOns(currentProduct.isAddOns);
+        setIsAvailable(currentProduct.isAvailable);
+      })();
+    } catch (error) {
+      alert('Error. Failed to load data.');
+      router.back();
+    }
+  }, [id]);
 
   useEffect(() => {
     if (sub_menu) {
@@ -53,13 +78,14 @@ export default function Products() {
     }
   }, [sub_menu]);
 
-  const onCreateProduct = async () => {
+  const updateProduct = async () => {
     try {
       if (!store || !category || !name || !productAbbrev || !price)
         throw new Error('Store, category and product name, abbreviation and price are required.');
 
       setIsLoading(true);
-      const payload: ISaveProduct = {
+      const payload: IUpdateProduct = {
+        id,
         categoryId: category,
         storeId: store,
         productAbbrev: productAbbrev,
@@ -69,29 +95,16 @@ export default function Products() {
         description,
         note,
         subMenu: isAddOns ? [] : subMenu,
+        isAvailable,
       };
 
-      await createDoc(payload);
-      alert('Product successfully created.');
-      setName('');
-      setProductAbbrev('');
-      setNote('');
-      setDescription('');
-      setPrice(0);
-      setIsAddOns(false);
+      await updateDoc(payload);
       setIsLoading(false);
+      alert('Product successfully updated.');
+      router.back();
     } catch (err: any) {
       setError(err?.message);
       setIsLoading(false);
-    }
-  };
-
-  const deleteProduct = async (id: string) => {
-    try {
-      if (!confirm('Are you sure you want to delete this record?')) return;
-      await deleteDoc(id);
-    } catch (err: any) {
-      setError(err?.message);
     }
   };
 
@@ -108,11 +121,11 @@ export default function Products() {
 
   return (
     <Container style={{ marginTop: '2rem', marginBottom: '2rem' }}>
-      <p style={{ fontSize: '22px' }}>Create Product</p>
+      <p style={{ fontSize: '22px' }}>Update Product</p>
       <DropdownField
+        disabled={true}
         label='Store'
         value={store}
-        onChange={(e: any) => setStore(e.target.value)}
         options={stores.map(store => ({ value: store.id, label: store.name }))}
       />
       <DropdownField
@@ -131,6 +144,10 @@ export default function Products() {
         control={<Checkbox checked={isAddOns} onChange={() => setIsAddOns(prev => !prev)} />}
         label='Is Add-on'
       />
+      <FormControlLabel
+        control={<Checkbox checked={isAvailable} onChange={() => setIsAvailable(prev => !prev)} />}
+        label='Is Available'
+      />
 
       {!isAddOns && (
         <MultipleSelectChip
@@ -140,19 +157,9 @@ export default function Products() {
           options={subMenuOptions}
         />
       )}
-      <Button loading={isLoading} label='Save' onClick={onCreateProduct} />
-      <i style={{ color: 'red' }}>{error}</i>
 
-      <TableComponent
-        label='Product List'
-        rows={documents.map(doc => ({
-          id: doc.id,
-          label: `${doc?.name}(${doc?.productAbbrev}) - P${doc?.price}`,
-          subLabel: doc?.store?.name,
-        }))}
-        onDelete={deleteProduct}
-        onSelect={(id: string) => router.push('/products/' + id)}
-      />
+      <Button loading={isLoading} label='Update' onClick={updateProduct} />
+      <i style={{ color: 'red' }}>{error}</i>
     </Container>
   );
 }

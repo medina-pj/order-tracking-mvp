@@ -38,8 +38,7 @@ const NavBar = () => {
           aria-controls='menu-appbar'
           aria-haspopup='true'
           onClick={handleOpenNavMenu}
-          color='inherit'
-        >
+          color='inherit'>
           <MenuIcon />
         </IconButton>
         <Menu
@@ -56,8 +55,7 @@ const NavBar = () => {
             horizontal: 'right',
           }}
           open={Boolean(anchorElNav)}
-          onClose={handleCloseNavMenu}
-        >
+          onClose={handleCloseNavMenu}>
           <MenuItem key={'Home'} onClick={handleCloseNavMenu}>
             <Typography textAlign='center' component='a' href='/dashboard'>
               Home
@@ -69,8 +67,8 @@ const NavBar = () => {
             </Typography>
           </MenuItem>
           <MenuItem key={'Grouped-Products'} onClick={handleCloseNavMenu}>
-            <Typography textAlign='center' component='a' href='/products/grouped'>
-              {'Grouped Products'}
+            <Typography textAlign='center' component='a' href='/products/groups'>
+              {'Group Products'}
             </Typography>
           </MenuItem>
           <MenuItem key={'Products'} onClick={handleCloseNavMenu}>

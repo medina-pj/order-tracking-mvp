@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Sunday June 11th 2023
  * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
- * Last Modified time: July 7th 2023, 9:04:25 pm
+ * Last Modified time: July 9th 2023, 8:04:56 pm
  * ---------------------------------------------
  */
 
@@ -15,11 +15,13 @@ const InputField = ({
   label,
   type = 'text',
   onChange,
+  disabled = false,
 }: {
   value: any;
   label: string;
   type?: string;
-  onChange: any;
+  onChange?: any;
+  disabled?: boolean;
 }) => {
   const style: CSSProperties = {
     marginBottom: '10px',
@@ -29,6 +31,7 @@ const InputField = ({
     <>
       <p style={{ marginBottom: '5px', fontSize: '18px' }}>{label}</p>
       <TextField
+        disabled={disabled}
         size='medium'
         fullWidth={true}
         variant='filled'

@@ -3,7 +3,7 @@
  * Author: Rovelin Enriquez
  * Date:   Saturday July 8th 2023
  * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
- * Last Modified time: July 9th 2023, 2:14:49 pm
+ * Last Modified time: July 12th 2023, 7:20:56 pm
  * ---------------------------------------------
  */
 
@@ -14,16 +14,23 @@ export default function DropdownField({
   value,
   onChange,
   options,
+  disabled = false,
 }: {
   label: string;
   value: string;
-  onChange: any;
+  onChange?: any;
   options: { value: string; label: string }[];
+  disabled?: boolean;
 }) {
   return (
     <FormControl fullWidth style={{ marginBottom: '20px' }}>
       <p style={{ marginBottom: '5px', fontSize: '18px' }}>{label}</p>
-      <Select labelId='user-type-select' id='user-type-select-id' value={value} onChange={onChange}>
+      <Select
+        disabled={disabled}
+        labelId='user-type-select'
+        id='user-type-select-id'
+        value={value}
+        onChange={onChange}>
         {options.map((option, key) => (
           <MenuItem key={key} value={option.value}>
             {option.label}

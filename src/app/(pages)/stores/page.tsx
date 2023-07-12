@@ -5,7 +5,7 @@
  * Author: Rovelin Enriquez
  * Date:   Sunday July 2nd 2023
  * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
- * Last Modified time: July 9th 2023, 4:50:52 pm
+ * Last Modified time: July 12th 2023, 10:14:44 pm
  * ---------------------------------------------
  */
 
@@ -28,6 +28,8 @@ export default function Stores() {
   const { documents: users } = useAdminAccount();
 
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
   const [name, setName] = useState('');
   const [location, setLocation] = useState('');
   const [contactNumber, setContactNumber] = useState('');
@@ -43,11 +45,9 @@ export default function Stores() {
 
   const createStore = async () => {
     try {
-      if (!name) {
-        alert('Store name is required.');
-        return;
-      }
+      if (!name) throw new Error('Store name is required.');
 
+      setIsLoading(true);
       setError('');
 
       const payload = {
@@ -57,17 +57,18 @@ export default function Stores() {
         staff,
       };
       await createDoc(payload);
-
+      alert('Store successfully created.');
       setName('');
       setLocation('');
       setContactNumber('');
       setStaff([]);
+      setIsLoading(false);
     } catch (err: any) {
       setError(err?.message);
+      setIsLoading(false);
     }
   };
 
-  const selectStore = (id: string) => router.push('/stores/' + id);
   const deleteStore = async (id: string) => {
     try {
       setError('');
@@ -94,14 +95,15 @@ export default function Stores() {
   return (
     <>
       <Container style={{ marginTop: '2rem', marginBottom: '2rem' }}>
-        <p style={{ fontSize: '28px' }}>Create Store</p>
+        <p style={{ fontSize: '22px' }}>Create Store</p>
         <InputField label='Name' value={name} onChange={setName} />
         <InputField label='Location' value={location} onChange={setLocation} />
         <InputField label='Contact Number' value={contactNumber} onChange={setContactNumber} />
         <MultipleSelectChip label='Staff' value={staff} onChange={handleStaffChange} options={staffOptions} />
-        <Button label='Save' onClick={createStore} />
-        <p>{error}</p>
+        <Button loading={isLoading} label='Save' onClick={createStore} />
+        <i style={{ color: 'red' }}>{error}</i>
       </Container>
+
       <TableComponent
         label='Store List'
         rows={stores.map(store => ({
@@ -110,7 +112,7 @@ export default function Stores() {
           subLabel: `${store?.location} - ${store?.contactNumber}`,
         }))}
         onDelete={deleteStore}
-        onSelect={selectStore}
+        onSelect={(id: string) => router.push('/stores/' + id)}
       />
     </>
   );
