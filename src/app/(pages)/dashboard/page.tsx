@@ -4,8 +4,8 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
- * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 15th 2023, 1:04:22 pm
+ * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
+ * Last Modified time: July 15th 2023, 10:02:34 pm
  * ---------------------------------------------
  */
 
@@ -22,6 +22,7 @@ import InputField from '@/components/TextField';
 import ButtonField from '@/components/Button';
 import useStore from '@/hooks/store';
 import useAuth from '@/hooks/auth';
+import OrderCard from '@/components/OrderCard';
 
 export default function Dashboard() {
   const { documents: orderDocs, searchOrder } = useOrder();
@@ -79,21 +80,11 @@ export default function Dashboard() {
         </Grid>
 
         <Grid item xs={12}>
-          <InputField
-            type='date'
-            label='Start Date'
-            value={startDate}
-            onChange={(e: any) => setStartDate(e.target.value)}
-          />
+          <InputField type='date' label='Start Date' value={startDate} onChange={setStartDate} />
         </Grid>
 
         <Grid item xs={12}>
-          <InputField
-            type='date'
-            label='End Date'
-            value={endDate}
-            onChange={(e: any) => setEndDate(e.target.value)}
-          />
+          <InputField type='date' label='End Date' value={endDate} onChange={setEndDate} />
         </Grid>
 
         <Grid item xs={12}>
@@ -108,6 +99,7 @@ export default function Dashboard() {
               { value: OrderStatusEnum.PREPARING, label: 'Processing' },
               { value: OrderStatusEnum.SERVED, label: 'Served' },
               { value: OrderStatusEnum.DECLINED, label: 'Declined' },
+              { value: OrderStatusEnum.CANCELLED, label: 'Cancelled' },
             ]}
           />
         </Grid>
@@ -115,13 +107,18 @@ export default function Dashboard() {
         <Grid item xs={12}>
           <ButtonField label='Search Orders' onClick={onSearchOrder} />
         </Grid>
-
-        {/* <Grid xs={12}>
-          {documents.map((order: any, i: number) => (
-            <OrderCard key={i} orderDetails={order} />
-          ))}
-        </Grid> */}
       </Grid>
+
+      {orderDocs.map((order, i) => (
+        <div key={i}>
+          <OrderCard
+            table={order.table.name}
+            type={order.type}
+            products={order.cartItems}
+            notes={order.notes}
+          />
+        </div>
+      ))}
     </Container>
   );
 }
