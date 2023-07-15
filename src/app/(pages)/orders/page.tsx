@@ -5,7 +5,7 @@
  * Author: PJ Medina
  * Date:   Sunday July 9th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 11th 2023, 10:37:00 pm
+ * Last Modified time: July 15th 2023, 11:15:13 pm
  * ---------------------------------------------
  */
 
@@ -24,6 +24,7 @@ import {
   Typography,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined';
 import Checkbox from '@mui/material/Checkbox';
 import InputField from '@/components/TextField';
 import ButtonField from '@/components/Button';
@@ -32,7 +33,13 @@ import useStore from '@/hooks/store';
 import useProduct, { IProduct } from '@/hooks/products';
 import numeral from 'numeral';
 import { ISubMenu } from '@/services/products';
-import { OrderTypeEnum, TCartAddOns, TCartItems } from '@/types/schema/order';
+import {
+  OrderPaymentMethodEnum,
+  OrderPaymentStatusEnum,
+  OrderTypeEnum,
+  TCartAddOns,
+  TCartItems,
+} from '@/types/schema/order';
 
 import { Button, ButtonGroup } from '@mui/material';
 import { produce } from 'immer';
@@ -47,6 +54,20 @@ interface ProductDetailsProps {
   cartItems?: any;
   setCartItems?: any;
   withDeleteBtn?: boolean;
+  withQnty?: boolean;
+}
+
+interface MenuCardProps {
+  product: IProduct;
+  cartItems: TCartItems[];
+  setCartItems: any;
+}
+
+interface CartItemCardProps {
+  itemNo: number;
+  cartItemId: string;
+  cartItems: TCartItems[];
+  setCartItems: any;
 }
 
 const globalStyles: { [key: string]: CSSProperties } = {
@@ -62,6 +83,7 @@ const ProductDetails = ({
   cartItems,
   setCartItems,
   withDeleteBtn,
+  withQnty = true,
 }: ProductDetailsProps) => {
   const productDetailStyle: any = {
     qntyButton: {
@@ -75,7 +97,7 @@ const ProductDetails = ({
       color: '#EF6262',
       borderColor: '#EF6262',
       textTransform: 'none',
-      fontSize: '0.75rem',
+      fontSize: '1.75rem',
     },
   };
 
@@ -206,7 +228,7 @@ const ProductDetails = ({
   return (
     <div style={style}>
       <Grid container spacing={2}>
-        <Grid item xs={12}>
+        <Grid item xs={8}>
           <Typography sx={{ ...globalStyles.typography, fontSize: 12 }} color='text.secondary' gutterBottom>
             {product?.productAbbrev}
           </Typography>
@@ -219,33 +241,33 @@ const ProductDetails = ({
           </Typography>
         </Grid>
 
-        <Grid item xs={6} display='flex' alignItems='center' justifyContent='flex-start'>
-          <Box>
-            <ButtonGroup size='small'>
-              <Button style={productDetailStyle.qntyButton} onClick={onAddQuantity}>
-                +
-              </Button>
-              {itemDetails?.quantity && (
-                <Button style={productDetailStyle.qntyButton}>{itemDetails?.quantity || 0}</Button>
-              )}
-              {itemDetails?.quantity && (
-                <Button style={productDetailStyle.qntyButton} onClick={onDeductQuantity}>
-                  -
-                </Button>
-              )}
-            </ButtonGroup>
-          </Box>
-        </Grid>
-
-        {withDeleteBtn && (
-          <Grid item xs={6}>
+        {withDeleteBtn && !withQnty && (
+          <Grid item xs={4}>
             <Box display='flex' justifyContent='flex-end'>
-              <Button
-                style={{ ...globalStyles.typography, ...productDetailStyle.removeButton }}
+              <DeleteForeverOutlinedIcon
                 onClick={onRemoveOrder}
-                variant='outlined'>
-                Remove
-              </Button>
+                style={{ ...productDetailStyle.removeButton }}
+              />
+            </Box>
+          </Grid>
+        )}
+
+        {withQnty && (
+          <Grid item xs={6} display='flex' alignItems='center' justifyContent='flex-start'>
+            <Box>
+              <ButtonGroup size='small'>
+                <Button style={productDetailStyle.qntyButton} onClick={onAddQuantity}>
+                  +
+                </Button>
+                {itemDetails?.quantity && (
+                  <Button style={productDetailStyle.qntyButton}>{itemDetails?.quantity || 0}</Button>
+                )}
+                {itemDetails?.quantity && (
+                  <Button style={productDetailStyle.qntyButton} onClick={onDeductQuantity}>
+                    -
+                  </Button>
+                )}
+              </ButtonGroup>
             </Box>
           </Grid>
         )}
@@ -254,15 +276,7 @@ const ProductDetails = ({
   );
 };
 
-const MenuCard = ({
-  product,
-  cartItems,
-  setCartItems,
-}: {
-  product: IProduct;
-  cartItems: TCartItems[];
-  setCartItems: any;
-}) => {
+const MenuCard = ({ product, cartItems, setCartItems }: MenuCardProps) => {
   let subTotal = 0;
   const itemExist = cartItems.find((d: any) => d.productId === product.id);
 
@@ -287,33 +301,6 @@ const MenuCard = ({
           cartItems={cartItems}
           setCartItems={setCartItems}
         />
-        {product?.subMenu.length > 0 && itemExist && (
-          <div>
-            <Typography
-              sx={{
-                ...globalStyles.typography,
-                fontWeight: '600',
-                fontSize: 14,
-                marginBottom: '0.5rem',
-                marginTop: '1.5rem',
-              }}
-              color='text.secondary'>
-              Add-Ons:
-            </Typography>
-            {product?.subMenu.map((sm: ISubMenu, index: number) => {
-              return (
-                <ProductDetails
-                  key={index}
-                  style={{ marginBottom: '1rem' }}
-                  product={sm}
-                  item={itemExist}
-                  cartItems={cartItems}
-                  setCartItems={setCartItems}
-                />
-              );
-            })}
-          </div>
-        )}
 
         <Typography
           sx={{ ...globalStyles.typography, fontSize: 14, marginTop: '0.5rem' }}
@@ -325,15 +312,7 @@ const MenuCard = ({
   );
 };
 
-const CartItemCard = ({
-  cartItemId,
-  cartItems,
-  setCartItems,
-}: {
-  cartItemId: string;
-  cartItems: TCartItems[];
-  setCartItems: any;
-}) => {
+const CartItemCard = ({ itemNo, cartItemId, cartItems, setCartItems }: CartItemCardProps) => {
   let subTotal = 0;
 
   const item = cartItems.find((d: any) => d.id === cartItemId);
@@ -353,12 +332,24 @@ const CartItemCard = ({
   return (
     <Card style={{ marginBottom: '1rem' }} variant='outlined'>
       <CardContent>
+        <Typography
+          sx={{
+            ...globalStyles.typography,
+            fontSize: 18,
+            fontWeight: 600,
+            marginTop: '0.5rem',
+            marginBottom: '1.25rem',
+          }}>
+          Item #{itemNo}
+        </Typography>
+
         <ProductDetails
           product={item?.product}
           item={item}
           cartItems={cartItems}
           setCartItems={setCartItems}
           withDeleteBtn
+          withQnty={false}
         />
         {item?.product?.subMenu.length > 0 && item && (
           <div>
@@ -409,13 +400,17 @@ export default function Order() {
   const [table, setTable] = useState('');
   const [type, setType] = useState<OrderTypeEnum>(OrderTypeEnum.DINE_IN);
   const [notes, setNotes] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState('');
   const [orderPaid, setOrderPaid] = useState(false);
   const [cartEntries, setCartEntries] = useState<TCartItems[]>([]);
   const [cartItems, setCartItems] = useState<TCartItems[]>([]);
 
   const onAddToCart = () => {
     if (cartEntries.length) {
-      setCartItems((prev: any) => prev.concat(cartEntries));
+      cartEntries.map((cartItem: any) => {
+        setCartItems((prev: any) => prev.concat(Array(cartItem.quantity).fill({ ...cartItem, quantity: 1 })));
+      });
+
       setCartEntries([]);
     }
   };
@@ -451,11 +446,15 @@ export default function Order() {
         customerNotes: '',
         type,
         cartItems: cart,
-        orderPaid,
+        payment: {
+          modeOfPayment: paymentMethod || '',
+          status: orderPaid ? OrderPaymentStatusEnum.PAID : '',
+        },
       };
 
       await createOrder(payload);
 
+      setPaymentMethod('');
       setTable('');
       setNotes('');
       setOrderPaid(false);
@@ -507,7 +506,7 @@ export default function Order() {
           { value: OrderTypeEnum.TAKE_OUT, label: 'Take Out' },
         ]}
       />
-      <InputField label='Notes' value={notes} onChange={setNotes} />
+
       <div>
         <Accordion style={{ border: 'none', boxShadow: 'none' }} defaultExpanded={true}>
           <AccordionSummary
@@ -544,11 +543,29 @@ export default function Order() {
                 {cartItems.map((d: TCartItems, index: number) => (
                   <CartItemCard
                     key={index}
+                    itemNo={index + 1}
                     cartItemId={d.id}
                     cartItems={cartItems}
                     setCartItems={setCartItems}
                   />
                 ))}
+
+                <Box>
+                  <InputField label='Notes' value={notes} onChange={setNotes} />
+                </Box>
+
+                <Box>
+                  <DropdownField
+                    label='Mode Of Payment'
+                    value={paymentMethod}
+                    onChange={(e: any) => setPaymentMethod(e.target.value)}
+                    options={[
+                      { value: OrderPaymentMethodEnum.CASH, label: 'Cash' },
+                      { value: OrderPaymentMethodEnum.GCASH, label: 'G-Cash' },
+                      { value: OrderPaymentMethodEnum.ONLINE_BANK, label: 'Online Bank' },
+                    ]}
+                  />
+                </Box>
 
                 <Box>
                   <FormControlLabel

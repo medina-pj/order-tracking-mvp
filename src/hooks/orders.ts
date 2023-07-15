@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 15th 2023, 1:00:35 pm
+ * Last Modified time: July 15th 2023, 9:44:17 pm
  * ---------------------------------------------
  */
 
@@ -34,6 +34,7 @@ import {
   TCartItems,
   TOrderData,
   TOrderHistory,
+  TOrderPayment,
 } from '@/types/schema/order';
 import constants from '@/utils/constants';
 import generateNanoId from '@/utils/generateNanoId';
@@ -50,7 +51,7 @@ export interface ICreateOrder {
   discount?: TDiscount[];
   cartItems: TCartItems[];
   data?: TOrderData;
-  orderPaid: boolean;
+  payment?: TOrderPayment;
 }
 
 export interface IOrder {
@@ -72,7 +73,7 @@ export interface IOrder {
   history: TOrderHistory[];
   discount: TDiscount[];
   data: TOrderData;
-  orderPaid: boolean;
+  payment?: TOrderPayment;
   createdAt: string;
   updatedAt: string;
 }
@@ -125,7 +126,7 @@ const useOrder = () => {
             status: doc.data().status,
             cartItems: doc.data().cartItems,
             history: doc.data().history,
-            orderPaid: doc.data().orderPaid,
+            payment: doc.data().payment,
             discount: doc.data().discount,
             data: doc.data().data,
             createdAt: moment(doc.data()?.createdAt).format('MMM DD, YYYY hh:mma'),
@@ -172,7 +173,7 @@ const useOrder = () => {
         type: payload.type,
         cartItems: payload.cartItems,
         status: OrderStatusEnum.CONFIRMED,
-        orderPaid: payload.orderPaid,
+        payment: payload.payment,
         discount: payload?.discount || [],
         data: payload.data || {},
         history: [

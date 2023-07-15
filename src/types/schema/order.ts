@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 11th 2023, 9:26:31 pm
+ * Last Modified time: July 15th 2023, 10:11:37 pm
  * ---------------------------------------------
  */
 
@@ -20,6 +20,16 @@ export enum OrderStatusEnum {
   SERVED = 'served',
   COMPLETED = 'completed',
   CANCELLED = 'cancelled',
+}
+
+export enum OrderPaymentStatusEnum {
+  PAID = 'paid',
+}
+
+export enum OrderPaymentMethodEnum {
+  CASH = 'cash',
+  GCASH = 'gcash',
+  ONLINE_BANK = 'online_banking',
 }
 
 export type TCartAddOns = {
@@ -63,6 +73,11 @@ export type TOrderData = {
   onlineOrderPlatform?: string;
 };
 
+export type TOrderPayment = {
+  modeOfPayment?: string;
+  status?: string;
+};
+
 export type OrderSchema = {
   id?: string;
   orderId: string;
@@ -75,7 +90,7 @@ export type OrderSchema = {
   cartItems: TCartItems[];
   history: TOrderHistory[];
   discount: TDiscount[];
-  orderPaid: boolean;
+  payment?: TOrderPayment;
   data?: TOrderData;
   createdAt?: number;
   updatedAt?: number;
