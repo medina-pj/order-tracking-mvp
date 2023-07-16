@@ -2,8 +2,8 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
- * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
- * Last Modified time: July 16th 2023, 1:54:35 pm
+ * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
+ * Last Modified time: July 16th 2023, 3:59:31 pm
  * ---------------------------------------------
  */
 
@@ -36,6 +36,7 @@ import {
   TOrderHistory,
   TOrderPayment,
   OrderPaymentStatusEnum,
+  OrderPaymentMethodEnum,
 } from '@/types/schema/order';
 import constants from '@/utils/constants';
 import generateNanoId from '@/utils/generateNanoId';
@@ -102,12 +103,12 @@ interface InitialState {
   filters?: IFilterOptions;
 }
 
-const OrderStatusPath: { [key in OrderStatusEnum]: OrderStatusEnum[] } = {
+export const OrderStatusPath: { [key in OrderStatusEnum]: OrderStatusEnum[] } = {
   [OrderStatusEnum.NEW]: [OrderStatusEnum.CONFIRMED, OrderStatusEnum.DECLINED],
   [OrderStatusEnum.DECLINED]: [],
-  [OrderStatusEnum.CONFIRMED]: [OrderStatusEnum.CANCELLED, OrderStatusEnum.PREPARING],
-  [OrderStatusEnum.PREPARING]: [OrderStatusEnum.CANCELLED, OrderStatusEnum.SERVED],
-  [OrderStatusEnum.SERVED]: [OrderStatusEnum.CANCELLED, OrderStatusEnum.COMPLETED],
+  [OrderStatusEnum.CONFIRMED]: [OrderStatusEnum.PREPARING, OrderStatusEnum.CANCELLED],
+  [OrderStatusEnum.PREPARING]: [OrderStatusEnum.SERVED, OrderStatusEnum.CANCELLED],
+  [OrderStatusEnum.SERVED]: [OrderStatusEnum.COMPLETED, OrderStatusEnum.CANCELLED],
   [OrderStatusEnum.COMPLETED]: [],
   [OrderStatusEnum.CANCELLED]: [],
 };
@@ -115,7 +116,6 @@ const OrderStatusPath: { [key in OrderStatusEnum]: OrderStatusEnum[] } = {
 const useOrder = (args?: InitialState) => {
   const { userInfo } = useAuth();
   const [documents, setDocuments] = useState<IOrder[]>([]);
-  const [error, setError] = useState<string>('');
 
   const [filters, setFilters] = useState<IFilterOptions>({
     startDate: args?.filters?.startDate || '',
@@ -138,10 +138,6 @@ const useOrder = (args?: InitialState) => {
 
       let ref = collection(db, constants.DB_ORDERS);
       let qry = query(ref, ...queries, orderBy('createdAt', 'desc'));
-
-      console.log({
-        queries,
-      });
 
       //will invoke everytime database is updated in the cloud
       const unsub = onSnapshot(qry, async snapshot => {
@@ -202,7 +198,7 @@ const useOrder = (args?: InitialState) => {
   const createOrder = async (payload: ICreateOrder): Promise<void> => {
     try {
       if (!userInfo) {
-        throw new Error('Unauthorized user can not create an order.');
+        throw new Error('Unauthorized user cannot create an order.');
       }
 
       const orderPayload: OrderSchema = {
@@ -239,14 +235,14 @@ const useOrder = (args?: InitialState) => {
   const updateOrderStatus = async (id: string, status: OrderStatusEnum): Promise<void> => {
     try {
       if (!userInfo) {
-        throw new Error('Unauthorized user can not create an order.');
+        throw new Error('Unauthorized user cannot update order status.');
       }
 
       const currentOrder = await OrderService.fetchOrder(id);
 
       if (!currentOrder) throw new Error('Order not found.');
 
-      if (OrderStatusPath[currentOrder?.status].includes(status)) {
+      if (!OrderStatusPath[currentOrder?.status].includes(status)) {
         throw new Error(`Cannot update order to ${status}. Order status is already ${currentOrder.status}`);
       }
 
@@ -278,38 +274,62 @@ const useOrder = (args?: InitialState) => {
 
       return;
     } catch (err: any) {
-      return err;
+      throw err;
     }
   };
 
-  // const updateOrderPaymentStatus = async (id: string, status: boolean): Promise<void> => {
-  //   try {
-  //     setError(null);
+  const updateOrderPaymentStatus = async (
+    id: string,
+    method: OrderPaymentMethodEnum,
+    status: OrderPaymentStatusEnum
+  ): Promise<void> => {
+    try {
+      if (!userInfo) {
+        throw new Error('Unauthorized user cannot update order payment status.');
+      }
 
-  //     const docRef = doc(db, constants.DB_ORDERS, id);
+      const docRef = doc(db, constants.DB_ORDERS, id);
 
-  //     await setDoc(
-  //       docRef,
-  //       {
-  //         orderPaid: status,
-  //         updatedAt: moment().toDate().getTime(),
-  //       },
-  //       { merge: true }
-  //     );
+      const history = {
+        action: `update-order-payment-status-to-${status}`,
+        actor: userInfo.name,
+        actorId: userInfo.id,
+        timestamp: moment().toDate().getTime(),
+      };
 
-  //     return;
-  //   } catch (error: any) {
-  //     setError(error?.message);
+      await setDoc(
+        docRef,
+        {
+          payment: {
+            modeOfPayment: method,
+            status,
+          },
+          history: arrayUnion(history),
+          updatedAt: moment().toDate().getTime(),
+        },
+        { merge: true }
+      );
 
-  //     return;
-  //   }
-  // };
+      return;
+    } catch (err: any) {
+      throw err;
+    }
+  };
 
   const updateOrder = async (payload: IUpdateOrder): Promise<void> => {
     try {
-      setError('');
+      if (!userInfo) {
+        throw new Error('Unauthorized user cannot update an order details.');
+      }
 
       const docRef = doc(db, constants.DB_ORDERS, payload.id);
+
+      const history = {
+        action: `update-order-details`,
+        actor: userInfo.name,
+        actorId: userInfo.id,
+        timestamp: moment().toDate().getTime(),
+      };
 
       await setDoc(
         docRef,
@@ -323,16 +343,15 @@ const useOrder = (args?: InitialState) => {
           payment: payload.payment,
           discount: payload?.discount || [],
           data: payload.data || {},
+          history: arrayUnion(history),
           updatedAt: moment().toDate().getTime(),
         },
         { merge: true }
       );
 
       return;
-    } catch (error: any) {
-      setError(error?.message);
-
-      return;
+    } catch (err: any) {
+      throw err;
     }
   };
 
@@ -340,7 +359,7 @@ const useOrder = (args?: InitialState) => {
     documents,
     createOrder,
     updateOrderStatus,
-    // updateOrderPaymentStatus,
+    updateOrderPaymentStatus,
     updateOrder,
     searchOrder,
   };

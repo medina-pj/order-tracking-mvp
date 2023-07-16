@@ -4,8 +4,8 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
- * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
- * Last Modified time: July 16th 2023, 1:44:34 pm
+ * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
+ * Last Modified time: July 16th 2023, 3:52:51 pm
  * ---------------------------------------------
  */
 
@@ -68,8 +68,6 @@ export default function Dashboard() {
     await searchOrder({ startDate, endDate, store, status: status === 'all' ? '' : status });
   };
 
-  console.log({ orderDocs, storeDocs, userInfo });
-
   return (
     <Container style={{ marginTop: '2rem', marginBottom: '2rem' }}>
       <Grid container direction='column'>
@@ -116,11 +114,13 @@ export default function Dashboard() {
       {orderDocs.map((order, i) => (
         <div key={i}>
           <OrderCard
+            orderId={order.id}
             table={order.table.name}
             type={order.type}
             products={order.cartItems}
             notes={order.notes}
-            payment={order.payment?.status || ''}
+            paymentStatus={order.payment?.status || ''}
+            status={order.status}
             onEdit={() => router.push('/orders/' + order.id)}
           />
         </div>
