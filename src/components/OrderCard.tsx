@@ -3,7 +3,7 @@
  * Author: Rovelin Enriquez
  * Date:   Saturday July 15th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 16th 2023, 3:57:53 pm
+ * Last Modified time: July 16th 2023, 11:38:50 pm
  * ---------------------------------------------
  */
 'use client';
@@ -115,6 +115,15 @@ const OrderCard = ({
           <ModeEditIcon style={{ width: '20px' }} />
         </Box>
       </Box>
+
+      <Typography
+        color={'text.secondary'}
+        sx={{
+          ...globalStyles.typography,
+          fontSize: 16,
+        }}>
+        {status.toUpperCase()}
+      </Typography>
       <hr />
 
       <Box style={{ marginBottom: '1rem', marginTop: '1rem' }}>
@@ -217,11 +226,9 @@ const OrderCard = ({
 
       <Box style={{ marginTop: '1.5rem', marginBottom: '1rem' }}>
         <ButtonGroup size='small' aria-label='small button group' fullWidth>
-          {(paymentStatus !== OrderPaymentStatusEnum.PAID && status === OrderStatusEnum.CONFIRMED) ||
-          status === OrderStatusEnum.PREPARING ||
-          status === OrderStatusEnum.SERVED ? (
+          {paymentStatus !== OrderPaymentStatusEnum.PAID && (
             <Button onClick={() => setPaymentField(prev => !prev)}>Pay Order</Button>
-          ) : null}
+          )}
           {OrderStatusPath[status].map((status: any, i: number) => (
             <Button key={i} onClick={() => onUpdateStatus(status)}>
               {OrderStatusButtonLabel[status]}

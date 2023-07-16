@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 16th 2023, 3:59:31 pm
+ * Last Modified time: July 16th 2023, 11:36:13 pm
  * ---------------------------------------------
  */
 
@@ -134,6 +134,15 @@ const useOrder = (args?: InitialState) => {
 
       if (filters.status) {
         queries.push(where('status', '==', filters.status));
+      } else {
+        queries.push(
+          where('status', 'in', [
+            OrderStatusEnum.NEW,
+            OrderStatusEnum.CONFIRMED,
+            OrderStatusEnum.PREPARING,
+            OrderStatusEnum.SERVED,
+          ])
+        );
       }
 
       let ref = collection(db, constants.DB_ORDERS);
@@ -286,6 +295,12 @@ const useOrder = (args?: InitialState) => {
     try {
       if (!userInfo) {
         throw new Error('Unauthorized user cannot update order payment status.');
+      }
+
+      const currentOrder = await OrderService.fetchOrder(id);
+      if (!currentOrder) throw new Error('Order not found.');
+      if (currentOrder?.payment?.status === OrderPaymentStatusEnum.PAID) {
+        throw new Error(`Cannot update payment status. status is already ${currentOrder?.payment?.status}`);
       }
 
       const docRef = doc(db, constants.DB_ORDERS, id);
