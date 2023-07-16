@@ -5,7 +5,7 @@
  * Author: PJ Medina
  * Date:   Sunday July 9th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 15th 2023, 11:15:13 pm
+ * Last Modified time: July 16th 2023, 12:33:00 pm
  * ---------------------------------------------
  */
 
@@ -407,8 +407,16 @@ export default function Order() {
 
   const onAddToCart = () => {
     if (cartEntries.length) {
-      cartEntries.map((cartItem: any) => {
-        setCartItems((prev: any) => prev.concat(Array(cartItem.quantity).fill({ ...cartItem, quantity: 1 })));
+      cartEntries.forEach((cartItem: any) => {
+        for (let index = 1; index <= cartItem.quantity; index++) {
+          setCartItems((prev: any) =>
+            prev.concat({
+              ...cartItem,
+              quantity: 1,
+              id: uuidv4(), // Generate a new UUID for each item
+            })
+          );
+        }
       });
 
       setCartEntries([]);
@@ -447,8 +455,8 @@ export default function Order() {
         type,
         cartItems: cart,
         payment: {
-          modeOfPayment: paymentMethod || '',
-          status: orderPaid ? OrderPaymentStatusEnum.PAID : '',
+          modeOfPayment: paymentMethod as OrderPaymentMethodEnum,
+          status: (orderPaid ? OrderPaymentStatusEnum.PAID : '') as OrderPaymentStatusEnum,
         },
       };
 

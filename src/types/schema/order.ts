@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 15th 2023, 10:11:37 pm
+ * Last Modified time: July 16th 2023, 11:46:42 am
  * ---------------------------------------------
  */
 
@@ -59,8 +59,10 @@ export type TCartItems = {
 
 export type TOrderHistory = {
   action: string;
-  actor: string;
   timestamp: number;
+  actor?: string;
+  actorId?: string;
+  reason?: string;
 };
 
 export type TDiscount = {
@@ -74,8 +76,8 @@ export type TOrderData = {
 };
 
 export type TOrderPayment = {
-  modeOfPayment?: string;
-  status?: string;
+  modeOfPayment?: OrderPaymentMethodEnum;
+  status?: OrderPaymentStatusEnum;
 };
 
 export type OrderSchema = {
