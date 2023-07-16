@@ -4,8 +4,8 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Tuesday July 4th 2023
- * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
- * Last Modified time: July 12th 2023, 10:41:50 pm
+ * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
+ * Last Modified time: July 16th 2023, 11:20:39 pm
  * ---------------------------------------------
  */
 
@@ -160,16 +160,21 @@ export default function Products() {
       <i style={{ color: 'red' }}>{error}</i>
       <TableComponent
         label='Group Product List'
-        rows={documents.map(doc => {
-          const totalCost = doc?.products.reduce((cur, acc) => cur + Number(acc.price), 0);
-          return {
-            id: doc?.id,
-            label: `${doc?.name} - P${totalCost}`,
-            subLabel: doc?.description,
-            labelList: 'Products',
-            list: doc.products.map(prod => `${prod.name}(${prod.productAbbrev}) - P${prod.price}`),
-          };
-        })}
+        rows={documents
+          .filter((d: any) => {
+            if (!store) return true;
+            return d.store.id === store;
+          })
+          .map(doc => {
+            const totalCost = doc?.products.reduce((cur, acc) => cur + Number(acc.price), 0);
+            return {
+              id: doc?.id,
+              label: `${doc?.name} - P${totalCost}`,
+              subLabel: doc?.description,
+              labelList: 'Products',
+              list: doc.products.map(prod => `${prod.name}(${prod.productAbbrev}) - P${prod.price}`),
+            };
+          })}
         onDelete={deleteGroupProduct}
         onSelect={(id: string) => router.push('/products/groups/' + id)}
       />

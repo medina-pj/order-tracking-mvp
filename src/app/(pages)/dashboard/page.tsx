@@ -5,7 +5,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 16th 2023, 3:52:51 pm
+ * Last Modified time: July 16th 2023, 11:28:31 pm
  * ---------------------------------------------
  */
 
@@ -59,9 +59,20 @@ export default function Dashboard() {
 
       if (filteredStores && filteredStores.length) {
         const store = filteredStores[0];
-        setStore(store.value);
+
+        if (store) {
+          setStore(store.value);
+          searchOrder({
+            startDate,
+            endDate,
+            store: store.value,
+            status: status === 'all' ? '' : status,
+          });
+        }
       }
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storeDocs, userInfo]);
 
   const onSearchOrder = async () => {

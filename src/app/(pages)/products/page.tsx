@@ -4,8 +4,8 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Tuesday July 4th 2023
- * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
- * Last Modified time: July 12th 2023, 10:24:38 pm
+ * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
+ * Last Modified time: July 16th 2023, 11:19:16 pm
  * ---------------------------------------------
  */
 
@@ -27,9 +27,6 @@ import TableComponent from '@/components/Table';
 export default function Products() {
   const router = useRouter();
 
-  const { documents: stores } = useStore();
-  const { documents: categories } = useCategory();
-  const { documents: sub_menu } = useGroupedProduct();
   const { documents, createDoc, deleteDoc } = useProduct();
 
   const [error, setError] = useState('');
@@ -46,12 +43,19 @@ export default function Products() {
   const [subMenu, setSubMenu] = useState<string[]>([]);
   const [subMenuOptions, setSubMenuOptions] = useState<{ label: string; value: string }[]>([]);
 
+  const { documents: stores } = useStore();
+  const { documents: categories } = useCategory();
+  const { documents: subMenus } = useGroupedProduct();
+
   useEffect(() => {
-    if (sub_menu) {
-      const subMenuOption = sub_menu.map(submenu => ({ label: submenu.name!, value: submenu.id! }));
+    if (subMenus && store) {
+      const subMenuOption = subMenus
+        .filter((d: any) => d.store.id === store)
+        .map(submenu => ({ label: submenu.name!, value: submenu.id! }));
+
       setSubMenuOptions(subMenuOption);
     }
-  }, [sub_menu]);
+  }, [subMenus, store]);
 
   const onCreateProduct = async () => {
     try {
@@ -145,11 +149,16 @@ export default function Products() {
 
       <TableComponent
         label='Product List'
-        rows={documents.map(doc => ({
-          id: doc.id,
-          label: `${doc?.name}(${doc?.productAbbrev}) - P${doc?.price}`,
-          subLabel: doc?.store?.name,
-        }))}
+        rows={documents
+          .filter((d: any) => {
+            if (!store) return true;
+            return d.store.id === store;
+          })
+          .map(doc => ({
+            id: doc.id,
+            label: `${doc?.name}(${doc?.productAbbrev}) - P${doc?.price}`,
+            subLabel: doc?.store?.name,
+          }))}
         onDelete={deleteProduct}
         onSelect={(id: string) => router.push('/products/' + id)}
       />

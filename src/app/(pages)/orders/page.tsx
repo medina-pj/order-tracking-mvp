@@ -5,11 +5,11 @@
  * Author: PJ Medina
  * Date:   Sunday July 9th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 16th 2023, 1:31:33 pm
+ * Last Modified time: July 16th 2023, 11:27:40 pm
  * ---------------------------------------------
  */
 
-import { CSSProperties, useState } from 'react';
+import { CSSProperties, useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import {
   Accordion,
@@ -46,6 +46,7 @@ import { produce } from 'immer';
 import useStoreTable from '@/hooks/storeTable';
 import DropdownField from '@/components/Dropdown';
 import useOrder, { ICreateOrder } from '@/hooks/orders';
+import useAuth from '@/hooks/auth';
 
 interface ProductDetailsProps {
   product: any;
@@ -393,7 +394,8 @@ const CartItemCard = ({ itemNo, cartItemId, cartItems, setCartItems }: CartItemC
 };
 
 export default function Order() {
-  const { documents: stores } = useStore();
+  const { userInfo } = useAuth();
+  const { documents: storeDocs } = useStore();
   const { documents: products } = useProduct();
   const { documents: tables } = useStoreTable();
   const { createOrder } = useOrder();
@@ -407,6 +409,38 @@ export default function Order() {
   const [orderPaid, setOrderPaid] = useState(false);
   const [cartEntries, setCartEntries] = useState<TCartItems[]>([]);
   const [cartItems, setCartItems] = useState<TCartItems[]>([]);
+  const [storeOptions, setStoreOptions] = useState<{ value: string; label: string }[]>([]);
+
+  useEffect(() => {
+    if (storeDocs && storeDocs.length) {
+      const filteredStores = storeDocs
+        .filter((store: any) => {
+          if (userInfo && userInfo?.userType === 'admin') {
+            return true;
+          } else if (userInfo && userInfo.userType !== 'admin') {
+            return store?.staff.includes(userInfo?.id);
+          }
+
+          return false;
+        })
+        .map((store: any) => ({
+          value: store.id,
+          label: store.name,
+        }));
+
+      setStoreOptions(filteredStores);
+
+      if (filteredStores && filteredStores.length) {
+        const store = filteredStores[0];
+
+        if (store) {
+          setStore(store.value);
+        }
+      }
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [storeDocs, userInfo]);
 
   const onAddToCart = () => {
     if (cartEntries.length) {
@@ -478,6 +512,13 @@ export default function Order() {
     }
   };
 
+  const onChangeStore = (value: string) => {
+    setTable('');
+    setCartEntries([]);
+    setCartItems([]);
+    setStore(value);
+  };
+
   const total = cartItems.reduce((acc: any, curr: any) => {
     const qnty = curr.quantity;
     const price = curr.price;
@@ -497,17 +538,10 @@ export default function Order() {
       <DropdownField
         label='Store'
         value={store}
-        onChange={(e: any) => setStore(e.target.value)}
-        options={stores.map(store => ({ value: store.id, label: store.name }))}
+        onChange={(e: any) => onChangeStore(e.target.value)}
+        options={storeOptions.map(store => ({ value: store.value, label: store.label }))}
       />
-      <DropdownField
-        label='Table'
-        value={table}
-        onChange={(e: any) => setTable(e.target.value)}
-        options={tables
-          .filter((d: any) => d.store.id === store)
-          .map(table => ({ value: table.id, label: table.name }))}
-      />
+
       <DropdownField
         label='Order Type'
         value={type}
@@ -516,6 +550,15 @@ export default function Order() {
           { value: OrderTypeEnum.DINE_IN, label: 'Dine In' },
           { value: OrderTypeEnum.TAKE_OUT, label: 'Take Out' },
         ]}
+      />
+
+      <DropdownField
+        label='Table'
+        value={table}
+        onChange={(e: any) => setTable(e.target.value)}
+        options={tables
+          .filter((d: any) => d.store.id === store)
+          .map(table => ({ value: table.id, label: table.name }))}
       />
 
       <div>
@@ -529,7 +572,7 @@ export default function Order() {
           </AccordionSummary>
           <AccordionDetails style={{ padding: 0 }}>
             {products
-              .filter((d: IProduct) => !d.isAddOns)
+              .filter((d: IProduct) => d.store.id === store && !d.isAddOns)
               .map((d: IProduct, index: number) => (
                 <MenuCard key={index} product={d} cartItems={cartEntries} setCartItems={setCartEntries} />
               ))}
