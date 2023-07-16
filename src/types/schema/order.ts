@@ -2,8 +2,8 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
- * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 16th 2023, 11:46:42 am
+ * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
+ * Last Modified time: July 16th 2023, 1:23:35 pm
  * ---------------------------------------------
  */
 
@@ -96,4 +96,5 @@ export type OrderSchema = {
   data?: TOrderData;
   createdAt?: number;
   updatedAt?: number;
+  isArchived?: boolean; //default is false
 };

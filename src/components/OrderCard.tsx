@@ -2,8 +2,8 @@
  * ---------------------------------------------
  * Author: Rovelin Enriquez
  * Date:   Saturday July 15th 2023
- * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 16th 2023, 1:19:36 pm
+ * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
+ * Last Modified time: July 16th 2023, 1:51:50 pm
  * ---------------------------------------------
  */
 'use client';
@@ -18,17 +18,22 @@ const globalStyles: { [key: string]: CSSProperties } = {
     fontSize: 16,
   },
 };
+import ModeEditIcon from '@mui/icons-material/ModeEdit';
 
 const OrderCard = ({
   table,
   type,
   products,
   notes,
+  payment,
+  onEdit,
 }: {
   table: string;
   type: string;
   products: any;
   notes: string;
+  payment: string;
+  onEdit: () => void;
 }) => {
   const total = products.reduce(
     (acc: any, cur: any) =>
@@ -43,19 +48,25 @@ const OrderCard = ({
       style={{
         marginTop: '2rem',
         marginBottom: '2rem',
-        backgroundColor: '#ededed',
+        // backgroundColor: '#ededed',
         padding: '1rem',
         borderRadius: 5,
+        boxShadow: '2px 2px 8px rgb(0 0 0 / 0.2)',
       }}>
-      <Typography
-        sx={{
-          ...globalStyles.typography,
-          fontSize: 18,
-          fontWeight: 600,
-        }}>
-        {table} ({type === 'dine_in' ? 'Dine-in' : 'Take-out'})
-      </Typography>
+      <Box display='flex' onClick={onEdit}>
+        <Typography
+          sx={{
+            ...globalStyles.typography,
+            fontSize: 18,
+            fontWeight: 600,
+          }}>
+          {table} ({type === 'dine_in' ? 'Dine-in' : 'Take-out'})
+        </Typography>
 
+        <Box flexGrow={1} display={'flex'} justifyContent={'flex-end'}>
+          <ModeEditIcon style={{ width: '20px' }} />
+        </Box>
+      </Box>
       <hr />
 
       <Box style={{ marginBottom: '1rem', marginTop: '1rem' }}>
@@ -153,6 +164,7 @@ const OrderCard = ({
             }}>
             P{numeral(total).format('0,0.00')}
           </Typography>
+          <i style={{ color: payment ? 'green' : 'red' }}> ({payment ? 'paid' : 'unpaid'})</i>
         </Box>
       </Box>
     </Container>

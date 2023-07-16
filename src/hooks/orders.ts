@@ -2,8 +2,8 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
- * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 16th 2023, 12:41:24 pm
+ * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
+ * Last Modified time: July 16th 2023, 1:54:35 pm
  * ---------------------------------------------
  */
 
@@ -54,6 +54,10 @@ export interface ICreateOrder {
   cartItems: TCartItems[];
   data?: TOrderData;
   payment?: TOrderPayment;
+}
+
+export interface IUpdateOrder extends ICreateOrder {
+  id: string;
 }
 
 export interface IOrder {
@@ -111,6 +115,7 @@ const OrderStatusPath: { [key in OrderStatusEnum]: OrderStatusEnum[] } = {
 const useOrder = (args?: InitialState) => {
   const { userInfo } = useAuth();
   const [documents, setDocuments] = useState<IOrder[]>([]);
+  const [error, setError] = useState<string>('');
 
   const [filters, setFilters] = useState<IFilterOptions>({
     startDate: args?.filters?.startDate || '',
@@ -222,6 +227,7 @@ const useOrder = (args?: InitialState) => {
         ],
         createdAt: moment().toDate().getTime(),
         updatedAt: moment().toDate().getTime(),
+        isArchived: false,
       };
 
       await addDoc(collection(db, constants.DB_ORDERS), orderPayload);
@@ -299,11 +305,43 @@ const useOrder = (args?: InitialState) => {
   //   }
   // };
 
+  const updateOrder = async (payload: IUpdateOrder): Promise<void> => {
+    try {
+      setError('');
+
+      const docRef = doc(db, constants.DB_ORDERS, payload.id);
+
+      await setDoc(
+        docRef,
+        {
+          storeId: payload.storeId,
+          tableId: payload.tableId,
+          notes: payload?.notes || '',
+          customerNotes: payload?.customerNotes || '',
+          type: payload.type,
+          cartItems: payload.cartItems,
+          payment: payload.payment,
+          discount: payload?.discount || [],
+          data: payload.data || {},
+          updatedAt: moment().toDate().getTime(),
+        },
+        { merge: true }
+      );
+
+      return;
+    } catch (error: any) {
+      setError(error?.message);
+
+      return;
+    }
+  };
+
   return {
     documents,
     createOrder,
     updateOrderStatus,
     // updateOrderPaymentStatus,
+    updateOrder,
     searchOrder,
   };
 };

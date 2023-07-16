@@ -4,27 +4,30 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
- * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 16th 2023, 12:40:02 pm
+ * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
+ * Last Modified time: July 16th 2023, 1:44:34 pm
  * ---------------------------------------------
  */
 
-import moment from 'moment-timezone';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import moment from 'moment-timezone';
 moment.tz.setDefault('Asia/Manila');
+import { Container, Grid } from '@mui/material';
 
-import { Container, Grid, MenuItem, Select, TextField, Button, FormControl } from '@mui/material';
-
-import useOrder from '@/hooks/orders';
-import { OrderStatusEnum } from '@/types/schema/order';
 import DropdownField from '@/components/Dropdown';
 import InputField from '@/components/TextField';
 import ButtonField from '@/components/Button';
-import useStore from '@/hooks/store';
-import useAuth from '@/hooks/auth';
 import OrderCard from '@/components/OrderCard';
 
+import useOrder from '@/hooks/orders';
+import { OrderStatusEnum } from '@/types/schema/order';
+import useStore from '@/hooks/store';
+import useAuth from '@/hooks/auth';
+
 export default function Dashboard() {
+  const router = useRouter();
+
   const { documents: orderDocs, searchOrder } = useOrder();
   const { documents: storeDocs } = useStore();
   const { userInfo } = useAuth();
@@ -117,6 +120,8 @@ export default function Dashboard() {
             type={order.type}
             products={order.cartItems}
             notes={order.notes}
+            payment={order.payment?.status || ''}
+            onEdit={() => router.push('/orders/' + order.id)}
           />
         </div>
       ))}
