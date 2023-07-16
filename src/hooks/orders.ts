@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 15th 2023, 9:44:17 pm
+ * Last Modified time: July 16th 2023, 12:41:24 pm
  * ---------------------------------------------
  */
 
@@ -35,12 +35,14 @@ import {
   TOrderData,
   TOrderHistory,
   TOrderPayment,
+  OrderPaymentStatusEnum,
 } from '@/types/schema/order';
 import constants from '@/utils/constants';
 import generateNanoId from '@/utils/generateNanoId';
 import useAuth from './auth';
 import StoreService from '@/services/stores';
 import TableService from '@/services/table';
+import OrderService from '@/services/orders';
 
 export interface ICreateOrder {
   storeId: string;
@@ -81,34 +83,60 @@ export interface IOrder {
 export interface IFilterParams {
   startDate: any;
   endDate: any;
-  status: string;
+  status: OrderStatusEnum | '';
   store: string;
 }
 
-const useOrder = () => {
+interface IFilterOptions {
+  startDate: any;
+  endDate: any;
+  status: OrderStatusEnum | '';
+  store: string;
+}
+
+interface InitialState {
+  filters?: IFilterOptions;
+}
+
+const OrderStatusPath: { [key in OrderStatusEnum]: OrderStatusEnum[] } = {
+  [OrderStatusEnum.NEW]: [OrderStatusEnum.CONFIRMED, OrderStatusEnum.DECLINED],
+  [OrderStatusEnum.DECLINED]: [],
+  [OrderStatusEnum.CONFIRMED]: [OrderStatusEnum.CANCELLED, OrderStatusEnum.PREPARING],
+  [OrderStatusEnum.PREPARING]: [OrderStatusEnum.CANCELLED, OrderStatusEnum.SERVED],
+  [OrderStatusEnum.SERVED]: [OrderStatusEnum.CANCELLED, OrderStatusEnum.COMPLETED],
+  [OrderStatusEnum.COMPLETED]: [],
+  [OrderStatusEnum.CANCELLED]: [],
+};
+
+const useOrder = (args?: InitialState) => {
   const { userInfo } = useAuth();
   const [documents, setDocuments] = useState<IOrder[]>([]);
 
-  //FIXME: CHANGE THIS TO useReducer
-  const [startDate, setStartDate] = useState<any>('');
-  const [endDate, setEndDate] = useState<any>('');
-  const [status, setStatus] = useState<string>('');
-  const [store, setStore] = useState<string>('');
+  const [filters, setFilters] = useState<IFilterOptions>({
+    startDate: args?.filters?.startDate || '',
+    endDate: args?.filters?.endDate || '',
+    status: args?.filters?.status || '',
+    store: args?.filters?.store || '',
+  });
 
   useEffect(() => {
-    if (store) {
+    if (filters.store) {
       const queries: QueryConstraint[] = [
-        where('createdAt', '>=', startDate || moment().startOf('day').valueOf()),
-        where('createdAt', '<=', endDate || moment().endOf('day').valueOf()),
-        where('storeId', '==', store),
+        where('createdAt', '>=', filters.startDate || moment().subtract(3, 'days').startOf('day').valueOf()),
+        where('createdAt', '<=', filters.endDate || moment().endOf('day').valueOf()),
+        where('storeId', '==', filters.store),
       ];
 
-      if (status) {
-        queries.push(where('status', '==', status));
+      if (filters.status) {
+        queries.push(where('status', '==', filters.status));
       }
 
       let ref = collection(db, constants.DB_ORDERS);
       let qry = query(ref, ...queries, orderBy('createdAt', 'desc'));
+
+      console.log({
+        queries,
+      });
 
       //will invoke everytime database is updated in the cloud
       const unsub = onSnapshot(qry, async snapshot => {
@@ -139,23 +167,31 @@ const useOrder = () => {
 
       return () => unsub();
     }
-  }, [endDate, startDate, status, store]);
+  }, [filters.endDate, filters.startDate, filters.status, filters.store]);
 
   const searchOrder = async (filters: IFilterParams) => {
-    if (!filters.store) return;
+    try {
+      if (!filters.store) {
+        throw new Error('Store is required.');
+      }
 
-    const filterStartDate = filters.startDate
-      ? moment(filters.startDate).startOf('day').valueOf()
-      : moment().startOf('day').valueOf();
+      const filterStartDate = filters.startDate
+        ? moment(filters.startDate).startOf('day').valueOf()
+        : moment().startOf('day').valueOf();
 
-    const filterEndDate = filters.endDate
-      ? moment(filters.endDate).endOf('day').valueOf()
-      : moment().startOf('day').valueOf();
+      const filterEndDate = filters.endDate
+        ? moment(filters.endDate).endOf('day').valueOf()
+        : moment().startOf('day').valueOf();
 
-    setStartDate(filterStartDate);
-    setEndDate(filterEndDate);
-    setStatus(filters?.status);
-    setStore(filters?.store);
+      setFilters({
+        startDate: filterStartDate,
+        endDate: filterEndDate,
+        status: filters?.status,
+        store: filters?.store,
+      });
+    } catch (err: any) {
+      throw err;
+    }
   };
 
   const createOrder = async (payload: ICreateOrder): Promise<void> => {
@@ -179,7 +215,8 @@ const useOrder = () => {
         history: [
           {
             action: 'order_received_and_confirmed',
-            actor: userInfo?.id as string,
+            actor: userInfo?.name,
+            actorId: userInfo?.id,
             timestamp: moment().toDate().getTime(),
           },
         ],
@@ -193,35 +230,51 @@ const useOrder = () => {
     }
   };
 
-  // const updateOrderStatus = async (id: string, status: OrderStatus): Promise<void> => {
-  //   try {
-  //     setError(null);
+  const updateOrderStatus = async (id: string, status: OrderStatusEnum): Promise<void> => {
+    try {
+      if (!userInfo) {
+        throw new Error('Unauthorized user can not create an order.');
+      }
 
-  //     const docRef = doc(db, constants.DB_ORDERS, id);
+      const currentOrder = await OrderService.fetchOrder(id);
 
-  //     const history = {
-  //       action: `order-${status}`,
-  //       actor: `staff`,
-  //       timestamp: moment().toDate().getTime(),
-  //     };
+      if (!currentOrder) throw new Error('Order not found.');
 
-  //     await setDoc(
-  //       docRef,
-  //       {
-  //         status,
-  //         history: arrayUnion(history),
-  //         updatedAt: moment().toDate().getTime(),
-  //       },
-  //       { merge: true }
-  //     );
+      if (OrderStatusPath[currentOrder?.status].includes(status)) {
+        throw new Error(`Cannot update order to ${status}. Order status is already ${currentOrder.status}`);
+      }
 
-  //     return;
-  //   } catch (error: any) {
-  //     setError(error?.message);
+      if (
+        status === OrderStatusEnum.COMPLETED &&
+        currentOrder?.payment?.status !== OrderPaymentStatusEnum.PAID
+      ) {
+        throw new Error(`Cannot complete order. Order still unpaid.`);
+      }
 
-  //     return;
-  //   }
-  // };
+      const docRef = doc(db, constants.DB_ORDERS, id);
+
+      const history = {
+        action: `order-${status}`,
+        actor: userInfo.name,
+        actorId: userInfo.id,
+        timestamp: moment().toDate().getTime(),
+      };
+
+      await setDoc(
+        docRef,
+        {
+          status,
+          history: arrayUnion(history),
+          updatedAt: moment().toDate().getTime(),
+        },
+        { merge: true }
+      );
+
+      return;
+    } catch (err: any) {
+      return err;
+    }
+  };
 
   // const updateOrderPaymentStatus = async (id: string, status: boolean): Promise<void> => {
   //   try {
@@ -249,7 +302,7 @@ const useOrder = () => {
   return {
     documents,
     createOrder,
-    // updateOrderStatus,
+    updateOrderStatus,
     // updateOrderPaymentStatus,
     searchOrder,
   };

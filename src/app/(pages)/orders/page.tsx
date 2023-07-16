@@ -5,7 +5,7 @@
  * Author: PJ Medina
  * Date:   Sunday July 9th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 16th 2023, 12:33:00 pm
+ * Last Modified time: July 16th 2023, 1:31:33 pm
  * ---------------------------------------------
  */
 
@@ -53,7 +53,6 @@ interface ProductDetailsProps {
   style?: any;
   cartItems?: any;
   setCartItems?: any;
-  withDeleteBtn?: boolean;
   withQnty?: boolean;
 }
 
@@ -82,7 +81,6 @@ const ProductDetails = ({
   item,
   cartItems,
   setCartItems,
-  withDeleteBtn,
   withQnty = true,
 }: ProductDetailsProps) => {
   const productDetailStyle: any = {
@@ -209,22 +207,6 @@ const ProductDetails = ({
     }
   };
 
-  const onRemoveOrder = () => {
-    if (!window.confirm('Are you sure you want to remove this item?')) {
-      return;
-    }
-
-    setCartItems(
-      produce(cartItems, (draftState: any) => {
-        const index = draftState.findIndex((obj: any) => obj.id === item.id);
-
-        if (index !== -1) {
-          draftState.splice(index, 1);
-        }
-      })
-    );
-  };
-
   return (
     <div style={style}>
       <Grid container spacing={2}>
@@ -240,17 +222,6 @@ const ProductDetails = ({
             P{numeral(product?.price).format('P0,0.00')}
           </Typography>
         </Grid>
-
-        {withDeleteBtn && !withQnty && (
-          <Grid item xs={4}>
-            <Box display='flex' justifyContent='flex-end'>
-              <DeleteForeverOutlinedIcon
-                onClick={onRemoveOrder}
-                style={{ ...productDetailStyle.removeButton }}
-              />
-            </Box>
-          </Grid>
-        )}
 
         {withQnty && (
           <Grid item xs={6} display='flex' alignItems='center' justifyContent='flex-start'>
@@ -293,7 +264,7 @@ const MenuCard = ({ product, cartItems, setCartItems }: MenuCardProps) => {
   }
 
   return (
-    <Card style={{ marginBottom: '1rem' }} variant='outlined'>
+    <Card style={{ marginBottom: '1rem', backgroundColor: '#ededed', border: 'none' }} variant='outlined'>
       <CardContent>
         <ProductDetails
           product={product}
@@ -329,26 +300,58 @@ const CartItemCard = ({ itemNo, cartItemId, cartItems, setCartItems }: CartItemC
     subTotal = Number(qnty) * Number(price) + Number(addOnsTotal);
   }
 
+  const onRemoveOrder = () => {
+    if (!window.confirm('Are you sure you want to remove this item?')) {
+      return;
+    }
+
+    setCartItems(
+      produce(cartItems, (draftState: any) => {
+        const index = draftState.findIndex((obj: any) => obj.id === cartItemId);
+
+        if (index !== -1) {
+          draftState.splice(index, 1);
+        }
+      })
+    );
+  };
+
   return (
-    <Card style={{ marginBottom: '1rem' }} variant='outlined'>
+    <Card style={{ marginBottom: '1rem', backgroundColor: '#ededed', border: 'none' }} variant='outlined'>
       <CardContent>
-        <Typography
-          sx={{
-            ...globalStyles.typography,
-            fontSize: 18,
-            fontWeight: 600,
-            marginTop: '0.5rem',
-            marginBottom: '1.25rem',
-          }}>
-          Item #{itemNo}
-        </Typography>
+        <Box display='flex' style={{ marginBottom: '0.75rem' }}>
+          <Box flexGrow={1} display='flex' justifyContent='flex-start' alignItems='flex-start'>
+            <Typography
+              sx={{
+                ...globalStyles.typography,
+                fontSize: 18,
+                fontWeight: 600,
+              }}>
+              Item #{itemNo}
+            </Typography>
+          </Box>
+
+          <Box flexGrow={1} display='flex' justifyContent='flex-end'>
+            <Box display='flex' alignItems='flex-start' justifyContent='flex-end'>
+              <DeleteForeverOutlinedIcon
+                onClick={onRemoveOrder}
+                style={{
+                  outline: 'none',
+                  color: '#EF6262',
+                  borderColor: '#EF6262',
+                  textTransform: 'none',
+                  fontSize: '1.75rem',
+                }}
+              />
+            </Box>
+          </Box>
+        </Box>
 
         <ProductDetails
           product={item?.product}
           item={item}
           cartItems={cartItems}
           setCartItems={setCartItems}
-          withDeleteBtn
           withQnty={false}
         />
         {item?.product?.subMenu.length > 0 && item && (

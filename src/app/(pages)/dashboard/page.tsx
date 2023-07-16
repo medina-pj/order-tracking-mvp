@@ -4,8 +4,8 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
- * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
- * Last Modified time: July 15th 2023, 10:02:34 pm
+ * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
+ * Last Modified time: July 16th 2023, 12:40:02 pm
  * ---------------------------------------------
  */
 
@@ -29,9 +29,9 @@ export default function Dashboard() {
   const { documents: storeDocs } = useStore();
   const { userInfo } = useAuth();
 
-  const [startDate, setStartDate] = useState(moment());
-  const [endDate, setEndDate] = useState(moment());
-  const [status, setStatus] = useState('default');
+  const [startDate, setStartDate] = useState(moment().format('YYYY-MM-DD'));
+  const [endDate, setEndDate] = useState(moment().format('YYYY-MM-DD'));
+  const [status, setStatus] = useState<OrderStatusEnum | 'all'>('all');
   const [store, setStore] = useState('');
   const [storeOptions, setStoreOptions] = useState<{ value: string; label: string }[]>([]);
 
@@ -62,7 +62,7 @@ export default function Dashboard() {
   }, [storeDocs, userInfo]);
 
   const onSearchOrder = async () => {
-    await searchOrder({ startDate, endDate, store, status: status === 'default' ? '' : status });
+    await searchOrder({ startDate, endDate, store, status: status === 'all' ? '' : status });
   };
 
   console.log({ orderDocs, storeDocs, userInfo });
@@ -93,6 +93,7 @@ export default function Dashboard() {
             value={status}
             onChange={(e: any) => setStatus(e.target.value)}
             options={[
+              { value: 'all', label: 'All' },
               { value: OrderStatusEnum.COMPLETED, label: 'Completed' },
               { value: OrderStatusEnum.NEW, label: 'New' },
               { value: OrderStatusEnum.CONFIRMED, label: 'Confirmed' },
