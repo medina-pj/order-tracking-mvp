@@ -3,30 +3,22 @@
  * Author: PJ Medina
  * Date:   Sunday July 2nd 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 6th 2023, 9:31:44 pm
+ * Last Modified time: July 16th 2023, 10:56:52 pm
  * ---------------------------------------------
  */
 
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import {
-  collection,
-  query,
-  where,
-  addDoc,
-  onSnapshot,
-  doc,
-  setDoc,
-  documentId,
-} from 'firebase/firestore';
+import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
+import { collection, query, where, addDoc, onSnapshot, doc, setDoc, documentId } from 'firebase/firestore';
 
 import moment from 'moment-timezone';
 moment.tz.setDefault('Asia/Manila');
 
-import { auth, db } from '@/config/firebase';
+import { db, firebaseConfig, initializeApp } from '@/config/firebase';
 import constants from '@/utils/constants';
 import { useEffect, useState } from 'react';
 import { UserSchema } from '@/types/schema/user';
 import useAuth from './auth';
+import { deleteApp } from 'firebase/app';
 
 export interface ICreateAccount {
   username: string;
@@ -50,11 +42,7 @@ const useAdminAccount = () => {
   useEffect(() => {
     if (userInfo !== null && userInfo?.userType === 'admin') {
       let ref = collection(db, constants.DB_ADMINS);
-      let qry = query(
-        ref,
-        where('isArchived', '==', false),
-        where(documentId(), '!=', userInfo.id)
-      );
+      let qry = query(ref, where('isArchived', '==', false), where(documentId(), '!=', userInfo.id));
 
       //will invoke everytime database is updated in the cloud
       const unsub = onSnapshot(qry, async snapshot => {
@@ -83,9 +71,13 @@ const useAdminAccount = () => {
   const createAccount = async (payload: ICreateAccount): Promise<void> => {
     try {
       if (userInfo !== null && userInfo?.userType === 'admin') {
+        //initialize new app reference
+        const appRef = initializeApp(firebaseConfig, 'Secondary');
+        const authRef = getAuth(appRef);
+
         // create firebase auth account
         const { user: createdUser } = await createUserWithEmailAndPassword(
-          auth,
+          authRef,
           payload.username,
           payload.password
         );
@@ -108,6 +100,7 @@ const useAdminAccount = () => {
         };
 
         await addDoc(collection(db, constants.DB_ADMINS), accountPayload);
+        await deleteApp(appRef);
       } else {
         throw new Error('Only admins can create an account.');
       }

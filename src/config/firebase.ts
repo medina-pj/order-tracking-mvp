@@ -3,14 +3,14 @@
  * Author: PJ Medina
  * Date:   Friday June 9th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 1st 2023, 10:36:08 am
+ * Last Modified time: July 16th 2023, 10:51:23 pm
  * ---------------------------------------------
  */
 
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
-// import { getStorage } from 'firebase/storage';
+import { getStorage } from 'firebase/storage';
 import constants from '../utils/constants';
 
 const firebaseConfig = {
@@ -23,7 +23,7 @@ const firebaseConfig = {
 };
 
 // init firebase
-const app = initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig, 'Primary');
 
 // init firebase auth
 const auth = getAuth(app);
@@ -31,4 +31,7 @@ const auth = getAuth(app);
 // init firestore
 const db = getFirestore(app);
 
-export { db, auth };
+// init firestore storage
+const storage = getStorage(app);
+
+export { app, db, auth, storage, firebaseConfig, initializeApp };
