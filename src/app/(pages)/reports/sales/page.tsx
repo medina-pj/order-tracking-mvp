@@ -5,7 +5,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 18th 2023, 5:14:13 am
+ * Last Modified time: July 18th 2023, 5:19:31 am
  * ---------------------------------------------
  */
 
@@ -131,11 +131,6 @@ export default function RecordExpenses() {
     await filterOrders({ startDate, endDate, store, status: OrderStatusEnum.COMPLETED });
   };
 
-  console.log({
-    orderDocs,
-    expensesDocs,
-  });
-
   const totalExpenses = useMemo(() => {
     return expensesDocs.reduce((acc, curr) => acc + +curr.unitPrice * +curr.quantity, 0);
   }, [expensesDocs]);
@@ -191,11 +186,6 @@ export default function RecordExpenses() {
 
     return [totalSales, _.orderBy(productTally, ['quantity'], ['desc'])];
   }, [orderDocs]);
-
-  console.log({
-    totalSales,
-    productTally,
-  });
 
   return (
     <Container style={{ marginTop: '2rem', marginBottom: '2rem' }}>

@@ -5,7 +5,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 17th 2023, 10:21:48 pm
+ * Last Modified time: July 18th 2023, 5:19:25 am
  * ---------------------------------------------
  */
 
@@ -27,10 +27,6 @@ export default function Dashboard() {
   const { createDoc, documents } = useExpenses();
   const { documents: storeDocs } = useStore();
   const { documents: categoryDocs } = useCategory();
-
-  console.log({
-    expenses: documents,
-  });
 
   const [store, setStore] = useState('');
   const [category, setCategory] = useState('');
