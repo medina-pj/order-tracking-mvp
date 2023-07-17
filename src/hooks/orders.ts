@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 16th 2023, 11:36:13 pm
+ * Last Modified time: July 17th 2023, 9:57:56 pm
  * ---------------------------------------------
  */
 
@@ -85,13 +85,6 @@ export interface IOrder {
   updatedAt: string;
 }
 
-export interface IFilterParams {
-  startDate: any;
-  endDate: any;
-  status: OrderStatusEnum | '';
-  store: string;
-}
-
 interface IFilterOptions {
   startDate: any;
   endDate: any;
@@ -127,7 +120,7 @@ const useOrder = (args?: InitialState) => {
   useEffect(() => {
     if (filters.store) {
       const queries: QueryConstraint[] = [
-        where('createdAt', '>=', filters.startDate || moment().subtract(3, 'days').startOf('day').valueOf()),
+        where('createdAt', '>=', filters.startDate || moment().startOf('day').valueOf()),
         where('createdAt', '<=', filters.endDate || moment().endOf('day').valueOf()),
         where('storeId', '==', filters.store),
       ];
@@ -153,22 +146,24 @@ const useOrder = (args?: InitialState) => {
         let results: IOrder[] = [];
 
         for (const doc of snapshot.docs) {
+          const data = doc.data();
+
           results.push({
             id: doc.id,
-            orderId: doc.data().orderId,
-            store: await StoreService.fetchStore(doc.data().storeId),
-            table: await TableService.fetchTable(doc.data().tableId),
-            notes: doc.data().notes,
-            customerNotes: doc.data().customerNotes,
-            type: doc.data().type,
-            status: doc.data().status,
-            cartItems: doc.data().cartItems,
-            history: doc.data().history,
-            payment: doc.data().payment,
-            discount: doc.data().discount,
-            data: doc.data().data,
-            createdAt: moment(doc.data()?.createdAt).format('MMM DD, YYYY hh:mma'),
-            updatedAt: moment(doc.data()?.updatedAt).format('MMM DD, YYYY hh:mma'),
+            orderId: data?.orderId,
+            store: await StoreService.fetchStore(data?.storeId),
+            table: await TableService.fetchTable(data?.tableId),
+            notes: data?.notes,
+            customerNotes: data?.customerNotes,
+            type: data?.type,
+            status: data?.status,
+            cartItems: data?.cartItems,
+            history: data?.history,
+            payment: data?.payment,
+            discount: data?.discount,
+            data: data?.data,
+            createdAt: moment(data?.createdAt).format('MMM DD, YYYY hh:mma'),
+            updatedAt: moment(data?.updatedAt).format('MMM DD, YYYY hh:mma'),
           });
         }
 
@@ -179,7 +174,7 @@ const useOrder = (args?: InitialState) => {
     }
   }, [filters.endDate, filters.startDate, filters.status, filters.store]);
 
-  const searchOrder = async (filters: IFilterParams) => {
+  const searchOrder = async (filters: IFilterOptions) => {
     try {
       if (!filters.store) {
         throw new Error('Store is required.');

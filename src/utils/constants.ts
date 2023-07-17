@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Friday June 9th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 8th 2023, 4:26:00 pm
+ * Last Modified time: July 17th 2023, 8:32:02 pm
  * ---------------------------------------------
  */
 
@@ -21,6 +21,7 @@ const constants = {
   DB_STORE: 'stores',
   DB_STORE_TABLE: 'store_table',
   DB_GROUPED_PRODUCT: 'grouped_products',
+  DB_EXPENSES: 'expenses',
 };
 
 export default constants;

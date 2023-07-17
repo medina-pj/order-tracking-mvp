@@ -91,6 +91,16 @@ const NavBar = () => {
               {'Stores'}
             </Typography>
           </MenuItem>
+          <MenuItem key={'Expenses'} onClick={handleCloseNavMenu}>
+            <Typography textAlign='center' component='a' href='/expenses'>
+              {'Expenses'}
+            </Typography>
+          </MenuItem>
+          <MenuItem key={'Record-Expenses'} onClick={handleCloseNavMenu}>
+            <Typography textAlign='center' component='a' href='/expenses/record'>
+              {'Record Expenses'}
+            </Typography>
+          </MenuItem>
           <MenuItem key={'Accounts'} onClick={handleCloseNavMenu}>
             <Typography textAlign='center' component='a' href='/accounts'>
               {'Accounts'}

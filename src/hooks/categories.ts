@@ -11,16 +11,7 @@ import { useState, useEffect } from 'react';
 import moment from 'moment-timezone';
 moment.tz.setDefault('Asia/Manila');
 
-import {
-  collection,
-  query,
-  onSnapshot,
-  where,
-  addDoc,
-  doc,
-  setDoc,
-  orderBy,
-} from 'firebase/firestore';
+import { collection, query, onSnapshot, where, addDoc, doc, setDoc, orderBy } from 'firebase/firestore';
 
 import { db } from '@/config/firebase';
 import { CategorySchema } from '@/types/schema/product';
