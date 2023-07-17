@@ -3,14 +3,14 @@
  * Author: Rovelin Enriquez
  * Date:   Saturday July 15th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 16th 2023, 11:38:50 pm
+ * Last Modified time: July 18th 2023, 4:23:23 am
  * ---------------------------------------------
  */
 'use client';
 
 import { Box, Button, ButtonGroup, Container, Typography } from '@mui/material';
 import numeral from 'numeral';
-import { CSSProperties, useState } from 'react';
+import { CSSProperties, useMemo, useState } from 'react';
 
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import { OrderPaymentMethodEnum, OrderPaymentStatusEnum, OrderStatusEnum } from '@/types/schema/order';
@@ -82,14 +82,16 @@ const OrderCard = ({
     }
   };
 
-  const total = products.reduce(
-    (acc: any, cur: any) =>
-      acc +
-      parseInt(cur?.price) * parseInt(cur?.quantity) +
-      cur?.addOns?.reduce((acc1: any, cur1: any) => acc1 + parseInt(cur1?.price), 0) *
-        parseInt(cur?.quantity),
-    0
-  );
+  const total = useMemo(() => {
+    return products.reduce(
+      (acc: any, cur: any) =>
+        acc +
+        parseInt(cur?.price) * parseInt(cur?.quantity) +
+        cur?.addOns?.reduce((acc1: any, cur1: any) => acc1 + parseInt(cur1?.price), 0) *
+          parseInt(cur?.quantity),
+      0
+    );
+  }, [products]);
 
   return (
     <Container

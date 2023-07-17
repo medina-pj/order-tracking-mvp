@@ -5,7 +5,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 16th 2023, 11:28:31 pm
+ * Last Modified time: July 18th 2023, 4:15:59 am
  * ---------------------------------------------
  */
 
@@ -28,7 +28,7 @@ import useAuth from '@/hooks/auth';
 export default function Dashboard() {
   const router = useRouter();
 
-  const { documents: orderDocs, searchOrder } = useOrder();
+  const { documents: orderDocs, filterOrders } = useOrder();
   const { documents: storeDocs } = useStore();
   const { userInfo } = useAuth();
 
@@ -62,7 +62,7 @@ export default function Dashboard() {
 
         if (store) {
           setStore(store.value);
-          searchOrder({
+          filterOrders({
             startDate,
             endDate,
             store: store.value,
@@ -75,8 +75,8 @@ export default function Dashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storeDocs, userInfo]);
 
-  const onSearchOrder = async () => {
-    await searchOrder({ startDate, endDate, store, status: status === 'all' ? '' : status });
+  const onfilterOrders = async () => {
+    await filterOrders({ startDate, endDate, store, status: status === 'all' ? '' : status });
   };
 
   return (
@@ -105,7 +105,7 @@ export default function Dashboard() {
             value={status}
             onChange={(e: any) => setStatus(e.target.value)}
             options={[
-              { value: 'all', label: 'All' },
+              { value: 'all', label: 'Active Orders' },
               { value: OrderStatusEnum.COMPLETED, label: 'Completed' },
               { value: OrderStatusEnum.NEW, label: 'New' },
               { value: OrderStatusEnum.CONFIRMED, label: 'Confirmed' },
@@ -118,7 +118,7 @@ export default function Dashboard() {
         </Grid>
 
         <Grid item xs={12}>
-          <ButtonField label='Search Orders' onClick={onSearchOrder} />
+          <ButtonField label='Search Orders' onClick={onfilterOrders} />
         </Grid>
       </Grid>
 

@@ -56,14 +56,14 @@ const NavBar = () => {
           }}
           open={Boolean(anchorElNav)}
           onClose={handleCloseNavMenu}>
-          <MenuItem key={'Home'} onClick={handleCloseNavMenu}>
+          <MenuItem key={'Orders'} onClick={handleCloseNavMenu}>
             <Typography textAlign='center' component='a' href='/dashboard'>
-              Home
+              {'Orders'}
             </Typography>
           </MenuItem>
-          <MenuItem key={'Orders'} onClick={handleCloseNavMenu}>
+          <MenuItem key={'Create-Orders'} onClick={handleCloseNavMenu}>
             <Typography textAlign='center' component='a' href='/orders'>
-              {'Orders'}
+              {'Create Orders'}
             </Typography>
           </MenuItem>
           <MenuItem key={'Grouped-Products'} onClick={handleCloseNavMenu}>
@@ -91,14 +91,19 @@ const NavBar = () => {
               {'Stores'}
             </Typography>
           </MenuItem>
+          <MenuItem key={'Record-Expenses'} onClick={handleCloseNavMenu}>
+            <Typography textAlign='center' component='a' href='/expenses/record'>
+              {'Record Expenses'}
+            </Typography>
+          </MenuItem>
           <MenuItem key={'Expenses'} onClick={handleCloseNavMenu}>
             <Typography textAlign='center' component='a' href='/expenses'>
               {'Expenses'}
             </Typography>
           </MenuItem>
-          <MenuItem key={'Record-Expenses'} onClick={handleCloseNavMenu}>
-            <Typography textAlign='center' component='a' href='/expenses/record'>
-              {'Record Expenses'}
+          <MenuItem key={'Sales-Report'} onClick={handleCloseNavMenu}>
+            <Typography textAlign='center' component='a' href='/reports/sales'>
+              {'Sales Report'}
             </Typography>
           </MenuItem>
           <MenuItem key={'Accounts'} onClick={handleCloseNavMenu}>

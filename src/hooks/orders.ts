@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 17th 2023, 9:57:56 pm
+ * Last Modified time: July 18th 2023, 4:15:46 am
  * ---------------------------------------------
  */
 
@@ -174,7 +174,7 @@ const useOrder = (args?: InitialState) => {
     }
   }, [filters.endDate, filters.startDate, filters.status, filters.store]);
 
-  const searchOrder = async (filters: IFilterOptions) => {
+  const filterOrders = async (filters: IFilterOptions) => {
     try {
       if (!filters.store) {
         throw new Error('Store is required.');
@@ -371,7 +371,7 @@ const useOrder = (args?: InitialState) => {
     updateOrderStatus,
     updateOrderPaymentStatus,
     updateOrder,
-    searchOrder,
+    filterOrders,
   };
 };
 

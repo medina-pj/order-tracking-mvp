@@ -5,11 +5,11 @@
  * Author: PJ Medina
  * Date:   Sunday July 9th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 16th 2023, 11:27:40 pm
+ * Last Modified time: July 18th 2023, 4:38:14 am
  * ---------------------------------------------
  */
 
-import { CSSProperties, useEffect, useState } from 'react';
+import { CSSProperties, useEffect, useMemo, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import {
   Accordion,
@@ -519,19 +519,21 @@ export default function Order() {
     setStore(value);
   };
 
-  const total = cartItems.reduce((acc: any, curr: any) => {
-    const qnty = curr.quantity;
-    const price = curr.price;
+  const total = useMemo(() => {
+    return cartItems.reduce((acc: any, curr: any) => {
+      const qnty = curr.quantity;
+      const price = curr.price;
 
-    const addOnsTotal = curr.addOns.reduce((acc: number, curr: TCartAddOns) => {
-      acc += curr.price * curr.quantity * qnty;
+      const addOnsTotal = curr.addOns.reduce((acc: number, curr: TCartAddOns) => {
+        acc += curr.price * curr.quantity * qnty;
+        return acc;
+      }, 0);
+
+      acc += Number(qnty) * Number(price) + Number(addOnsTotal);
+
       return acc;
     }, 0);
-
-    acc += Number(qnty) * Number(price) + Number(addOnsTotal);
-
-    return acc;
-  }, 0);
+  }, [cartItems]);
 
   return (
     <Container style={{ marginTop: '2rem', marginBottom: '5rem' }}>

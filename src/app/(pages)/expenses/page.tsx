@@ -5,25 +5,14 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 17th 2023, 11:12:57 pm
+ * Last Modified time: July 18th 2023, 4:33:03 am
  * ---------------------------------------------
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import moment from 'moment-timezone';
 moment.tz.setDefault('Asia/Manila');
-import {
-  Container,
-  Grid,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Typography,
-} from '@mui/material';
+import { Container, Grid, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 
 import DropdownField from '@/components/Dropdown';
 import InputField from '@/components/TextField';
@@ -32,7 +21,7 @@ import ButtonField from '@/components/Button';
 import useStore from '@/hooks/store';
 import useCategory from '@/hooks/categories';
 import { ExpenseStatusEnum } from '@/types/schema/expenses';
-import useExpenses from '@/hooks/expenses';
+import useExpenses, { IExpenses } from '@/hooks/expenses';
 import useAuth from '@/hooks/auth';
 import numeral from 'numeral';
 
@@ -89,11 +78,9 @@ export default function RecordExpenses() {
     await filterExpenses({ startDate, endDate, store, status: status === 'all' ? '' : status });
   };
 
-  console.log({
-    expensesDocs,
-  });
-
-  const totalCost = expensesDocs.reduce((acc: any, curr: any) => acc + +curr.unitPrice * +curr.quantity, 0);
+  const totalCost = useMemo(() => {
+    return expensesDocs.reduce((acc: number, curr: IExpenses) => acc + +curr.unitPrice * +curr.quantity, 0);
+  }, [expensesDocs]);
 
   return (
     <Container style={{ marginTop: '2rem', marginBottom: '2rem' }}>
