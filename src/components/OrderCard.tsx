@@ -3,7 +3,7 @@
  * Author: Rovelin Enriquez
  * Date:   Saturday July 15th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 18th 2023, 12:52:35 pm
+ * Last Modified time: July 18th 2023, 1:35:38 pm
  * ---------------------------------------------
  */
 'use client';
@@ -83,14 +83,15 @@ const OrderCard = ({
   };
 
   const total = useMemo(() => {
-    return products.reduce(
-      (acc: any, cur: any) =>
-        acc +
-        parseInt(cur?.price) * parseInt(cur?.quantity) +
-        cur?.addOns?.reduce((acc1: any, cur1: any) => acc1 + parseInt(cur1?.price), 0) *
-          parseInt(cur?.quantity),
-      0
-    );
+    return products.reduce((acc: any, item: any) => {
+      const addOnsTotal = item?.addOns?.reduce(
+        (acc: any, addOn: any) =>
+          acc + parseInt(addOn?.price) * parseInt(addOn?.quantity) * parseInt(item?.quantity),
+        0
+      );
+
+      return acc + parseInt(item?.price) * parseInt(item?.quantity) + addOnsTotal;
+    }, 0);
   }, [products]);
 
   return (
