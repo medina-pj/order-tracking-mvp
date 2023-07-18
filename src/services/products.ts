@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Thursday July 6th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 9th 2023, 9:17:45 pm
+ * Last Modified time: July 18th 2023, 8:24:46 pm
  * ---------------------------------------------
  */
 import moment from 'moment-timezone';
@@ -39,7 +39,7 @@ const ProductService = {
 
       const qrySnapshot = await getDocs(qry);
 
-      for (const doc of qrySnapshot.docs) {
+      const promises = qrySnapshot.docs.map(async (doc: any) => {
         let category = doc.data()?.categoryId;
         let store = doc.data()?.storeId;
         let subMenu = doc.data()?.subMenu;
@@ -69,7 +69,9 @@ const ProductService = {
           createdAt: moment(doc.data()?.createdAt).format('MMM DD, YYYY hh:mma'),
           updatedAt: moment(doc.data()?.updatedAt).format('MMM DD, YYYY hh:mma'),
         });
-      }
+      });
+
+      await Promise.all(promises);
 
       return result;
     } catch (err: any) {

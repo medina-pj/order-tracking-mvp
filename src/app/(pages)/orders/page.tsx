@@ -5,7 +5,7 @@
  * Author: PJ Medina
  * Date:   Sunday July 9th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 18th 2023, 1:00:00 pm
+ * Last Modified time: July 18th 2023, 8:33:14 pm
  * ---------------------------------------------
  */
 
@@ -47,6 +47,7 @@ import useStoreTable from '@/hooks/storeTable';
 import DropdownField from '@/components/Dropdown';
 import useOrder, { ICreateOrder } from '@/hooks/orders';
 import useAuth from '@/hooks/auth';
+import _ from 'lodash';
 
 interface ProductDetailsProps {
   product: any;
@@ -107,7 +108,9 @@ const ProductDetails = ({
     itemDetails = item?.addOns.find((d: any) => d.productId === product?.productId);
   }
 
-  const onAddQuantity = () => {
+  const onAddQuantity = (event: any) => {
+    event.stopPropagation();
+
     // Add item to cart
     if (!item && !product?.isAddOns) {
       setCartItems((prev: any) =>
@@ -167,7 +170,9 @@ const ProductDetails = ({
     }
   };
 
-  const onDeductQuantity = () => {
+  const onDeductQuantity = (event: any) => {
+    event.stopPropagation();
+
     // Decrement of item in cart
     if (item && !product?.isAddOns) {
       setCartItems(
@@ -284,6 +289,7 @@ const MenuCard = ({ product, cartItems, setCartItems }: MenuCardProps) => {
 
 const CartItemCard = ({ itemNo, cartItemId, cartItems, setCartItems }: CartItemCardProps) => {
   let subTotal = 0;
+  const [maximizeCard, setMaximizeCard] = useState(false);
 
   const item = cartItems.find((d: any) => d.id === cartItemId);
 
@@ -299,7 +305,9 @@ const CartItemCard = ({ itemNo, cartItemId, cartItems, setCartItems }: CartItemC
     subTotal = Number(qnty) * Number(price) + Number(addOnsTotal);
   }
 
-  const onRemoveOrder = () => {
+  const onRemoveOrder = (event: any) => {
+    event.stopPropagation();
+
     if (!window.confirm('Are you sure you want to remove this item?')) {
       return;
     }
@@ -307,7 +315,6 @@ const CartItemCard = ({ itemNo, cartItemId, cartItems, setCartItems }: CartItemC
     setCartItems(
       produce(cartItems, (draftState: any) => {
         const index = draftState.findIndex((obj: any) => obj.id === cartItemId);
-
         if (index !== -1) {
           draftState.splice(index, 1);
         }
@@ -317,7 +324,7 @@ const CartItemCard = ({ itemNo, cartItemId, cartItems, setCartItems }: CartItemC
 
   return (
     <Card style={{ marginBottom: '1rem', backgroundColor: '#ededed', border: 'none' }} variant='outlined'>
-      <CardContent>
+      <CardContent onClick={() => setMaximizeCard((prev: any) => !prev)}>
         <Box display='flex' style={{ marginBottom: '0.75rem' }}>
           <Box flexGrow={1} display='flex' justifyContent='flex-start' alignItems='flex-start'>
             <Typography
@@ -353,7 +360,8 @@ const CartItemCard = ({ itemNo, cartItemId, cartItems, setCartItems }: CartItemC
           setCartItems={setCartItems}
           withQnty={false}
         />
-        {item?.product?.subMenu.length > 0 && item && (
+
+        {item?.product?.subMenu.length > 0 && item && maximizeCard && (
           <div>
             <Typography
               sx={{
@@ -573,13 +581,19 @@ export default function Order() {
             </Typography>
           </AccordionSummary>
           <AccordionDetails style={{ padding: 0 }}>
-            {products
-              .filter((d: IProduct) => d.store.id === store && !d.isAddOns)
-              .map((d: IProduct, index: number) => (
-                <MenuCard key={index} product={d} cartItems={cartEntries} setCartItems={setCartEntries} />
-              ))}
+            <Grid container spacing={2}>
+              {_.orderBy(products, ['name'], ['asc'])
+                .filter((d: IProduct) => d.store.id === store && !d.isAddOns)
+                .map((d: IProduct, index: number) => (
+                  <Grid item key={index} xs={6}>
+                    <MenuCard product={d} cartItems={cartEntries} setCartItems={setCartEntries} />
+                  </Grid>
+                ))}
 
-            <ButtonField label='Add To Cart' onClick={onAddToCart} />
+              <Grid item xs={12}>
+                <ButtonField label='Add To Cart' onClick={onAddToCart} />
+              </Grid>
+            </Grid>
           </AccordionDetails>
         </Accordion>
 
