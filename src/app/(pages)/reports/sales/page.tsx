@@ -5,7 +5,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 18th 2023, 5:19:31 am
+ * Last Modified time: July 18th 2023, 1:16:44 pm
  * ---------------------------------------------
  */
 
@@ -47,7 +47,7 @@ const TableContent = ({ name, price, quantity, total }: any) => {
         <Typography
           sx={{
             fontFamily: 'inherit',
-            fontSize: 13,
+            fontSize: 14,
           }}>
           {name}
         </Typography>
@@ -55,15 +55,15 @@ const TableContent = ({ name, price, quantity, total }: any) => {
           color={'text.secondary'}
           sx={{
             fontFamily: 'inherit',
-            fontSize: 13,
+            fontSize: 14,
           }}>
           {price}
         </Typography>
       </TableCell>
-      <TableCell sx={{ fontFamily: 'inherit' }} align='right'>
+      <TableCell sx={{ fontFamily: 'inherit', fontSize: 14 }} align='right'>
         {quantity}
       </TableCell>
-      <TableCell sx={{ fontFamily: 'inherit' }} align='right'>
+      <TableCell sx={{ fontFamily: 'inherit', fontSize: 14 }} align='right'>
         {total}
       </TableCell>
     </TableRow>
@@ -231,12 +231,12 @@ export default function RecordExpenses() {
             }}>
             <TableHead>
               <TableRow>
-                <TableCell sx={{ fontFamily: 'inherit', fontSize: 13 }}>Product</TableCell>
-                <TableCell sx={{ fontFamily: 'inherit', fontSize: 13 }} align='right'>
+                <TableCell sx={{ fontFamily: 'inherit', fontSize: 16 }}>Product</TableCell>
+                <TableCell sx={{ fontFamily: 'inherit', fontSize: 16 }} align='right'>
                   Quantity
                 </TableCell>
-                <TableCell sx={{ fontFamily: 'inherit', fontSize: 13 }} align='right'>
-                  Cost
+                <TableCell sx={{ fontFamily: 'inherit', fontSize: 16 }} align='right'>
+                  Total
                 </TableCell>
               </TableRow>
             </TableHead>
@@ -251,10 +251,10 @@ export default function RecordExpenses() {
                 />
               ))}
               <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                <TableCell colSpan={2} sx={{ fontFamily: 'inherit', fontWeight: 600, fontSize: 16 }}>
+                <TableCell colSpan={2} sx={{ fontFamily: 'inherit', fontWeight: 600, fontSize: 14 }}>
                   Total
                 </TableCell>
-                <TableCell align='right' sx={{ fontFamily: 'inherit', fontWeight: 600, fontSize: 16 }}>
+                <TableCell align='right' sx={{ fontFamily: 'inherit', fontWeight: 600, fontSize: 14 }}>
                   P{numeral(totalSales).format('0,0.00')}
                 </TableCell>
               </TableRow>
@@ -282,11 +282,11 @@ export default function RecordExpenses() {
             }}>
             <TableHead>
               <TableRow>
-                <TableCell sx={{ fontFamily: 'inherit', fontSize: 13 }}>Particulars</TableCell>
-                <TableCell sx={{ fontFamily: 'inherit', fontSize: 13 }} align='right'>
+                <TableCell sx={{ fontFamily: 'inherit', fontSize: 16 }}>Particulars</TableCell>
+                <TableCell sx={{ fontFamily: 'inherit', fontSize: 16 }} align='right'>
                   Quantity
                 </TableCell>
-                <TableCell sx={{ fontFamily: 'inherit', fontSize: 13 }} align='right'>
+                <TableCell sx={{ fontFamily: 'inherit', fontSize: 16 }} align='right'>
                   Cost
                 </TableCell>
               </TableRow>
@@ -302,18 +302,18 @@ export default function RecordExpenses() {
                 />
               ))}
               <TableRow>
-                <TableCell colSpan={2} sx={{ fontFamily: 'inherit', fontWeight: 600, fontSize: 16 }}>
+                <TableCell colSpan={2} sx={{ fontFamily: 'inherit', fontWeight: 600, fontSize: 14 }}>
                   Total
                 </TableCell>
-                <TableCell align='right' sx={{ fontFamily: 'inherit', fontWeight: 600, fontSize: 16 }}>
+                <TableCell align='right' sx={{ fontFamily: 'inherit', fontWeight: 600, fontSize: 14 }}>
                   P{numeral(totalExpenses).format('0,0.00')}
                 </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell colSpan={2} sx={{ fontFamily: 'inherit', fontWeight: 600, fontSize: 16 }}>
+                <TableCell colSpan={2} sx={{ fontFamily: 'inherit', fontWeight: 600, fontSize: 14 }}>
                   Gross
                 </TableCell>
-                <TableCell align='right' sx={{ fontFamily: 'inherit', fontWeight: 600, fontSize: 16 }}>
+                <TableCell align='right' sx={{ fontFamily: 'inherit', fontWeight: 600, fontSize: 14 }}>
                   P{numeral(totalSales).format('0,0.00')}
                 </TableCell>
               </TableRow>

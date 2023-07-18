@@ -2,8 +2,8 @@
  * ---------------------------------------------
  * Author: Rovelin Enriquez
  * Date:   Saturday July 8th 2023
- * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
- * Last Modified time: July 12th 2023, 7:20:56 pm
+ * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
+ * Last Modified time: July 18th 2023, 1:06:34 pm
  * ---------------------------------------------
  */
 
@@ -23,16 +23,17 @@ export default function DropdownField({
   disabled?: boolean;
 }) {
   return (
-    <FormControl fullWidth style={{ marginBottom: '20px' }}>
-      <p style={{ marginBottom: '5px', fontSize: '18px' }}>{label}</p>
+    <FormControl fullWidth>
+      <p style={{ fontFamily: 'inherit', marginBottom: '5px', fontSize: '18px' }}>{label}</p>
       <Select
+        sx={{ '.MuiOutlinedInput-notchedOutline': { borderStyle: 'none' }, backgroundColor: '#F0F0F0' }}
         disabled={disabled}
         labelId='user-type-select'
         id='user-type-select-id'
         value={value}
         onChange={onChange}>
         {options.map((option, key) => (
-          <MenuItem key={key} value={option.value}>
+          <MenuItem key={key} value={option.value} style={{ fontFamily: 'inherit' }}>
             {option.label}
           </MenuItem>
         ))}

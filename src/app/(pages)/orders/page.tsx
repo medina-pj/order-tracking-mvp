@@ -5,7 +5,7 @@
  * Author: PJ Medina
  * Date:   Sunday July 9th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 18th 2023, 4:38:14 am
+ * Last Modified time: July 18th 2023, 1:00:00 pm
  * ---------------------------------------------
  */
 
@@ -73,6 +73,7 @@ interface CartItemCardProps {
 const globalStyles: { [key: string]: CSSProperties } = {
   typography: {
     fontFamily: 'inherit',
+    fontSize: 14,
   },
 };
 
@@ -212,14 +213,11 @@ const ProductDetails = ({
     <div style={style}>
       <Grid container spacing={2}>
         <Grid item xs={8}>
-          <Typography sx={{ ...globalStyles.typography, fontSize: 12 }} color='text.secondary' gutterBottom>
-            {product?.productAbbrev}
+          <Typography sx={{ ...globalStyles.typography }} color='text.secondary' gutterBottom>
+            {product?.productAbbrev.toUpperCase()}
           </Typography>
-          <Typography sx={{ ...globalStyles.typography, fontSize: 16 }}>{product?.name}</Typography>
-          <Typography
-            sx={{ ...globalStyles.typography, fontSize: 14 }}
-            color='text.secondary'
-            component='div'>
+          <Typography sx={{ ...globalStyles.typography }}>{product?.name.toUpperCase()}</Typography>
+          <Typography sx={{ ...globalStyles.typography }} color='text.secondary' component='div'>
             P{numeral(product?.price).format('P0,0.00')}
           </Typography>
         </Grid>
@@ -277,7 +275,7 @@ const MenuCard = ({ product, cartItems, setCartItems }: MenuCardProps) => {
         <Typography
           sx={{ ...globalStyles.typography, fontSize: 14, marginTop: '0.5rem' }}
           color='text.secondary'>
-          Sub Total: P{numeral(subTotal).format('P0,00.00')}
+          SUB TOTAL: P{numeral(subTotal).format('P0,00.00')}
         </Typography>
       </CardContent>
     </Card>
@@ -325,7 +323,7 @@ const CartItemCard = ({ itemNo, cartItemId, cartItems, setCartItems }: CartItemC
             <Typography
               sx={{
                 ...globalStyles.typography,
-                fontSize: 18,
+                fontSize: 16,
                 fontWeight: 600,
               }}>
               Item #{itemNo}
@@ -386,7 +384,7 @@ const CartItemCard = ({ itemNo, cartItemId, cartItems, setCartItems }: CartItemC
         <Typography
           sx={{ ...globalStyles.typography, fontSize: 14, marginTop: '0.5rem' }}
           color='text.secondary'>
-          Sub Total: P{numeral(subTotal).format('P0,00.00')}
+          SUB TOTAL: P{numeral(subTotal).format('P0,00.00')}
         </Typography>
       </CardContent>
     </Card>
@@ -570,7 +568,9 @@ export default function Order() {
             expandIcon={<ExpandMoreIcon />}
             aria-controls='panel1a-content'
             id='panel1a-header'>
-            <Typography style={{ ...globalStyles.typography, fontSize: '18px' }}>Menu</Typography>
+            <Typography style={{ ...globalStyles.typography, fontSize: 18, fontWeight: 600 }}>
+              Menu
+            </Typography>
           </AccordionSummary>
           <AccordionDetails style={{ padding: 0 }}>
             {products
@@ -589,7 +589,8 @@ export default function Order() {
             expandIcon={<ExpandMoreIcon />}
             aria-controls='panel2a-content'
             id='panel2a-header'>
-            <Typography sx={{ ...globalStyles.typography, marginBottom: '1.5rem', fontSize: '18px' }}>
+            <Typography
+              sx={{ ...globalStyles.typography, marginBottom: '1.5rem', fontSize: 18, fontWeight: 600 }}>
               Cart
             </Typography>
           </AccordionSummary>
@@ -634,12 +635,12 @@ export default function Order() {
                   <Typography
                     sx={{
                       ...globalStyles.typography,
-                      fontSize: 18,
+                      fontSize: 16,
                       marginBottom: '1rem',
                       marginTop: '1rem',
                     }}
                     color='text.secondary'>
-                    Total: P{numeral(total).format('0,0.00')}
+                    TOTAL: P{numeral(total).format('0,0.00')}
                   </Typography>
                 </Box>
 
@@ -648,7 +649,7 @@ export default function Order() {
             ) : (
               <Box display='flex' alignItems='center' justifyContent='center'>
                 <Typography
-                  sx={{ ...globalStyles.typography, fontSize: 18, marginBottom: '1.5rem' }}
+                  sx={{ ...globalStyles.typography, fontSize: 16, marginBottom: '1.5rem' }}
                   color='text.secondary'>
                   {`Cart Is Empty :(`}
                 </Typography>

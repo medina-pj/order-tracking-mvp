@@ -3,7 +3,7 @@
  * Author: Rovelin Enriquez
  * Date:   Saturday July 15th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 18th 2023, 4:23:23 am
+ * Last Modified time: July 18th 2023, 12:52:35 pm
  * ---------------------------------------------
  */
 'use client';
@@ -31,7 +31,7 @@ const OrderStatusButtonLabel: any = {
 const globalStyles: { [key: string]: CSSProperties } = {
   typography: {
     fontFamily: 'inherit',
-    fontSize: 16,
+    fontSize: 14,
   },
 };
 
@@ -107,10 +107,10 @@ const OrderCard = ({
         <Typography
           sx={{
             ...globalStyles.typography,
-            fontSize: 18,
+            fontSize: 16,
             fontWeight: 600,
           }}>
-          {table} ({type === 'dine_in' ? 'Dine-in' : 'Take-out'})
+          {table.toUpperCase()} ({type === 'dine_in' ? 'Dine-in' : 'Take-out'})
         </Typography>
 
         <Box flexGrow={1} display={'flex'} justifyContent={'flex-end'}>
@@ -122,7 +122,6 @@ const OrderCard = ({
         color={'text.secondary'}
         sx={{
           ...globalStyles.typography,
-          fontSize: 16,
         }}>
         {status.toUpperCase()}
       </Typography>
@@ -137,7 +136,7 @@ const OrderCard = ({
                   sx={{
                     ...globalStyles.typography,
                   }}>
-                  {i + 1}. {prod?.productName} ({prod?.productAbbrev})
+                  {i + 1}. {prod?.productName.toUpperCase()} ({prod?.productAbbrev.toUpperCase()})
                 </Typography>
               </Box>
 
@@ -151,41 +150,43 @@ const OrderCard = ({
               </Box>
             </Box>
 
-            {prod?.addOns?.length > 0 && (
-              <Box>
-                <Typography
-                  color='text.secondary'
-                  sx={{
-                    ...globalStyles.typography,
-                    fontStyle: 'italic',
-                    margin: '0.25rem 0 0.25rem 0.75rem',
-                  }}>
-                  Add Ons:
-                </Typography>
+            <Box style={{ marginBottom: '0.75rem' }}>
+              {prod?.addOns?.length > 0 && (
+                <Box>
+                  <Typography
+                    color='text.secondary'
+                    sx={{
+                      ...globalStyles.typography,
+                      fontStyle: 'italic',
+                      margin: '0.25rem 0 0.25rem 0.75rem',
+                    }}>
+                    Add Ons:
+                  </Typography>
 
-                {prod?.addOns.map((addon: any, i: number) => (
-                  <Box key={i} display='flex' style={{ marginLeft: '0.75rem' }}>
-                    <Box flexGrow={1} display={'flex'} justifyContent={'flex-start'}>
-                      <Typography
-                        sx={{
-                          ...globalStyles.typography,
-                        }}>
-                        {i + 1}. {addon?.productName} ({addon?.productAbbrev})
-                      </Typography>
-                    </Box>
+                  {prod?.addOns.map((addon: any, i: number) => (
+                    <Box key={i} display='flex' style={{ marginLeft: '0.75rem' }}>
+                      <Box flexGrow={1} display={'flex'} justifyContent={'flex-start'}>
+                        <Typography
+                          sx={{
+                            ...globalStyles.typography,
+                          }}>
+                          {i + 1}. {addon?.productName.toUpperCase()} ({addon?.productAbbrev.toUpperCase()})
+                        </Typography>
+                      </Box>
 
-                    <Box flexGrow={1} display={'flex'} justifyContent={'flex-end'}>
-                      <Typography
-                        sx={{
-                          ...globalStyles.typography,
-                        }}>
-                        P{numeral(addon?.price).format('0,0.00')} - x{addon?.quantity}
-                      </Typography>
+                      <Box flexGrow={1} display={'flex'} justifyContent={'flex-end'}>
+                        <Typography
+                          sx={{
+                            ...globalStyles.typography,
+                          }}>
+                          P{numeral(addon?.price).format('0,0.00')} - x{addon?.quantity}
+                        </Typography>
+                      </Box>
                     </Box>
-                  </Box>
-                ))}
-              </Box>
-            )}
+                  ))}
+                </Box>
+              )}
+            </Box>
           </Box>
         ))}
       </Box>
@@ -195,8 +196,9 @@ const OrderCard = ({
         color='text.secondary'
         sx={{
           ...globalStyles.typography,
+          fontSize: 16,
         }}>
-        Notes : {notes}
+        Notes: {notes}
       </Typography>
 
       <hr />
@@ -207,9 +209,9 @@ const OrderCard = ({
             sx={{
               ...globalStyles.typography,
               fontWeight: 600,
-              fontSize: 18,
+              fontSize: 16,
             }}>
-            Total
+            TOTAL
           </Typography>
         </Box>
 
@@ -218,7 +220,7 @@ const OrderCard = ({
             sx={{
               ...globalStyles.typography,
               fontWeight: 600,
-              fontSize: 18,
+              fontSize: 16,
             }}>
             P{numeral(total).format('0,0.00')}
             {paymentStatus === OrderPaymentStatusEnum.PAID && <i style={{ color: '#539165' }}> (Paid)</i>}

@@ -5,7 +5,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 18th 2023, 4:15:59 am
+ * Last Modified time: July 18th 2023, 1:07:06 pm
  * ---------------------------------------------
  */
 
@@ -13,7 +13,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import moment from 'moment-timezone';
 moment.tz.setDefault('Asia/Manila');
-import { Container, Grid } from '@mui/material';
+import { Box, Container, Grid, Typography } from '@mui/material';
 
 import DropdownField from '@/components/Dropdown';
 import InputField from '@/components/TextField';
@@ -117,25 +117,40 @@ export default function Dashboard() {
           />
         </Grid>
 
-        <Grid item xs={12}>
+        <Grid item xs={12} style={{ marginTop: '1rem' }}>
           <ButtonField label='Search Orders' onClick={onfilterOrders} />
         </Grid>
       </Grid>
 
-      {orderDocs.map((order, i) => (
-        <div key={i}>
-          <OrderCard
-            orderId={order.id}
-            table={order.table.name}
-            type={order.type}
-            products={order.cartItems}
-            notes={order.notes}
-            paymentStatus={order.payment?.status || ''}
-            status={order.status}
-            onEdit={() => router.push('/orders/' + order.id)}
-          />
-        </div>
-      ))}
+      {orderDocs.length > 0 ? (
+        orderDocs.map((order, i) => (
+          <div key={i}>
+            <OrderCard
+              orderId={order.id}
+              table={order.table.name}
+              type={order.type}
+              products={order.cartItems}
+              notes={order.notes}
+              paymentStatus={order.payment?.status || ''}
+              status={order.status}
+              onEdit={() => router.push('/orders/' + order.id)}
+            />
+          </div>
+        ))
+      ) : (
+        <Box display={'flex'} justifyContent={'center'} alignItems={'center'} width={'100%'}>
+          <Typography
+            color={'text.secondary'}
+            sx={{
+              fontFamily: 'inherit',
+              marginTop: '2rem',
+              marginBottom: '1rem',
+              fontSize: 24,
+            }}>
+            {`No Orders :(`}
+          </Typography>
+        </Box>
+      )}
     </Container>
   );
 }

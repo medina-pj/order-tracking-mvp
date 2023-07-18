@@ -2,12 +2,12 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Sunday June 11th 2023
- * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
- * Last Modified time: July 9th 2023, 8:04:56 pm
+ * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
+ * Last Modified time: July 18th 2023, 1:05:24 pm
  * ---------------------------------------------
  */
 
-import { TextField } from '@mui/material';
+import { Box, TextField } from '@mui/material';
 import { CSSProperties } from 'react';
 
 const InputField = ({
@@ -28,7 +28,7 @@ const InputField = ({
   };
 
   return (
-    <>
+    <Box>
       <p style={{ marginBottom: '5px', fontSize: '18px' }}>{label}</p>
       <TextField
         disabled={disabled}
@@ -49,7 +49,7 @@ const InputField = ({
           },
         }}
       />
-    </>
+    </Box>
   );
 };
 
