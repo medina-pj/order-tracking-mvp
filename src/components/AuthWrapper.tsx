@@ -5,7 +5,7 @@
  * Author: PJ Medina
  * Date:   Sunday July 2nd 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 31st 2023, 5:34:06 pm
+ * Last Modified time: July 31st 2023, 5:37:52 pm
  * ---------------------------------------------
  */
 
@@ -26,17 +26,8 @@ export default function AuthWrapper({ children }: { children: React.ReactNode })
   const router = useRouter();
   const path = usePathname();
 
-  console.log({
-    user,
-    userInfo,
-  });
-
   useEffect(() => {
-    console.log('TRIGGER PO ME IM HERE');
-
     if (!loading && !user) {
-      console.log('IM HERE');
-
       router.replace('/');
       setCheckingAuth(false);
     } else if (!loading && userInfo) {
