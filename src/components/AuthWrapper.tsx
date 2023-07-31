@@ -5,7 +5,7 @@
  * Author: PJ Medina
  * Date:   Sunday July 2nd 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 31st 2023, 4:44:31 pm
+ * Last Modified time: July 31st 2023, 5:34:06 pm
  * ---------------------------------------------
  */
 
@@ -20,14 +20,26 @@ const adminRoutes = ['accounts', 'stores', 'category'];
 const exceptionRoutes = ['tables'];
 
 export default function AuthWrapper({ children }: { children: React.ReactNode }) {
-  const { loading, userInfo } = useAuth();
+  const { user, loading, userInfo } = useAuth();
   const [checkingAuth, setCheckingAuth] = useState(true);
 
   const router = useRouter();
   const path = usePathname();
 
+  console.log({
+    user,
+    userInfo,
+  });
+
   useEffect(() => {
-    if (!loading && userInfo) {
+    console.log('TRIGGER PO ME IM HERE');
+
+    if (!loading && !user) {
+      console.log('IM HERE');
+
+      router.replace('/');
+      setCheckingAuth(false);
+    } else if (!loading && userInfo) {
       const currentPath = path.split('/');
 
       // Redirect to the login page if the user is not authenticated
@@ -57,7 +69,7 @@ export default function AuthWrapper({ children }: { children: React.ReactNode })
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading, userInfo, path]);
+  }, [user, loading, userInfo, path]);
 
   if (checkingAuth) {
     return (
