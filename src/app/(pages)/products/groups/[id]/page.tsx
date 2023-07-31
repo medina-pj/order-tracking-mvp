@@ -3,7 +3,7 @@
  * Author: Rovelin Enriquez
  * Date:   Wednesday July 12th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 31st 2023, 5:21:17 pm
+ * Last Modified time: July 31st 2023, 8:44:01 pm
  * ---------------------------------------------
  */
 'use client';
@@ -35,7 +35,7 @@ export default function Products() {
 
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-
+  const [storeName, setStoreName] = useState('');
   const [store, setStore] = useState('');
   const [name, setName] = useState('');
   const [sequence, setSequence] = useState(0);
@@ -51,7 +51,8 @@ export default function Products() {
         const currentProduct = await GroupedProductService.fetchGroupProduct(id);
         const store = await StoreService.fetchStore(currentProduct.storeId);
 
-        setStore(store.name);
+        setStoreName(store.name);
+        setStore(currentProduct.storeId);
         setName(currentProduct.name);
         setSequence(currentProduct.sequence);
         setDescription(currentProduct.description);
@@ -117,7 +118,7 @@ export default function Products() {
 
   return (
     <Container style={{ marginTop: '2rem', marginBottom: '2rem' }}>
-      <InputField label='Store' value={store} disabled />
+      <InputField label='Store' value={storeName} disabled />
       <InputField label='Name' value={name} onChange={setName} />
       <InputField label='Sequence' value={sequence} onChange={setSequence} />
       <InputField label='Description' value={description} onChange={setDescription} />

@@ -5,7 +5,7 @@
  * Author: PJ Medina
  * Date:   Tuesday July 4th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 31st 2023, 5:02:34 pm
+ * Last Modified time: July 31st 2023, 9:00:10 pm
  * ---------------------------------------------
  */
 
@@ -25,6 +25,7 @@ import { SelectChangeEvent } from '@mui/material/Select';
 import TableComponent from '@/components/Table';
 import useAuth from '@/hooks/auth';
 import { UserTypes } from '@/types/schema/user';
+import _ from 'lodash';
 
 export default function Products() {
   const router = useRouter();
@@ -184,7 +185,7 @@ export default function Products() {
 
       <TableComponent
         label='Product List'
-        rows={documents
+        rows={_.orderBy(documents, ['name'], ['asc'])
           .filter((d: any) => {
             if (!store) return true;
             return d.store.id === store;
