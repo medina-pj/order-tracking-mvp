@@ -5,7 +5,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 18th 2023, 1:16:44 pm
+ * Last Modified time: July 31st 2023, 3:28:11 pm
  * ---------------------------------------------
  */
 
@@ -39,6 +39,7 @@ import numeral from 'numeral';
 import useOrder, { IOrder } from '@/hooks/orders';
 import { OrderStatusEnum, TCartAddOns, TCartItems } from '@/types/schema/order';
 import { TAddOnProduct } from '@/types/schema/product';
+import { UserTypes } from '@/types/schema/user';
 
 const TableContent = ({ name, price, quantity, total }: any) => {
   return (
@@ -86,9 +87,9 @@ export default function RecordExpenses() {
     if (storeDocs && storeDocs.length) {
       const filteredStores = storeDocs
         .filter((store: any) => {
-          if (userInfo && userInfo?.userType === 'admin') {
+          if (userInfo && userInfo?.userType === UserTypes.ADMIN) {
             return true;
-          } else if (userInfo && userInfo.userType !== 'admin') {
+          } else if (userInfo && userInfo.userType !== UserTypes.ADMIN) {
             return store?.staff.includes(userInfo?.id);
           }
 

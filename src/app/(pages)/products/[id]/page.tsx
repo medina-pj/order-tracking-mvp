@@ -2,8 +2,8 @@
  * ---------------------------------------------
  * Author: Rovelin Enriquez
  * Date:   Wednesday July 12th 2023
- * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
- * Last Modified time: July 12th 2023, 10:44:06 pm
+ * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
+ * Last Modified time: July 31st 2023, 5:06:09 pm
  * ---------------------------------------------
  */
 'use client';
@@ -18,17 +18,16 @@ import Button from '@/components/Button';
 import DropdownField from '@/components/Dropdown';
 import MultipleSelectChip from '@/components/MultipleSelect';
 
-import useStore from '@/hooks/store';
 import useProduct, { IUpdateProduct } from '@/hooks/products';
 import useCategory from '@/hooks/categories';
 import useGroupedProduct from '@/hooks/groupedProducts';
 import ProductService from '@/services/products';
+import StoreService from '@/services/stores';
 
 export default function ViewProduct() {
   const { id } = useParams();
   const router = useRouter();
 
-  const { documents: stores } = useStore();
   const { documents: categories } = useCategory();
   const { documents: sub_menu } = useGroupedProduct();
 
@@ -37,6 +36,7 @@ export default function ViewProduct() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  const [storeName, setStoreName] = useState('');
   const [store, setStore] = useState('');
   const [category, setCategory] = useState('');
   const [name, setName] = useState('');
@@ -53,7 +53,9 @@ export default function ViewProduct() {
     try {
       (async function () {
         const currentProduct = await ProductService.fetchProduct(id);
+        const store = await StoreService.fetchStore(currentProduct.storeId);
 
+        setStoreName(store.name);
         setStore(currentProduct.storeId);
         setCategory(currentProduct.categoryId);
         setName(currentProduct.name);
@@ -69,14 +71,19 @@ export default function ViewProduct() {
       alert('Error. Failed to load data.');
       router.back();
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   useEffect(() => {
     if (sub_menu) {
-      const subMenuOption = sub_menu.map(submenu => ({ label: submenu.name!, value: submenu.id! }));
+      const subMenuOption = sub_menu
+        .filter((d: any) => d.store.id === store)
+        .map(submenu => ({ label: submenu.name!, value: submenu.id! }));
+
       setSubMenuOptions(subMenuOption);
     }
-  }, [sub_menu]);
+  }, [store, sub_menu]);
 
   const updateProduct = async () => {
     try {
@@ -122,12 +129,8 @@ export default function ViewProduct() {
   return (
     <Container style={{ marginTop: '2rem', marginBottom: '2rem' }}>
       <p style={{ fontSize: '22px' }}>Update Product</p>
-      <DropdownField
-        disabled={true}
-        label='Store'
-        value={store}
-        options={stores.map(store => ({ value: store.id, label: store.name }))}
-      />
+      <InputField label='Name' value={storeName} disabled />
+
       <DropdownField
         label='Category'
         value={category}

@@ -5,7 +5,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 18th 2023, 1:07:06 pm
+ * Last Modified time: July 31st 2023, 3:27:39 pm
  * ---------------------------------------------
  */
 
@@ -24,6 +24,7 @@ import useOrder from '@/hooks/orders';
 import { OrderStatusEnum } from '@/types/schema/order';
 import useStore from '@/hooks/store';
 import useAuth from '@/hooks/auth';
+import { UserTypes } from '@/types/schema/user';
 
 export default function Dashboard() {
   const router = useRouter();
@@ -42,9 +43,9 @@ export default function Dashboard() {
     if (storeDocs && storeDocs.length) {
       const filteredStores = storeDocs
         .filter((store: any) => {
-          if (userInfo && userInfo?.userType === 'admin') {
+          if (userInfo && userInfo?.userType === UserTypes.ADMIN) {
             return true;
-          } else if (userInfo && userInfo.userType !== 'admin') {
+          } else if (userInfo && userInfo.userType !== UserTypes.ADMIN) {
             return store?.staff.includes(userInfo?.id);
           }
 

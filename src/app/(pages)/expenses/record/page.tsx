@@ -5,11 +5,11 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 18th 2023, 5:19:25 am
+ * Last Modified time: July 31st 2023, 4:49:42 pm
  * ---------------------------------------------
  */
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import moment from 'moment-timezone';
 moment.tz.setDefault('Asia/Manila');
 import { Container, Grid, Typography } from '@mui/material';
@@ -22,9 +22,12 @@ import useStore from '@/hooks/store';
 import useCategory from '@/hooks/categories';
 import { ExpenseStatusEnum } from '@/types/schema/expenses';
 import useExpenses, { ISaveExpenses } from '@/hooks/expenses';
+import useAuth from '@/hooks/auth';
+import { UserTypes } from '@/types/schema/user';
 
 export default function Dashboard() {
-  const { createDoc, documents } = useExpenses();
+  const { userInfo } = useAuth();
+  const { createDoc } = useExpenses();
   const { documents: storeDocs } = useStore();
   const { documents: categoryDocs } = useCategory();
 
@@ -39,6 +42,38 @@ export default function Dashboard() {
   const [status, setStatus] = useState<ExpenseStatusEnum>(ExpenseStatusEnum.SETTLED);
   const [paymentDue, setPaymentDue] = useState(moment().format('YYYY-MM-DD'));
   const [error, setError] = useState('');
+  const [storeOptions, setStoreOptions] = useState<{ value: string; label: string }[]>([]);
+
+  useEffect(() => {
+    if (storeDocs && storeDocs.length) {
+      const filteredStores = storeDocs
+        .filter((store: any) => {
+          if (userInfo && userInfo?.userType === UserTypes.ADMIN) {
+            return true;
+          } else if (userInfo && userInfo.userType !== UserTypes.ADMIN) {
+            return store?.staff.includes(userInfo?.id);
+          }
+
+          return false;
+        })
+        .map((store: any) => ({
+          value: store.id,
+          label: store.name,
+        }));
+
+      setStoreOptions(filteredStores);
+
+      if (filteredStores && filteredStores.length) {
+        const store = filteredStores[0];
+
+        if (store) {
+          setStore(store.value);
+        }
+      }
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [storeDocs, userInfo]);
 
   const onRecordExpenses = async () => {
     try {
@@ -82,10 +117,7 @@ export default function Dashboard() {
             label='Store'
             value={store}
             onChange={(e: any) => setStore(e.target.value)}
-            options={storeDocs.map((store: any) => ({
-              value: store.id,
-              label: store.name,
-            }))}
+            options={storeOptions}
           />
         </Grid>
 

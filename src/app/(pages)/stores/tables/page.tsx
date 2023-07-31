@@ -2,8 +2,8 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Sunday July 9th 2023
- * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
- * Last Modified time: July 12th 2023, 10:14:58 pm
+ * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
+ * Last Modified time: July 31st 2023, 4:55:21 pm
  * ---------------------------------------------
  */
 
@@ -18,22 +18,25 @@
  * ---------------------------------------------
  */
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Container } from '@mui/material';
 
-import useStoreTable from '@/hooks/storeTable';
+import useStoreTable, { IStoreTable } from '@/hooks/storeTable';
 import useStore from '@/hooks/store';
 
 import InputField from '@/components/TextField';
 import Button from '@/components/Button';
 import DropdownField from '@/components/Dropdown';
 import TableComponent from '@/components/Table';
+import useAuth from '@/hooks/auth';
+import { UserTypes } from '@/types/schema/user';
 
 export default function Tables() {
+  const { userInfo } = useAuth();
   const router = useRouter();
 
-  const { documents: stores } = useStore();
+  const { documents: storeDocs } = useStore();
   const { documents, createDoc, deleteDoc } = useStoreTable();
 
   const [error, setError] = useState('');
@@ -41,6 +44,39 @@ export default function Tables() {
 
   const [store, setStore] = useState('');
   const [name, setName] = useState('');
+
+  const [storeOptions, setStoreOptions] = useState<{ value: string; label: string }[]>([]);
+
+  useEffect(() => {
+    if (storeDocs && storeDocs.length) {
+      const filteredStores = storeDocs
+        .filter((store: any) => {
+          if (userInfo && userInfo?.userType === UserTypes.ADMIN) {
+            return true;
+          } else if (userInfo && userInfo.userType !== UserTypes.ADMIN) {
+            return store?.staff.includes(userInfo?.id);
+          }
+
+          return false;
+        })
+        .map((store: any) => ({
+          value: store.id,
+          label: store.name,
+        }));
+
+      setStoreOptions(filteredStores);
+
+      if (filteredStores && filteredStores.length) {
+        const store = filteredStores[0];
+
+        if (store) {
+          setStore(store.value);
+        }
+      }
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [storeDocs, userInfo]);
 
   const createTable = async () => {
     try {
@@ -74,18 +110,20 @@ export default function Tables() {
         label='Select Store'
         value={store}
         onChange={(e: any) => setStore(e.target.value)}
-        options={stores.map(store => ({ label: store.name, value: store.id }))}
+        options={storeOptions}
       />
       <Button loading={isLoading} label='Save' onClick={createTable} />
       <i style={{ color: 'red' }}>{error}</i>
 
       <TableComponent
         label='Table List'
-        rows={documents.map(doc => ({
-          id: doc.id,
-          label: `${doc.name} (${doc?.isAvailable ? 'Available' : 'Not Available'})`,
-          subLabel: doc.store.name || '',
-        }))}
+        rows={documents
+          .filter((doc: IStoreTable) => doc.store.id === store)
+          .map((doc: IStoreTable) => ({
+            id: doc.id,
+            label: `${doc.name} (${doc?.isAvailable ? 'Available' : 'Not Available'})`,
+            subLabel: doc.store.name || '',
+          }))}
         onDelete={deleteTable}
         onSelect={(id: string) => router.push('/stores/tables/' + id)}
       />

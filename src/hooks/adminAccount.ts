@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Sunday July 2nd 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 16th 2023, 10:56:52 pm
+ * Last Modified time: July 31st 2023, 4:17:04 pm
  * ---------------------------------------------
  */
 
@@ -16,9 +16,11 @@ moment.tz.setDefault('Asia/Manila');
 import { db, firebaseConfig, initializeApp } from '@/config/firebase';
 import constants from '@/utils/constants';
 import { useEffect, useState } from 'react';
-import { UserSchema } from '@/types/schema/user';
+import { UserSchema, UserTypes } from '@/types/schema/user';
 import useAuth from './auth';
 import { deleteApp } from 'firebase/app';
+import { StoreSchema } from '@/types/schema/store';
+import UserService from '@/services/user';
 
 export interface ICreateAccount {
   username: string;
@@ -35,20 +37,26 @@ export interface IUpdateAccount {
   userType: string;
 }
 
+export interface IUserDetails extends UserSchema {
+  assignedStores: StoreSchema[];
+}
+
 const useAdminAccount = () => {
   const { userInfo } = useAuth();
-  const [documents, setDocuments] = useState<UserSchema[]>([]);
+  const [documents, setDocuments] = useState<IUserDetails[]>([]);
 
   useEffect(() => {
-    if (userInfo !== null && userInfo?.userType === 'admin') {
+    if (userInfo !== null && userInfo?.userType === UserTypes.ADMIN) {
       let ref = collection(db, constants.DB_ADMINS);
       let qry = query(ref, where('isArchived', '==', false), where(documentId(), '!=', userInfo.id));
 
       //will invoke everytime database is updated in the cloud
       const unsub = onSnapshot(qry, async snapshot => {
-        let results: UserSchema[] = [];
+        let results: IUserDetails[] = [];
 
-        for (const doc of snapshot.docs) {
+        const promises = snapshot.docs.map(async (doc: any) => {
+          const assignedStores = await UserService.fetchAssignedStores(doc.id);
+
           results.push({
             id: doc.id,
             authId: doc.data().authId,
@@ -56,10 +64,13 @@ const useAdminAccount = () => {
             name: doc.data()?.name,
             contactNumber: doc.data()?.contactNumber,
             userType: doc.data().userType,
+            assignedStores,
             createdAt: moment(doc.data()?.createdAt).format('MMM DD, YYYY hh:mma'),
             updatedAt: moment(doc.data()?.updatedAt).format('MMM DD, YYYY hh:mma'),
           });
-        }
+        });
+
+        await Promise.all(promises);
 
         setDocuments(results);
       });
@@ -70,7 +81,7 @@ const useAdminAccount = () => {
 
   const createAccount = async (payload: ICreateAccount): Promise<void> => {
     try {
-      if (userInfo !== null && userInfo?.userType === 'admin') {
+      if (userInfo !== null && userInfo?.userType === UserTypes.ADMIN) {
         //initialize new app reference
         const appRef = initializeApp(firebaseConfig, 'Secondary');
         const authRef = getAuth(appRef);
@@ -111,7 +122,7 @@ const useAdminAccount = () => {
 
   const updateAccount = async (payload: IUpdateAccount): Promise<void> => {
     try {
-      if (userInfo !== null && userInfo?.userType === 'admin') {
+      if (userInfo !== null && userInfo?.userType === UserTypes.ADMIN) {
         const docRef = doc(db, constants.DB_ADMINS, payload.id);
 
         await setDoc(
@@ -134,7 +145,7 @@ const useAdminAccount = () => {
 
   const deleteAccount = async (id: string): Promise<void> => {
     try {
-      if (userInfo !== null && userInfo?.userType === 'admin') {
+      if (userInfo !== null && userInfo?.userType === UserTypes.ADMIN) {
         const docRef = doc(db, constants.DB_ADMINS, id);
 
         await setDoc(

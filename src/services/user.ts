@@ -2,8 +2,8 @@
  * ---------------------------------------------
  * Author: Rovelin Enriquez
  * Date:   Wednesday July 12th 2023
- * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
- * Last Modified time: July 12th 2023, 9:07:48 pm
+ * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
+ * Last Modified time: July 31st 2023, 3:23:57 pm
  * ---------------------------------------------
  */
 
@@ -14,6 +14,7 @@ import { db } from '@/config/firebase';
 import constants from '@/utils/constants';
 import { collection, documentId, getDocs, query, where } from 'firebase/firestore';
 import { UserSchema } from '@/types/schema/user';
+import { StoreSchema } from '@/types/schema/store';
 
 const UserService = {
   fetchUser: async (id: string): Promise<UserSchema> => {
@@ -36,6 +37,32 @@ const UserService = {
       }
 
       throw new Error('User not found.');
+    } catch (err: any) {
+      throw err;
+    }
+  },
+  fetchAssignedStores: async (id: string): Promise<StoreSchema[]> => {
+    try {
+      const ref = collection(db, constants.DB_STORE);
+      const qry = query(ref, where('isArchived', '==', false), where('staff', 'array-contains', id));
+
+      const qrySnapshot = await getDocs(qry);
+
+      let results: StoreSchema[] = [];
+
+      for (const doc of qrySnapshot.docs) {
+        results.push({
+          id: doc.id,
+          name: doc.data()?.name,
+          location: doc.data()?.location,
+          contactNumber: doc.data()?.contactNumber,
+          staff: doc.data()?.staff,
+          createdAt: doc.data()?.createdAt,
+          updatedAt: doc.data()?.updatedAt,
+        });
+      }
+
+      return results;
     } catch (err: any) {
       throw err;
     }

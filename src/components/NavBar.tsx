@@ -4,6 +4,7 @@ import React from 'react';
 import { AppBar, Toolbar, IconButton, Typography, Menu, MenuItem } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import useAuth from '@/hooks/auth';
+import { UserTypes } from '@/types/schema/user';
 
 const NavBar = () => {
   const { logout, userInfo } = useAuth();
@@ -22,12 +23,9 @@ const NavBar = () => {
     try {
       await logout();
     } catch (err: any) {
-      console.log(err?.message);
+      console.error(err?.message);
     }
   };
-
-  //FIXME: HIDE PAGES BASE ON USER TYPE
-  console.log(userInfo);
 
   return (
     <AppBar position='sticky' style={{ height: '60px', backgroundColor: '#101932' }}>
@@ -76,21 +74,13 @@ const NavBar = () => {
               {'Products'}
             </Typography>
           </MenuItem>
-          <MenuItem key={'Category'} onClick={handleCloseNavMenu}>
-            <Typography textAlign='center' component='a' href='/category'>
-              {'Category'}
-            </Typography>
-          </MenuItem>
+
           <MenuItem key={'Tables'} onClick={handleCloseNavMenu}>
             <Typography textAlign='center' component='a' href='/stores/tables'>
               {'Tables'}
             </Typography>
           </MenuItem>
-          <MenuItem key={'Stores'} onClick={handleCloseNavMenu}>
-            <Typography textAlign='center' component='a' href='/stores'>
-              {'Stores'}
-            </Typography>
-          </MenuItem>
+
           <MenuItem key={'Record-Expenses'} onClick={handleCloseNavMenu}>
             <Typography textAlign='center' component='a' href='/expenses/record'>
               {'Record Expenses'}
@@ -106,11 +96,28 @@ const NavBar = () => {
               {'Sales Report'}
             </Typography>
           </MenuItem>
-          <MenuItem key={'Accounts'} onClick={handleCloseNavMenu}>
-            <Typography textAlign='center' component='a' href='/accounts'>
-              {'Accounts'}
-            </Typography>
-          </MenuItem>
+          {userInfo?.userType === UserTypes.ADMIN && (
+            <>
+              <MenuItem key={'Category'} onClick={handleCloseNavMenu}>
+                <Typography textAlign='center' component='a' href='/category'>
+                  {'Category'}
+                </Typography>
+              </MenuItem>
+
+              <MenuItem key={'Stores'} onClick={handleCloseNavMenu}>
+                <Typography textAlign='center' component='a' href='/stores'>
+                  {'Stores'}
+                </Typography>
+              </MenuItem>
+
+              <MenuItem key={'Accounts'} onClick={handleCloseNavMenu}>
+                <Typography textAlign='center' component='a' href='/accounts'>
+                  {'Accounts'}
+                </Typography>
+              </MenuItem>
+            </>
+          )}
+
           <MenuItem key={'Logout'} onClick={handleCloseNavMenu}>
             <Typography textAlign='center' onClick={onLogout}>
               {'Logout'}

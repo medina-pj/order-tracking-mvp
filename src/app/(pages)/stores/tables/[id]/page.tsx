@@ -2,8 +2,8 @@
  * ---------------------------------------------
  * Author: Rovelin Enriquez
  * Date:   Sunday July 9th 2023
- * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
- * Last Modified time: July 12th 2023, 10:16:21 pm
+ * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
+ * Last Modified time: July 31st 2023, 4:59:45 pm
  * ---------------------------------------------
  */
 
@@ -16,16 +16,14 @@ import InputField from '@/components/TextField';
 import Button from '@/components/Button';
 
 import useStoreTable from '@/hooks/storeTable';
-import useStore from '@/hooks/store';
 import TableService from '@/services/table';
-import DropdownField from '@/components/Dropdown';
+import StoreService from '@/services/stores';
 
 export default function ViewTable() {
   const { id } = useParams();
   const router = useRouter();
 
   const { updateDoc } = useStoreTable();
-  const { documents: stores } = useStore();
 
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -38,14 +36,18 @@ export default function ViewTable() {
     try {
       (async function () {
         const currentTable = await TableService.fetchTable(id);
-        setStore(currentTable.storeId);
+        const storeDetails = await StoreService.fetchStore(currentTable.storeId);
+
         setName(currentTable.name);
+        setStore(storeDetails.name);
         setIsAvailable(currentTable.isAvailable);
       })();
     } catch (error) {
       alert('Error. Failed to load data.');
       router.back();
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const updateTable = async () => {
@@ -67,12 +69,9 @@ export default function ViewTable() {
     <Container style={{ marginTop: '2rem', marginBottom: '2rem' }}>
       <p style={{ fontSize: '22px' }}>Update Table</p>
       <InputField label='Name' value={name} onChange={setName} />
-      <DropdownField
-        label='Store'
-        value={store}
-        options={stores.map(store => ({ label: store.name, value: store.id }))}
-        disabled={true}
-      />
+
+      <InputField label='Store' value={store} disabled />
+
       <FormControlLabel
         control={<Checkbox checked={isAvailable} onChange={() => setIsAvailable(prev => !prev)} />}
         label='Available'

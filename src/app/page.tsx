@@ -4,8 +4,8 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
- * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
- * Last Modified time: July 8th 2023, 12:00:15 pm
+ * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
+ * Last Modified time: July 31st 2023, 4:16:50 pm
  * ---------------------------------------------
  */
 
@@ -39,7 +39,7 @@ export default function Login() {
       await login(username, password);
       router.push('/dashboard');
     } catch (err: any) {
-      console.log(err?.message);
+      console.error(err?.message);
       setError('invalid username/password.');
     }
   };

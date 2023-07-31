@@ -5,11 +5,11 @@
  * Author: PJ Medina
  * Date:   Tuesday July 4th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 16th 2023, 11:20:39 pm
+ * Last Modified time: July 31st 2023, 5:18:28 pm
  * ---------------------------------------------
  */
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Container } from '@mui/material';
 
@@ -23,11 +23,14 @@ import { TAddOnProduct } from '@/types/schema/product';
 import useGroupedProduct, { ISaveGroupedProduct } from '@/hooks/groupedProducts';
 import DropdownField from '@/components/Dropdown';
 import TableComponent from '@/components/Table';
+import useAuth from '@/hooks/auth';
+import { UserTypes } from '@/types/schema/user';
 
 export default function Products() {
+  const { userInfo } = useAuth();
   const router = useRouter();
 
-  const { documents: stores } = useStore();
+  const { documents: storeDocs } = useStore();
   const { documents: productsDocs } = useProduct();
   const { documents, createDoc, deleteDoc } = useGroupedProduct();
 
@@ -41,6 +44,39 @@ export default function Products() {
   const [products, setProducts] = useState<TAddOnProduct[]>([]);
   const [selectedProduct, setSelectedProduct] = useState('');
   const [price, setPrice] = useState(0);
+
+  const [storeOptions, setStoreOptions] = useState<{ value: string; label: string }[]>([]);
+
+  useEffect(() => {
+    if (storeDocs && storeDocs.length) {
+      const filteredStores = storeDocs
+        .filter((store: any) => {
+          if (userInfo && userInfo?.userType === UserTypes.ADMIN) {
+            return true;
+          } else if (userInfo && userInfo.userType !== UserTypes.ADMIN) {
+            return store?.staff.includes(userInfo?.id);
+          }
+
+          return false;
+        })
+        .map((store: any) => ({
+          value: store.id,
+          label: store.name,
+        }));
+
+      setStoreOptions(filteredStores);
+
+      if (filteredStores && filteredStores.length) {
+        const store = filteredStores[0];
+
+        if (store) {
+          setStore(store.value);
+        }
+      }
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [storeDocs, userInfo]);
 
   const onCreateGroupedProduct = async () => {
     try {
@@ -119,7 +155,7 @@ export default function Products() {
           setPrice(0);
           setStore(e.target.value);
         }}
-        options={stores.map(store => ({ label: store.name, value: store.id }))}
+        options={storeOptions}
       />
       <InputField label='Name' value={name} onChange={setName} />
       <InputField label='Sequence' value={sequence} onChange={setSequence} />

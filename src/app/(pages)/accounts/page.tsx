@@ -4,15 +4,15 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
- * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
- * Last Modified time: July 12th 2023, 9:17:44 pm
+ * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
+ * Last Modified time: July 31st 2023, 4:17:07 pm
  * ---------------------------------------------
  */
 
 import moment from 'moment-timezone';
 moment.tz.setDefault('Asia/Manila');
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Container } from '@mui/material';
 
@@ -21,9 +21,13 @@ import Button from '@/components/Button';
 import DropdownField from '@/components/Dropdown';
 import useAdminAccount from '@/hooks/adminAccount';
 import TableComponent from '@/components/Table';
+import { UserTypes, formatUserTypes } from '@/types/schema/user';
+import { StoreSchema } from '@/types/schema/store';
+import useAuth from '@/hooks/auth';
 
 export default function ManageAccount() {
   const router = useRouter();
+  const { userInfo } = useAuth();
 
   const { documents, createAccount } = useAdminAccount();
 
@@ -91,8 +95,9 @@ export default function ManageAccount() {
         value={userType}
         onChange={(e: any) => setUserType(e.target.value)}
         options={[
-          { value: 'staff', label: 'Staff' },
-          { value: 'admin', label: 'Admin' },
+          { value: UserTypes.STAFF, label: 'Staff' },
+          { value: UserTypes.STORE_MANAGER, label: 'Store Manager' },
+          { value: UserTypes.ADMIN, label: 'Admin' },
         ]}
       />
       <Button loading={isLoading} label='Save' onClick={onCreateAccount} />
@@ -100,11 +105,16 @@ export default function ManageAccount() {
 
       <TableComponent
         label='User List'
-        rows={documents.map(doc => ({
-          label: doc.name,
-          subLabel: doc.userType + ' - ' + doc.contactNumber,
-          id: doc.id,
-        }))}
+        rows={documents.map(doc => {
+          const assignedStores = doc.assignedStores.map((doc: StoreSchema) => doc.name).join(', ');
+
+          return {
+            label: doc.name,
+            subLabel: formatUserTypes[doc.userType] + ' - ' + doc.contactNumber,
+            additionalData: `Assigned Stores: ${assignedStores}`,
+            id: doc.id,
+          };
+        })}
         onSelect={(id: string) => router.push('/accounts/' + id)}
       />
     </Container>

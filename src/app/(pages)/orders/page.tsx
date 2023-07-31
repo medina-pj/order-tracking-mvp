@@ -5,7 +5,7 @@
  * Author: PJ Medina
  * Date:   Sunday July 9th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 18th 2023, 8:33:14 pm
+ * Last Modified time: July 31st 2023, 3:28:03 pm
  * ---------------------------------------------
  */
 
@@ -48,6 +48,7 @@ import DropdownField from '@/components/Dropdown';
 import useOrder, { ICreateOrder } from '@/hooks/orders';
 import useAuth from '@/hooks/auth';
 import _ from 'lodash';
+import { UserTypes } from '@/types/schema/user';
 
 interface ProductDetailsProps {
   product: any;
@@ -421,9 +422,9 @@ export default function Order() {
     if (storeDocs && storeDocs.length) {
       const filteredStores = storeDocs
         .filter((store: any) => {
-          if (userInfo && userInfo?.userType === 'admin') {
+          if (userInfo && userInfo?.userType === UserTypes.ADMIN) {
             return true;
-          } else if (userInfo && userInfo.userType !== 'admin') {
+          } else if (userInfo && userInfo.userType !== UserTypes.ADMIN) {
             return store?.staff.includes(userInfo?.id);
           }
 

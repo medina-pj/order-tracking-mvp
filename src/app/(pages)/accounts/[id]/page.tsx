@@ -2,8 +2,8 @@
  * ---------------------------------------------
  * Author: Rovelin Enriquez
  * Date:   Wednesday July 12th 2023
- * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
- * Last Modified time: July 12th 2023, 10:17:46 pm
+ * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
+ * Last Modified time: July 31st 2023, 3:29:46 pm
  * ---------------------------------------------
  */
 'use client';
@@ -18,6 +18,7 @@ import DropdownField from '@/components/Dropdown';
 
 import useAdminAccount from '@/hooks/adminAccount';
 import UserService from '@/services/user';
+import { UserTypes } from '@/types/schema/user';
 
 export default function ManageAccount() {
   const { id } = useParams();
@@ -46,6 +47,8 @@ export default function ManageAccount() {
       alert('Error. Failed to load data.');
       router.back();
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const onUpdateAccount = async () => {
@@ -81,8 +84,9 @@ export default function ManageAccount() {
         value={userType}
         onChange={(e: any) => setUserType(e.target.value)}
         options={[
-          { value: 'staff', label: 'Staff' },
-          { value: 'admin', label: 'Admin' },
+          { value: UserTypes.STAFF, label: 'Staff' },
+          { value: UserTypes.STORE_MANAGER, label: 'Store Manager' },
+          { value: UserTypes.ADMIN, label: 'Admin' },
         ]}
       />
       <Button loading={isLoading} label='Update' onClick={onUpdateAccount} />

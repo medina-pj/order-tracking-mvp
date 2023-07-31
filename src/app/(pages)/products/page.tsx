@@ -5,7 +5,7 @@
  * Author: PJ Medina
  * Date:   Tuesday July 4th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 16th 2023, 11:19:16 pm
+ * Last Modified time: July 31st 2023, 5:02:34 pm
  * ---------------------------------------------
  */
 
@@ -23,10 +23,12 @@ import useGroupedProduct from '@/hooks/groupedProducts';
 import MultipleSelectChip from '@/components/MultipleSelect';
 import { SelectChangeEvent } from '@mui/material/Select';
 import TableComponent from '@/components/Table';
+import useAuth from '@/hooks/auth';
+import { UserTypes } from '@/types/schema/user';
 
 export default function Products() {
   const router = useRouter();
-
+  const { userInfo } = useAuth();
   const { documents, createDoc, deleteDoc } = useProduct();
 
   const [error, setError] = useState('');
@@ -43,7 +45,7 @@ export default function Products() {
   const [subMenu, setSubMenu] = useState<string[]>([]);
   const [subMenuOptions, setSubMenuOptions] = useState<{ label: string; value: string }[]>([]);
 
-  const { documents: stores } = useStore();
+  const { documents: storeDocs } = useStore();
   const { documents: categories } = useCategory();
   const { documents: subMenus } = useGroupedProduct();
 
@@ -56,6 +58,39 @@ export default function Products() {
       setSubMenuOptions(subMenuOption);
     }
   }, [subMenus, store]);
+
+  const [storeOptions, setStoreOptions] = useState<{ value: string; label: string }[]>([]);
+
+  useEffect(() => {
+    if (storeDocs && storeDocs.length) {
+      const filteredStores = storeDocs
+        .filter((store: any) => {
+          if (userInfo && userInfo?.userType === UserTypes.ADMIN) {
+            return true;
+          } else if (userInfo && userInfo.userType !== UserTypes.ADMIN) {
+            return store?.staff.includes(userInfo?.id);
+          }
+
+          return false;
+        })
+        .map((store: any) => ({
+          value: store.id,
+          label: store.name,
+        }));
+
+      setStoreOptions(filteredStores);
+
+      if (filteredStores && filteredStores.length) {
+        const store = filteredStores[0];
+
+        if (store) {
+          setStore(store.value);
+        }
+      }
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [storeDocs, userInfo]);
 
   const onCreateProduct = async () => {
     try {
@@ -117,7 +152,7 @@ export default function Products() {
         label='Store'
         value={store}
         onChange={(e: any) => setStore(e.target.value)}
-        options={stores.map(store => ({ value: store.id, label: store.name }))}
+        options={storeOptions}
       />
       <DropdownField
         label='Category'

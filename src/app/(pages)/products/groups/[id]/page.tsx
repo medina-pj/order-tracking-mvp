@@ -2,8 +2,8 @@
  * ---------------------------------------------
  * Author: Rovelin Enriquez
  * Date:   Wednesday July 12th 2023
- * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
- * Last Modified time: July 12th 2023, 10:41:57 pm
+ * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
+ * Last Modified time: July 31st 2023, 5:21:17 pm
  * ---------------------------------------------
  */
 'use client';
@@ -23,6 +23,7 @@ import useGroupedProduct, { ISaveGroupedProduct, IUpdateGroupedProduct } from '@
 import DropdownField from '@/components/Dropdown';
 import TableComponent from '@/components/Table';
 import GroupedProductService from '@/services/groupedProducts';
+import StoreService from '@/services/stores';
 
 export default function Products() {
   const { id } = useParams();
@@ -48,8 +49,9 @@ export default function Products() {
     try {
       (async function () {
         const currentProduct = await GroupedProductService.fetchGroupProduct(id);
+        const store = await StoreService.fetchStore(currentProduct.storeId);
 
-        setStore(currentProduct.storeId);
+        setStore(store.name);
         setName(currentProduct.name);
         setSequence(currentProduct.sequence);
         setDescription(currentProduct.description);
@@ -59,6 +61,8 @@ export default function Products() {
       alert('Error. Failed to load data.');
       router.back();
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const onUpdateGroupedProduct = async () => {
@@ -113,12 +117,7 @@ export default function Products() {
 
   return (
     <Container style={{ marginTop: '2rem', marginBottom: '2rem' }}>
-      <DropdownField
-        disabled={true}
-        label='Store'
-        value={store}
-        options={stores.map(store => ({ label: store.name, value: store.id }))}
-      />
+      <InputField label='Store' value={store} disabled />
       <InputField label='Name' value={name} onChange={setName} />
       <InputField label='Sequence' value={sequence} onChange={setSequence} />
       <InputField label='Description' value={description} onChange={setDescription} />
