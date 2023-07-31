@@ -2,8 +2,8 @@
  * ---------------------------------------------
  * Author: Rovelin Enriquez
  * Date:   Sunday July 9th 2023
- * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
- * Last Modified time: July 12th 2023, 8:22:57 pm
+ * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
+ * Last Modified time: July 31st 2023, 2:37:41 pm
  * ---------------------------------------------
  */
 
@@ -14,6 +14,7 @@ interface RowInterface {
   id?: string | number;
   label?: string;
   subLabel?: string;
+  additionalData?: string;
   labelList?: string;
   list?: string[];
 }
@@ -36,6 +37,8 @@ const TableComponent = ({
           <b>{row?.label || ''}</b>
           <br />
           <a style={{ color: 'gray' }}> {row?.subLabel || ''}</a>
+          <br />
+          <a style={{ color: 'gray' }}> {row?.additionalData || ''}</a>
         </p>
         {row.labelList && row?.list?.length && (
           <>

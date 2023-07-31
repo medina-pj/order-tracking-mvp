@@ -4,8 +4,8 @@
  * ---------------------------------------------
  * Author: Rovelin Enriquez
  * Date:   Sunday July 2nd 2023
- * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
- * Last Modified time: July 12th 2023, 10:14:44 pm
+ * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
+ * Last Modified time: July 31st 2023, 2:46:45 pm
  * ---------------------------------------------
  */
 
@@ -106,11 +106,16 @@ export default function Stores() {
 
       <TableComponent
         label='Store List'
-        rows={stores.map(store => ({
-          id: store.id,
-          label: store.name,
-          subLabel: `${store?.location} - ${store?.contactNumber}`,
-        }))}
+        rows={stores.map(store => {
+          const staff = store.staffDetails.map((user: any) => `${user.name.toUpperCase()}`).join(', ');
+
+          return {
+            id: store.id,
+            label: store.name,
+            subLabel: `${store?.location} - ${store?.contactNumber}`,
+            additionalData: `Assigned Accounts: ${staff}`,
+          };
+        })}
         onDelete={deleteStore}
         onSelect={(id: string) => router.push('/stores/' + id)}
       />

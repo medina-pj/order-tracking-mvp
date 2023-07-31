@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Friday June 9th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 6th 2023, 11:24:10 pm
+ * Last Modified time: July 31st 2023, 2:31:23 pm
  * ---------------------------------------------
  */
 
@@ -16,6 +16,8 @@ import { collection, query, onSnapshot, where, addDoc, doc, setDoc } from 'fireb
 import { db } from '../config/firebase';
 import { StoreSchema } from '../types/schema/store';
 import constants from '@/utils/constants';
+import { UserSchema } from '@/types/schema/user';
+import UserService from '@/services/user';
 
 export interface ISaveStore {
   name: string;
@@ -31,6 +33,7 @@ export interface IUpdateStore extends ISaveStore {
 export interface IStore extends ISaveStore, IUpdateStore {
   createdAt: string;
   updatedAt: string;
+  staffDetails: UserSchema[];
 }
 
 const useStore = () => {
@@ -45,12 +48,25 @@ const useStore = () => {
       let results: IStore[] = [];
 
       for (const doc of snapshot.docs) {
+        let staffDetails: UserSchema[] = [];
+
+        if (doc.data()?.staff && doc.data()?.staff.length) {
+          const userDetails: UserSchema[] = await Promise.all(
+            doc.data()?.staff.map(async (id: string) => {
+              return await UserService.fetchUser(id);
+            })
+          );
+
+          staffDetails.push(...userDetails);
+        }
+
         results.push({
           id: doc.id,
           name: doc.data()?.name,
           location: doc.data()?.location,
           contactNumber: doc.data()?.contactNumber,
           staff: doc.data()?.staff,
+          staffDetails,
           createdAt: moment(doc.data()?.createdAt).format('MMM DD, YYYY hh:mma'),
           updatedAt: moment(doc.data()?.updatedAt).format('MMM DD, YYYY hh:mma'),
         });
