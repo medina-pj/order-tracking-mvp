@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Thursday July 6th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: August 2nd 2023, 2:17:51 pm
+ * Last Modified time: August 2nd 2023, 2:19:15 pm
  * ---------------------------------------------
  */
 import moment from 'moment-timezone';
@@ -35,28 +35,13 @@ const ProductService = {
 
       if (!ids.length) return result;
 
-      console.log({
-        ids,
-        length: ids.length,
-      });
-
       const chunkedValues = splitArrayToChunks({ data: ids });
-
-      console.log({
-        ids,
-        length: ids.length,
-        chunkedValues,
-      });
 
       const ref = collection(db, constants.DB_PRODUCTS);
 
       const queries = chunkedValues.map(chunk => {
         return query(ref, where('isArchived', '==', false), where(documentId(), 'in', chunk));
       });
-
-      // const qry =
-
-      console.log({ queries });
 
       const qrySnapshots = await Promise.all(queries.map(getDocs));
       const snapshotResults = qrySnapshots.flatMap(snapshot => snapshot.docs.map(doc => doc));
