@@ -1,13 +1,13 @@
-'use client';
-
 /*
  * ---------------------------------------------
- * Author: PJ Medina
- * Date:   Saturday June 10th 2023
+ * Author: Rovelin Enriquez
+ * Date:   Wednesday August 2nd 2023
  * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
- * Last Modified time: August 2nd 2023, 3:33:15 pm
+ * Last Modified time: August 2nd 2023, 3:44:45 pm
  * ---------------------------------------------
  */
+
+'use client';
 
 import { useEffect, useState } from 'react';
 import moment from 'moment-timezone';
@@ -21,13 +21,18 @@ import ButtonField from '@/components/Button';
 import useStore from '@/hooks/store';
 import useCategory from '@/hooks/categories';
 import { ExpenseStatusEnum } from '@/types/schema/expenses';
-import useExpenses, { ISaveExpenses } from '@/hooks/expenses';
+import useExpenses, { IUpdateExpenses } from '@/hooks/expenses';
 import useAuth from '@/hooks/auth';
 import { UserTypes } from '@/types/schema/user';
+import { useParams, useRouter } from 'next/navigation';
+import ExpenseService from '@/services/expenses';
 
-export default function Dashboard() {
+export default function Expenses() {
+  const { id } = useParams();
+  const router = useRouter();
+
   const { userInfo } = useAuth();
-  const { createDoc } = useExpenses();
+  const { updateDoc } = useExpenses();
   const { documents: storeDocs } = useStore();
   const { documents: categoryDocs } = useCategory();
 
@@ -43,6 +48,28 @@ export default function Dashboard() {
   const [paymentDue, setPaymentDue] = useState(moment().format('YYYY-MM-DD'));
   const [error, setError] = useState('');
   const [storeOptions, setStoreOptions] = useState<{ value: string; label: string }[]>([]);
+
+  useEffect(() => {
+    try {
+      (async function () {
+        const currentExpense = await ExpenseService.fetchExpense(id);
+        console.log(currentExpense);
+        setStore(currentExpense?.storeId);
+        setCategory(currentExpense?.categoryId || '');
+        setOtherCategory(currentExpense?.otherCategory || '');
+        setParticulars(currentExpense?.particulars);
+        setDescription(currentExpense?.description || '');
+        setUnit(currentExpense?.unit);
+        setQuantity(currentExpense?.quantity);
+        setUnitPrice(currentExpense?.unitPrice);
+        setStatus(currentExpense?.status);
+        setPaymentDue(moment(currentExpense?.paymentDue).format('YYYY-MM-DD'));
+      })();
+    } catch (error) {
+      alert('Error. Failed to load data.');
+      router.back();
+    }
+  }, [id]);
 
   useEffect(() => {
     if (storeDocs && storeDocs.length) {
@@ -75,14 +102,15 @@ export default function Dashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storeDocs, userInfo]);
 
-  const onRecordExpenses = async () => {
+  const updateExpense = async () => {
     try {
       if (!store || !particulars || !quantity || !unitPrice || !unit) {
         alert('Fillup required fields (store, quantity, unitPrice, unit).');
         return;
       }
 
-      const payload: ISaveExpenses = {
+      const payload: IUpdateExpenses = {
+        id,
         storeId: store,
         categoryId: ['others', ''].includes(category) ? '' : category,
         otherCategory,
@@ -95,7 +123,7 @@ export default function Dashboard() {
         paymentDue: status === ExpenseStatusEnum.UNSETTLED ? paymentDue : '',
       };
 
-      await createDoc(payload);
+      await updateDoc(payload);
 
       setParticulars('');
       setDescription('');
@@ -105,7 +133,8 @@ export default function Dashboard() {
       setStatus(ExpenseStatusEnum.SETTLED);
       setPaymentDue(moment().format('YYYY-MM-DD'));
 
-      alert('Expense record successfully created.');
+      alert('Expense record successfully updated.');
+      router.back();
     } catch (err: any) {
       setError(err?.message);
     }
@@ -185,7 +214,7 @@ export default function Dashboard() {
         )}
 
         <Grid item xs={12}>
-          <ButtonField label='Record Expenses' onClick={onRecordExpenses} />
+          <ButtonField label='Update' onClick={updateExpense} />
         </Grid>
 
         <Grid item xs={12}>

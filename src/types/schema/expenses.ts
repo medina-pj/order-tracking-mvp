@@ -2,8 +2,8 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Monday July 17th 2023
- * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 17th 2023, 10:08:09 pm
+ * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
+ * Last Modified time: August 2nd 2023, 3:06:27 pm
  * ---------------------------------------------
  */
 
@@ -14,7 +14,7 @@ export enum ExpenseStatusEnum {
 
 export type ExpensesSchema = {
   id?: string;
-  expensesCode: string;
+  expensesCode?: string;
   storeId: string;
   categoryId?: string;
   otherCategory?: string;

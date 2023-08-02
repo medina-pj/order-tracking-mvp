@@ -4,15 +4,25 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
- * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 31st 2023, 4:48:29 pm
+ * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
+ * Last Modified time: August 2nd 2023, 3:45:39 pm
  * ---------------------------------------------
  */
 
 import { useEffect, useMemo, useState } from 'react';
 import moment from 'moment-timezone';
 moment.tz.setDefault('Asia/Manila');
-import { Container, Grid, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
+import {
+  Container,
+  Grid,
+  IconButton,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Typography,
+} from '@mui/material';
 
 import DropdownField from '@/components/Dropdown';
 import InputField from '@/components/TextField';
@@ -24,10 +34,13 @@ import useExpenses, { IExpenses } from '@/hooks/expenses';
 import useAuth from '@/hooks/auth';
 import numeral from 'numeral';
 import { UserTypes } from '@/types/schema/user';
+import { DeleteForever } from '@mui/icons-material';
+import { useRouter } from 'next/navigation';
 
 export default function RecordExpenses() {
+  const router = useRouter();
   const { userInfo } = useAuth();
-  const { documents: expensesDocs, filterExpenses } = useExpenses();
+  const { documents: expensesDocs, filterExpenses, deleteDoc } = useExpenses();
   const { documents: storeDocs } = useStore();
 
   const [store, setStore] = useState('');
@@ -81,6 +94,14 @@ export default function RecordExpenses() {
   const totalCost = useMemo(() => {
     return expensesDocs.reduce((acc: number, curr: IExpenses) => acc + +curr.unitPrice * +curr.quantity, 0);
   }, [expensesDocs]);
+
+  const onDelete = async (id: string) => {
+    try {
+      if (!confirm('Are you sure you want to delete this record?')) return;
+
+      await deleteDoc(id);
+    } catch (err: any) {}
+  };
 
   return (
     <Container style={{ marginTop: '2rem', marginBottom: '2rem' }}>
@@ -141,7 +162,11 @@ export default function RecordExpenses() {
             <TableBody>
               {expensesDocs.map((d: any) => (
                 <TableRow key={d.id}>
-                  <TableCell component='th' scope='row' sx={{ fontFamily: 'inherit' }}>
+                  <TableCell
+                    component='th'
+                    scope='row'
+                    sx={{ fontFamily: 'inherit' }}
+                    onClick={() => router.push('/expenses/' + d.id)}>
                     <Typography
                       sx={{
                         fontFamily: 'inherit',
@@ -163,6 +188,11 @@ export default function RecordExpenses() {
                   </TableCell>
                   <TableCell sx={{ fontFamily: 'inherit', fontSize: 14 }} align='right'>
                     P{numeral(+d.quantity * +d.unitPrice).format('0,0.00')}
+                  </TableCell>
+                  <TableCell align='center' style={{ padding: 0, width: '20px' }}>
+                    <IconButton onClick={() => onDelete(d.id)}>
+                      <DeleteForever style={{ color: '#ea6655' }} />
+                    </IconButton>
                   </TableCell>
                 </TableRow>
               ))}

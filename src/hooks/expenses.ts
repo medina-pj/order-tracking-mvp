@@ -2,8 +2,8 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Monday July 17th 2023
- * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 17th 2023, 10:18:24 pm
+ * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
+ * Last Modified time: August 2nd 2023, 3:19:27 pm
  * ---------------------------------------------
  */
 
@@ -218,7 +218,34 @@ const useExpenses = (args?: InitialState) => {
     }
   };
 
-  return { documents, createDoc, deleteDoc, filterExpenses };
+  const updateDoc = async (payload: IUpdateExpenses): Promise<void> => {
+    try {
+      const docRef = doc(db, constants.DB_EXPENSES, payload.id);
+      await setDoc(
+        docRef,
+        {
+          storeId: payload.storeId,
+          categoryId: payload.categoryId,
+          otherCategory: payload.otherCategory,
+          particulars: payload.particulars,
+          description: payload.description,
+          unit: payload.unit,
+          quantity: payload.quantity,
+          unitPrice: payload.unitPrice,
+          status: payload.status,
+          paymentDue: moment(payload.paymentDue).toDate().getTime(),
+          updatedAt: moment().toDate().getTime(),
+        },
+        { merge: true }
+      );
+
+      return;
+    } catch (err: any) {
+      throw err;
+    }
+  };
+
+  return { documents, createDoc, deleteDoc, filterExpenses, updateDoc };
 };
 
 export default useExpenses;
