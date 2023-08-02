@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Thursday July 6th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 18th 2023, 8:24:46 pm
+ * Last Modified time: August 2nd 2023, 2:17:51 pm
  * ---------------------------------------------
  */
 import moment from 'moment-timezone';
@@ -16,6 +16,7 @@ import { ProductSchema } from '@/types/schema/product';
 import CategoryService from './categories';
 import StoreService from './stores';
 import { IProduct } from '@/hooks/products';
+import splitArrayToChunks from '@/utils/splitArrayToChunks';
 
 export interface ISubMenu {
   productId: string;
@@ -34,12 +35,33 @@ const ProductService = {
 
       if (!ids.length) return result;
 
+      console.log({
+        ids,
+        length: ids.length,
+      });
+
+      const chunkedValues = splitArrayToChunks({ data: ids });
+
+      console.log({
+        ids,
+        length: ids.length,
+        chunkedValues,
+      });
+
       const ref = collection(db, constants.DB_PRODUCTS);
-      const qry = query(ref, where('isArchived', '==', false), where(documentId(), 'in', ids));
 
-      const qrySnapshot = await getDocs(qry);
+      const queries = chunkedValues.map(chunk => {
+        return query(ref, where('isArchived', '==', false), where(documentId(), 'in', chunk));
+      });
 
-      const promises = qrySnapshot.docs.map(async (doc: any) => {
+      // const qry =
+
+      console.log({ queries });
+
+      const qrySnapshots = await Promise.all(queries.map(getDocs));
+      const snapshotResults = qrySnapshots.flatMap(snapshot => snapshot.docs.map(doc => doc));
+
+      const promises = snapshotResults.map(async (doc: any) => {
         let category = doc.data()?.categoryId;
         let store = doc.data()?.storeId;
         let subMenu = doc.data()?.subMenu;
