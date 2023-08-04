@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 18th 2023, 4:15:46 am
+ * Last Modified time: August 5th 2023, 1:06:48 am
  * ---------------------------------------------
  */
 
@@ -88,7 +88,7 @@ export interface IOrder {
 interface IFilterOptions {
   startDate: any;
   endDate: any;
-  status: OrderStatusEnum | '';
+  status: OrderStatusEnum | '' | 'active';
   store: string;
 }
 
@@ -125,9 +125,7 @@ const useOrder = (args?: InitialState) => {
         where('storeId', '==', filters.store),
       ];
 
-      if (filters.status) {
-        queries.push(where('status', '==', filters.status));
-      } else {
+      if (filters.status === 'active') {
         queries.push(
           where('status', 'in', [
             OrderStatusEnum.NEW,
@@ -136,6 +134,8 @@ const useOrder = (args?: InitialState) => {
             OrderStatusEnum.SERVED,
           ])
         );
+      } else if (filters.status) {
+        queries.push(where('status', '==', filters.status));
       }
 
       let ref = collection(db, constants.DB_ORDERS);

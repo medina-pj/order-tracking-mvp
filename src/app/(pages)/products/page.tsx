@@ -5,7 +5,7 @@
  * Author: PJ Medina
  * Date:   Tuesday July 4th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 31st 2023, 9:00:10 pm
+ * Last Modified time: August 5th 2023, 2:36:55 am
  * ---------------------------------------------
  */
 
@@ -194,6 +194,7 @@ export default function Products() {
             id: doc.id,
             label: `${doc?.name}(${doc?.productAbbrev}) - P${doc?.price}`,
             subLabel: doc?.store?.name,
+            additionalData: doc?.category?.name,
           }))}
         onDelete={deleteProduct}
         onSelect={(id: string) => router.push('/products/' + id)}

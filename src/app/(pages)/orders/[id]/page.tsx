@@ -3,15 +3,14 @@
  * Author: Rovelin Enriquez
  * Date:   Sunday July 16th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 17th 2023, 9:52:05 pm
+ * Last Modified time: August 5th 2023, 2:38:06 am
  * ---------------------------------------------
  */
 
 'use client';
 
-import { CSSProperties, useState, useEffect } from 'react';
+import { CSSProperties, useState, useEffect, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { produce } from 'immer';
 import numeral from 'numeral';
 import { v4 as uuidv4 } from 'uuid';
 import {
@@ -29,17 +28,15 @@ import {
   ButtonGroup,
   Checkbox,
 } from '@mui/material';
-import { ExpandMore, DeleteForeverOutlined } from '@mui/icons-material';
+import { ExpandMore } from '@mui/icons-material';
 
 import InputField from '@/components/TextField';
 import ButtonField from '@/components/Button';
 import DropdownField from '@/components/Dropdown';
 
 import useStoreTable from '@/hooks/storeTable';
-import useStore from '@/hooks/store';
 import useProduct, { IProduct } from '@/hooks/products';
 import useOrder, { IUpdateOrder } from '@/hooks/orders';
-import { ISubMenu } from '@/services/products';
 import OrderService from '@/services/orders';
 import {
   OrderPaymentMethodEnum,
@@ -48,29 +45,9 @@ import {
   TCartAddOns,
   TCartItems,
 } from '@/types/schema/order';
-
-interface ProductDetailsProps {
-  product: any;
-  item?: any;
-  style?: any;
-  cartItems?: any;
-  setCartItems?: any;
-  withDeleteBtn?: boolean;
-  withQnty?: boolean;
-}
-
-interface MenuCardProps {
-  product: IProduct;
-  cartItems: TCartItems[];
-  setCartItems: any;
-}
-
-interface CartItemCardProps {
-  itemNo: number;
-  cartItemId: string;
-  cartItems: TCartItems[];
-  setCartItems: any;
-}
+import { CartItemCard, MenuCard } from '../page';
+import _ from 'lodash';
+import StoreService from '@/services/stores';
 
 const globalStyles: { [key: string]: CSSProperties } = {
   typography: {
@@ -78,321 +55,10 @@ const globalStyles: { [key: string]: CSSProperties } = {
   },
 };
 
-const ProductDetails = ({
-  product,
-  style,
-  item,
-  cartItems,
-  setCartItems,
-  withDeleteBtn,
-  withQnty = true,
-}: ProductDetailsProps) => {
-  const productDetailStyle: any = {
-    qntyButton: {
-      outline: 'none',
-      color: 'grey',
-      borderColor: 'grey',
-      fontSize: '0.75rem',
-    },
-    removeButton: {
-      outline: 'none',
-      color: '#EF6262',
-      borderColor: '#EF6262',
-      textTransform: 'none',
-      fontSize: '1.75rem',
-    },
-  };
-
-  let itemDetails = item;
-
-  if (product?.isAddOns) {
-    itemDetails = item?.addOns.find((d: any) => d.productId === product?.productId);
-  }
-
-  const onAddQuantity = () => {
-    // Add item to cart
-    if (!item && !product?.isAddOns) {
-      setCartItems((prev: any) =>
-        prev.concat({
-          product: product, // remove when creating order
-          id: uuidv4(),
-          productId: product.id,
-          productCode: product.productCode,
-          productName: product.name,
-          productAbbrev: product.productAbbrev,
-          price: product.price,
-          quantity: 1,
-          notes: '',
-          addOns: [],
-          voided: false,
-        })
-      );
-    }
-
-    // Increment quantity of item in cart
-    if (item && !product?.isAddOns) {
-      setCartItems(
-        produce(cartItems, (draftState: any) => {
-          const cartItem = draftState.find((obj: any) => obj.id === item.id);
-
-          if (cartItem) {
-            cartItem.quantity += 1;
-          }
-        })
-      );
-    }
-
-    // Check if product is add-ons
-    if (item && product?.isAddOns) {
-      setCartItems(
-        produce(cartItems, (draftState: any) => {
-          const cartItem: TCartItems = draftState.find((obj: any) => obj.id === item.id);
-          const addOnItemIndex = cartItem.addOns.findIndex((d: any) => d.productId === product.productId);
-
-          // // Add the add-on to the selected item in cart
-          if (addOnItemIndex === -1) {
-            cartItem.addOns.push({
-              id: uuidv4(),
-              productId: product.productId,
-              productCode: product.productCode,
-              productName: product.name,
-              productAbbrev: product.productAbbrev,
-              price: product.price,
-              quantity: 1,
-              voided: false,
-            });
-          } else {
-            cartItem.addOns[addOnItemIndex].quantity += 1;
-          }
-        })
-      );
-    }
-  };
-
-  const onDeductQuantity = () => {
-    // Decrement of item in cart
-    if (item && !product?.isAddOns) {
-      setCartItems(
-        produce(cartItems, (draftState: any) => {
-          const cartItem = draftState.find((obj: any) => obj.id === item.id);
-          const index = draftState.findIndex((obj: any) => obj.id === item.id);
-
-          if (index !== -1) {
-            const newQuantity = cartItem.quantity - 1;
-
-            if (newQuantity === 0) {
-              draftState.splice(index, 1);
-            } else {
-              cartItem.quantity = newQuantity;
-            }
-          }
-        })
-      );
-    }
-
-    // Decrement the quantity of add-on items in cart
-    if (item && product?.isAddOns) {
-      setCartItems(
-        produce(cartItems, (draftState: any) => {
-          const cartItem = draftState.find((obj: any) => obj.id === item.id);
-          const addOnItemIndex = cartItem.addOns.findIndex((d: any) => d.productId === product.productId);
-
-          if (addOnItemIndex !== -1) {
-            const newQuantity = cartItem.addOns[addOnItemIndex].quantity - 1;
-
-            if (newQuantity === 0) {
-              cartItem.addOns.splice(addOnItemIndex, 1);
-            } else {
-              cartItem.addOns[addOnItemIndex].quantity = newQuantity;
-            }
-          }
-        })
-      );
-    }
-  };
-
-  const onRemoveOrder = () => {
-    if (!window.confirm('Are you sure you want to remove this item?')) {
-      return;
-    }
-
-    setCartItems(
-      produce(cartItems, (draftState: any) => {
-        const index = draftState.findIndex((obj: any) => obj.id === item.id);
-
-        if (index !== -1) {
-          draftState.splice(index, 1);
-        }
-      })
-    );
-  };
-
-  return (
-    <div style={style}>
-      <Grid container spacing={2}>
-        <Grid item xs={8}>
-          <Typography sx={{ ...globalStyles.typography, fontSize: 12 }} color='text.secondary' gutterBottom>
-            {product?.productAbbrev}
-          </Typography>
-          <Typography sx={{ ...globalStyles.typography, fontSize: 16 }}>{product?.name}</Typography>
-          <Typography
-            sx={{ ...globalStyles.typography, fontSize: 14 }}
-            color='text.secondary'
-            component='div'>
-            P{numeral(product?.price).format('P0,0.00')}
-          </Typography>
-        </Grid>
-
-        {withDeleteBtn && !withQnty && (
-          <Grid item xs={4}>
-            <Box display='flex' justifyContent='flex-end'>
-              <DeleteForeverOutlined onClick={onRemoveOrder} style={{ ...productDetailStyle.removeButton }} />
-            </Box>
-          </Grid>
-        )}
-
-        {withQnty && (
-          <Grid item xs={6} display='flex' alignItems='center' justifyContent='flex-start'>
-            <Box>
-              <ButtonGroup size='small'>
-                <Button style={productDetailStyle.qntyButton} onClick={onAddQuantity}>
-                  +
-                </Button>
-                {itemDetails?.quantity && (
-                  <Button style={productDetailStyle.qntyButton}>{itemDetails?.quantity || 0}</Button>
-                )}
-                {itemDetails?.quantity && (
-                  <Button style={productDetailStyle.qntyButton} onClick={onDeductQuantity}>
-                    -
-                  </Button>
-                )}
-              </ButtonGroup>
-            </Box>
-          </Grid>
-        )}
-      </Grid>
-    </div>
-  );
-};
-
-const MenuCard = ({ product, cartItems, setCartItems }: MenuCardProps) => {
-  let subTotal = 0;
-  const itemExist = cartItems.find((d: any) => d.productId === product.id);
-
-  if (itemExist) {
-    const qnty = itemExist.quantity;
-    const price = itemExist.price;
-
-    const addOnsTotal = itemExist.addOns.reduce((acc: number, curr: TCartAddOns) => {
-      acc += curr.price * curr.quantity * qnty;
-      return acc;
-    }, 0);
-
-    subTotal = Number(qnty) * Number(price) + Number(addOnsTotal);
-  }
-
-  return (
-    <Card style={{ marginBottom: '1rem' }} variant='outlined'>
-      <CardContent>
-        <ProductDetails
-          product={product}
-          item={itemExist}
-          cartItems={cartItems}
-          setCartItems={setCartItems}
-        />
-
-        <Typography
-          sx={{ ...globalStyles.typography, fontSize: 14, marginTop: '0.5rem' }}
-          color='text.secondary'>
-          Sub Total: P{numeral(subTotal).format('P0,00.00')}
-        </Typography>
-      </CardContent>
-    </Card>
-  );
-};
-
-const CartItemCard = ({ itemNo, cartItemId, cartItems, setCartItems }: CartItemCardProps) => {
-  let subTotal = 0;
-
-  const item = cartItems.find((d: any) => d.id === cartItemId);
-
-  if (item) {
-    const qnty = item.quantity;
-    const price = item.price;
-
-    const addOnsTotal = item.addOns.reduce((acc: number, curr: TCartAddOns) => {
-      acc += curr.price * curr.quantity * qnty;
-      return acc;
-    }, 0);
-
-    subTotal = Number(qnty) * Number(price) + Number(addOnsTotal);
-  }
-
-  return (
-    <Card style={{ marginBottom: '1rem' }} variant='outlined'>
-      <CardContent>
-        <Typography
-          sx={{
-            ...globalStyles.typography,
-            fontSize: 18,
-            fontWeight: 600,
-            marginTop: '0.5rem',
-            marginBottom: '1.25rem',
-          }}>
-          Item #{itemNo}
-        </Typography>
-
-        <ProductDetails
-          product={item?.product}
-          item={item}
-          cartItems={cartItems}
-          setCartItems={setCartItems}
-          withDeleteBtn
-          withQnty={false}
-        />
-        {item?.product?.subMenu.length > 0 && item && (
-          <div>
-            <Typography
-              sx={{
-                ...globalStyles.typography,
-                fontWeight: '600',
-                fontSize: 14,
-                marginBottom: '0.5rem',
-                marginTop: '1.5rem',
-              }}
-              color='text.secondary'>
-              Add-Ons:
-            </Typography>
-            {item.product?.subMenu.map((sm: ISubMenu, index: number) => {
-              return (
-                <ProductDetails
-                  key={index}
-                  style={{ marginBottom: '1rem' }}
-                  product={sm}
-                  item={item}
-                  cartItems={cartItems}
-                  setCartItems={setCartItems}
-                />
-              );
-            })}
-          </div>
-        )}
-
-        <Typography
-          sx={{ ...globalStyles.typography, fontSize: 14, marginTop: '0.5rem' }}
-          color='text.secondary'>
-          Sub Total: P{numeral(subTotal).format('P0,00.00')}
-        </Typography>
-      </CardContent>
-    </Card>
-  );
-};
-
 export default function Order() {
   const { id } = useParams();
   const router = useRouter();
 
-  const { documents: stores } = useStore();
   const { documents: products } = useProduct();
   const { documents: tables } = useStoreTable();
   const { updateOrder } = useOrder();
@@ -400,6 +66,7 @@ export default function Order() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  const [storeName, setStoreName] = useState('');
   const [store, setStore] = useState('');
   const [table, setTable] = useState('');
   const [type, setType] = useState<OrderTypeEnum>(OrderTypeEnum.DINE_IN);
@@ -412,15 +79,19 @@ export default function Order() {
   useEffect(() => {
     try {
       (async function () {
-        const currentProduct = await OrderService.fetchOrder(id);
+        if (id) {
+          const orderDetails = await OrderService.fetchOrder(id);
+          const storeDetails = await StoreService.fetchStore(orderDetails.storeId);
 
-        setStore(currentProduct.storeId);
-        setTable(currentProduct.tableId);
-        setType(currentProduct.type);
-        setNotes(currentProduct.notes);
-        setPaymentMethod(currentProduct?.payment?.modeOfPayment || '');
-        setOrderPaid(currentProduct?.payment?.status === 'paid' ? true : false);
-        setCartItems(currentProduct.cartItems);
+          setStoreName(storeDetails.name);
+          setStore(orderDetails.storeId);
+          setTable(orderDetails.tableId);
+          setType(orderDetails.type);
+          setNotes(orderDetails.notes);
+          setPaymentMethod(orderDetails?.payment?.modeOfPayment || '');
+          setOrderPaid(orderDetails?.payment?.status === 'paid' ? true : false);
+          setCartItems(orderDetails.cartItems);
+        }
       })();
     } catch (error) {
       alert('Error. Failed to load data.');
@@ -497,28 +168,34 @@ export default function Order() {
     }
   };
 
-  const total = cartItems.reduce((acc: any, curr: any) => {
-    const qnty = curr.quantity;
-    const price = curr.price;
+  const total = useMemo(() => {
+    return cartItems.reduce((acc: any, curr: any) => {
+      const qnty = curr.quantity;
+      const price = curr.price;
 
-    const addOnsTotal = curr.addOns.reduce((acc: number, curr: TCartAddOns) => {
-      acc += curr.price * curr.quantity * qnty;
+      const addOnsTotal = curr.addOns.reduce((acc: number, curr: TCartAddOns) => {
+        acc += curr.price * curr.quantity * qnty;
+        return acc;
+      }, 0);
+
+      acc += Number(qnty) * Number(price) + Number(addOnsTotal);
+
       return acc;
     }, 0);
+  }, [cartItems]);
 
-    acc += Number(qnty) * Number(price) + Number(addOnsTotal);
-
-    return acc;
-  }, 0);
+  const filteredProducs = useMemo(() => {
+    return _.orderBy(products, ['category.sequence', 'name'], ['asc', 'asc']).filter(
+      (d: IProduct) => d.store.id === store
+    );
+  }, [products, store]);
 
   return (
     <Container style={{ marginTop: '2rem', marginBottom: '5rem' }}>
-      <DropdownField
-        label='Store'
-        value={store}
-        onChange={(e: any) => setStore(e.target.value)}
-        options={stores.map(store => ({ value: store.id, label: store.name }))}
-      />
+      <Box>
+        <InputField label='Store' value={storeName} disabled />
+      </Box>
+
       <DropdownField
         label='Table'
         value={table}
@@ -547,13 +224,17 @@ export default function Order() {
             <Typography style={{ ...globalStyles.typography, fontSize: '18px' }}>Menu</Typography>
           </AccordionSummary>
           <AccordionDetails style={{ padding: 0 }}>
-            {products
-              .filter((d: IProduct) => !d.isAddOns)
-              .map((d: IProduct, index: number) => (
-                <MenuCard key={index} product={d} cartItems={cartEntries} setCartItems={setCartEntries} />
+            <Grid container spacing={2}>
+              {filteredProducs.map((d: IProduct, index: number) => (
+                <Grid item key={index} xs={6}>
+                  <MenuCard key={index} product={d} cartItems={cartEntries} setCartItems={setCartEntries} />
+                </Grid>
               ))}
 
-            <ButtonField label='Add To Cart' onClick={onAddToCart} />
+              <Grid item xs={12}>
+                <ButtonField label='Add To Cart' onClick={onAddToCart} />
+              </Grid>
+            </Grid>
           </AccordionDetails>
         </Accordion>
 
@@ -577,6 +258,7 @@ export default function Order() {
                     cartItemId={d.id}
                     cartItems={cartItems}
                     setCartItems={setCartItems}
+                    products={products}
                   />
                 ))}
 

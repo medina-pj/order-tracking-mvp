@@ -3,7 +3,7 @@
  * Author: Rovelin Enriquez
  * Date:   Saturday July 15th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 18th 2023, 1:35:38 pm
+ * Last Modified time: August 5th 2023, 1:02:45 am
  * ---------------------------------------------
  */
 'use client';
@@ -36,6 +36,7 @@ const globalStyles: { [key: string]: CSSProperties } = {
 };
 
 const OrderCard = ({
+  orderCode,
   orderId,
   table,
   type,
@@ -45,6 +46,7 @@ const OrderCard = ({
   paymentStatus,
   onEdit,
 }: {
+  orderCode: string;
   orderId: string;
   table: string;
   type: string;
@@ -104,6 +106,17 @@ const OrderCard = ({
         borderRadius: 5,
         // boxShadow: '2px 2px 8px rgb(0 0 0 / 0.2)',
       }}>
+      <Typography
+        color={'text.secondary'}
+        sx={{
+          ...globalStyles.typography,
+          fontSize: 16,
+          fontWeight: 600,
+          marginRight: '5px',
+        }}>
+        {orderCode.toUpperCase()}
+      </Typography>
+
       <Box display='flex' onClick={onEdit}>
         <Typography
           sx={{
@@ -120,7 +133,7 @@ const OrderCard = ({
       </Box>
 
       <Typography
-        color={'text.secondary'}
+        // color={'text.secondary'}
         sx={{
           ...globalStyles.typography,
         }}>

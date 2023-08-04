@@ -2,8 +2,8 @@
  * ---------------------------------------------
  * Author: Rovelin Enriquez
  * Date:   Wednesday August 2nd 2023
- * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
- * Last Modified time: August 2nd 2023, 3:44:45 pm
+ * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
+ * Last Modified time: August 5th 2023, 2:38:29 am
  * ---------------------------------------------
  */
 
@@ -53,7 +53,7 @@ export default function Expenses() {
     try {
       (async function () {
         const currentExpense = await ExpenseService.fetchExpense(id);
-        console.log(currentExpense);
+
         setStore(currentExpense?.storeId);
         setCategory(currentExpense?.categoryId || '');
         setOtherCategory(currentExpense?.otherCategory || '');
@@ -69,6 +69,8 @@ export default function Expenses() {
       alert('Error. Failed to load data.');
       router.back();
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   useEffect(() => {

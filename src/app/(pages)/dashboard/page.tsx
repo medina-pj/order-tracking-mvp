@@ -5,7 +5,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 31st 2023, 3:27:39 pm
+ * Last Modified time: August 5th 2023, 1:09:08 am
  * ---------------------------------------------
  */
 
@@ -35,7 +35,7 @@ export default function Dashboard() {
 
   const [startDate, setStartDate] = useState(moment().format('YYYY-MM-DD'));
   const [endDate, setEndDate] = useState(moment().format('YYYY-MM-DD'));
-  const [status, setStatus] = useState<OrderStatusEnum | 'all'>('all');
+  const [status, setStatus] = useState<OrderStatusEnum | 'active' | 'all'>('active');
   const [store, setStore] = useState('');
   const [storeOptions, setStoreOptions] = useState<{ value: string; label: string }[]>([]);
 
@@ -106,7 +106,7 @@ export default function Dashboard() {
             value={status}
             onChange={(e: any) => setStatus(e.target.value)}
             options={[
-              { value: 'all', label: 'Active Orders' },
+              { value: 'active', label: 'Active Orders' },
               { value: OrderStatusEnum.COMPLETED, label: 'Completed' },
               { value: OrderStatusEnum.NEW, label: 'New' },
               { value: OrderStatusEnum.CONFIRMED, label: 'Confirmed' },
@@ -114,6 +114,7 @@ export default function Dashboard() {
               { value: OrderStatusEnum.SERVED, label: 'Served' },
               { value: OrderStatusEnum.DECLINED, label: 'Declined' },
               { value: OrderStatusEnum.CANCELLED, label: 'Cancelled' },
+              { value: 'all', label: 'All Orders' },
             ]}
           />
         </Grid>
@@ -127,6 +128,7 @@ export default function Dashboard() {
         orderDocs.map((order, i) => (
           <div key={i}>
             <OrderCard
+              orderCode={order.orderId}
               orderId={order.id}
               table={order.table.name}
               type={order.type}

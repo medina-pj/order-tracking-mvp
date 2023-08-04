@@ -5,7 +5,7 @@
  * Author: PJ Medina
  * Date:   Sunday July 9th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 31st 2023, 3:28:03 pm
+ * Last Modified time: August 5th 2023, 2:37:43 am
  * ---------------------------------------------
  */
 
@@ -57,6 +57,7 @@ interface ProductDetailsProps {
   cartItems?: any;
   setCartItems?: any;
   withQnty?: boolean;
+  isProductSubMenu?: boolean;
 }
 
 interface MenuCardProps {
@@ -70,6 +71,7 @@ interface CartItemCardProps {
   cartItemId: string;
   cartItems: TCartItems[];
   setCartItems: any;
+  products: IProduct[];
 }
 
 const globalStyles: { [key: string]: CSSProperties } = {
@@ -79,13 +81,14 @@ const globalStyles: { [key: string]: CSSProperties } = {
   },
 };
 
-const ProductDetails = ({
+export const ProductDetails = ({
   product,
   style,
   item,
   cartItems,
   setCartItems,
   withQnty = true,
+  isProductSubMenu = false,
 }: ProductDetailsProps) => {
   const productDetailStyle: any = {
     qntyButton: {
@@ -105,7 +108,7 @@ const ProductDetails = ({
 
   let itemDetails = item;
 
-  if (product?.isAddOns) {
+  if (isProductSubMenu) {
     itemDetails = item?.addOns.find((d: any) => d.productId === product?.productId);
   }
 
@@ -113,7 +116,7 @@ const ProductDetails = ({
     event.stopPropagation();
 
     // Add item to cart
-    if (!item && !product?.isAddOns) {
+    if (!item && !isProductSubMenu) {
       setCartItems((prev: any) =>
         prev.concat({
           product: product, // remove when creating order
@@ -132,7 +135,7 @@ const ProductDetails = ({
     }
 
     // Increment quantity of item in cart
-    if (item && !product?.isAddOns) {
+    if (item && !isProductSubMenu) {
       setCartItems(
         produce(cartItems, (draftState: any) => {
           const cartItem = draftState.find((obj: any) => obj.id === item.id);
@@ -145,7 +148,7 @@ const ProductDetails = ({
     }
 
     // Check if product is add-ons
-    if (item && product?.isAddOns) {
+    if (item && isProductSubMenu) {
       setCartItems(
         produce(cartItems, (draftState: any) => {
           const cartItem: TCartItems = draftState.find((obj: any) => obj.id === item.id);
@@ -175,7 +178,7 @@ const ProductDetails = ({
     event.stopPropagation();
 
     // Decrement of item in cart
-    if (item && !product?.isAddOns) {
+    if (item && !isProductSubMenu) {
       setCartItems(
         produce(cartItems, (draftState: any) => {
           const cartItem = draftState.find((obj: any) => obj.id === item.id);
@@ -195,7 +198,7 @@ const ProductDetails = ({
     }
 
     // Decrement the quantity of add-on items in cart
-    if (item && product?.isAddOns) {
+    if (item && isProductSubMenu) {
       setCartItems(
         produce(cartItems, (draftState: any) => {
           const cartItem = draftState.find((obj: any) => obj.id === item.id);
@@ -252,7 +255,7 @@ const ProductDetails = ({
   );
 };
 
-const MenuCard = ({ product, cartItems, setCartItems }: MenuCardProps) => {
+export const MenuCard = ({ product, cartItems, setCartItems }: MenuCardProps) => {
   let subTotal = 0;
   const itemExist = cartItems.find((d: any) => d.productId === product.id);
 
@@ -288,23 +291,37 @@ const MenuCard = ({ product, cartItems, setCartItems }: MenuCardProps) => {
   );
 };
 
-const CartItemCard = ({ itemNo, cartItemId, cartItems, setCartItems }: CartItemCardProps) => {
-  let subTotal = 0;
+export const CartItemCard = ({
+  itemNo,
+  cartItemId,
+  cartItems,
+  setCartItems,
+  products,
+}: CartItemCardProps) => {
   const [maximizeCard, setMaximizeCard] = useState(false);
 
-  const item = cartItems.find((d: any) => d.id === cartItemId);
+  const item = useMemo(() => cartItems.find((d: any) => d.id === cartItemId), [cartItemId, cartItems]);
 
-  if (item) {
-    const qnty = item.quantity;
-    const price = item.price;
+  const productInfo = useMemo(
+    () => products?.find((d: any) => d.id === item?.productId),
+    [item?.productId, products]
+  );
 
-    const addOnsTotal = item.addOns.reduce((acc: number, curr: TCartAddOns) => {
-      acc += curr.price * curr.quantity * qnty;
-      return acc;
-    }, 0);
+  const subTotal = useMemo(() => {
+    if (item) {
+      const qnty = item.quantity;
+      const price = item.price;
 
-    subTotal = Number(qnty) * Number(price) + Number(addOnsTotal);
-  }
+      const addOnsTotal = item.addOns.reduce((acc: number, curr: TCartAddOns) => {
+        acc += curr.price * curr.quantity * qnty;
+        return acc;
+      }, 0);
+
+      return Number(qnty) * Number(price) + Number(addOnsTotal);
+    }
+
+    return 0;
+  }, [item]);
 
   const onRemoveOrder = (event: any) => {
     event.stopPropagation();
@@ -322,6 +339,20 @@ const CartItemCard = ({ itemNo, cartItemId, cartItems, setCartItems }: CartItemC
       })
     );
   };
+
+  if (!productInfo)
+    return (
+      <Box flexGrow={1} display='flex' justifyContent='flex-start' alignItems='flex-start'>
+        <Typography
+          sx={{
+            ...globalStyles.typography,
+            fontSize: 16,
+            fontWeight: 600,
+          }}>
+          Item #{itemNo}
+        </Typography>
+      </Box>
+    );
 
   return (
     <Card style={{ marginBottom: '1rem', backgroundColor: '#ededed', border: 'none' }} variant='outlined'>
@@ -355,14 +386,14 @@ const CartItemCard = ({ itemNo, cartItemId, cartItems, setCartItems }: CartItemC
         </Box>
 
         <ProductDetails
-          product={item?.product}
+          product={productInfo}
           item={item}
           cartItems={cartItems}
           setCartItems={setCartItems}
           withQnty={false}
         />
 
-        {item?.product?.subMenu.length > 0 && item && maximizeCard && (
+        {productInfo?.subMenu.length > 0 && item && maximizeCard && (
           <div>
             <Typography
               sx={{
@@ -375,7 +406,7 @@ const CartItemCard = ({ itemNo, cartItemId, cartItems, setCartItems }: CartItemC
               color='text.secondary'>
               Add-Ons:
             </Typography>
-            {item.product?.subMenu.map((sm: ISubMenu, index: number) => {
+            {productInfo?.subMenu.map((sm: ISubMenu, index: number) => {
               return (
                 <ProductDetails
                   key={index}
@@ -384,6 +415,7 @@ const CartItemCard = ({ itemNo, cartItemId, cartItems, setCartItems }: CartItemC
                   item={item}
                   cartItems={cartItems}
                   setCartItems={setCartItems}
+                  isProductSubMenu={true}
                 />
               );
             })}
@@ -474,7 +506,7 @@ export default function Order() {
         return;
       }
 
-      if (!window.confirm('Sure na?')) {
+      if (!window.confirm('Confirm order.')) {
         return;
       }
 
@@ -542,6 +574,12 @@ export default function Order() {
     }, 0);
   }, [cartItems]);
 
+  const filteredProducs = useMemo(() => {
+    return _.orderBy(products, ['category.sequence', 'name'], ['asc', 'asc']).filter(
+      (d: IProduct) => d.store.id === store
+    );
+  }, [products, store]);
+
   return (
     <Container style={{ marginTop: '2rem', marginBottom: '5rem' }}>
       <DropdownField
@@ -583,13 +621,11 @@ export default function Order() {
           </AccordionSummary>
           <AccordionDetails style={{ padding: 0 }}>
             <Grid container spacing={2}>
-              {_.orderBy(products, ['name'], ['asc'])
-                .filter((d: IProduct) => d.store.id === store && !d.isAddOns)
-                .map((d: IProduct, index: number) => (
-                  <Grid item key={index} xs={6}>
-                    <MenuCard product={d} cartItems={cartEntries} setCartItems={setCartEntries} />
-                  </Grid>
-                ))}
+              {filteredProducs.map((d: IProduct, index: number) => (
+                <Grid item key={index} xs={6}>
+                  <MenuCard product={d} cartItems={cartEntries} setCartItems={setCartEntries} />
+                </Grid>
+              ))}
 
               <Grid item xs={12}>
                 <ButtonField label='Add To Cart' onClick={onAddToCart} />
@@ -619,6 +655,7 @@ export default function Order() {
                     cartItemId={d.id}
                     cartItems={cartItems}
                     setCartItems={setCartItems}
+                    products={products}
                   />
                 ))}
 
