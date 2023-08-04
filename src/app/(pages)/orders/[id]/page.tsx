@@ -3,7 +3,7 @@
  * Author: Rovelin Enriquez
  * Date:   Sunday July 16th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: August 5th 2023, 2:38:06 am
+ * Last Modified time: August 5th 2023, 2:49:15 am
  * ---------------------------------------------
  */
 
@@ -45,9 +45,9 @@ import {
   TCartAddOns,
   TCartItems,
 } from '@/types/schema/order';
-import { CartItemCard, MenuCard } from '../page';
 import _ from 'lodash';
 import StoreService from '@/services/stores';
+import { CartItemCard, MenuCard } from '../components';
 
 const globalStyles: { [key: string]: CSSProperties } = {
   typography: {
