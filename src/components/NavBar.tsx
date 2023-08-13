@@ -5,6 +5,7 @@ import { AppBar, Toolbar, IconButton, Typography, Menu, MenuItem } from '@mui/ma
 import MenuIcon from '@mui/icons-material/Menu';
 import useAuth from '@/hooks/auth';
 import { UserTypes } from '@/types/schema/user';
+import Link from 'next/link';
 
 const NavBar = () => {
   const { logout, userInfo } = useAuth();
@@ -55,68 +56,101 @@ const NavBar = () => {
           open={Boolean(anchorElNav)}
           onClose={handleCloseNavMenu}>
           <MenuItem key={'Orders'} onClick={handleCloseNavMenu}>
-            <Typography textAlign='center' component='a' href='/dashboard'>
+            {/* <Typography textAlign='center' component='a' href='/dashboard'>
               {'Orders'}
-            </Typography>
+            </Typography> */}
+            <Link href='/dashboard'>
+              <Typography textAlign='center'>{'Dashboard'}</Typography>
+            </Link>
           </MenuItem>
           <MenuItem key={'Create-Orders'} onClick={handleCloseNavMenu}>
-            <Typography textAlign='center' component='a' href='/orders'>
+            <Link href='/orders'>
+              <Typography textAlign='center'>{'Orders'}</Typography>
+            </Link>
+            {/* <Typography textAlign='center' component='a' href='/orders'>
               {'Create Orders'}
-            </Typography>
+            </Typography> */}
           </MenuItem>
 
           {[UserTypes.ADMIN, UserTypes.STORE_MANAGER].includes(userInfo?.userType as UserTypes) && [
             <MenuItem key={'Grouped-Products'} onClick={handleCloseNavMenu}>
-              <Typography textAlign='center' component='a' href='/products/groups'>
+              {/* <Typography textAlign='center' component='a' href='/products/groups'>
                 {'Group Products'}
-              </Typography>
+              </Typography> */}
+              <Link href='/products/groups'>
+                <Typography textAlign='center'>{'Group Products'}</Typography>
+              </Link>
             </MenuItem>,
 
             <MenuItem key={'Products'} onClick={handleCloseNavMenu}>
-              <Typography textAlign='center' component='a' href='/products'>
+              {/* <Typography textAlign='center' component='a' href='/products'>
                 {'Products'}
-              </Typography>
+              </Typography> */}
+              <Link href='/products'>
+                <Typography textAlign='center'>{'Products'}</Typography>
+              </Link>
             </MenuItem>,
 
             <MenuItem key={'Tables'} onClick={handleCloseNavMenu}>
-              <Typography textAlign='center' component='a' href='/stores/tables'>
+              {/* <Typography textAlign='center' component='a' href='/stores/tables'>
                 {'Tables'}
-              </Typography>
+              </Typography> */}
+              <Link href='/stores/tables'>
+                <Typography textAlign='center'>{'Tables'}</Typography>
+              </Link>
             </MenuItem>,
           ]}
 
           <MenuItem key={'Record-Expenses'} onClick={handleCloseNavMenu}>
-            <Typography textAlign='center' component='a' href='/expenses/record'>
+            {/* <Typography textAlign='center' component='a' href='/expenses/record'>
               {'Record Expenses'}
-            </Typography>
+            </Typography> */}
+            <Link href='/expenses/record'>
+              <Typography textAlign='center'>{'Record Expenses'}</Typography>
+            </Link>
           </MenuItem>
           <MenuItem key={'Expenses'} onClick={handleCloseNavMenu}>
-            <Typography textAlign='center' component='a' href='/expenses'>
+            {/* <Typography textAlign='center' component='a' href='/expenses'>
               {'Expenses'}
-            </Typography>
+            </Typography> */}
+            <Link href='/expenses'>
+              <Typography textAlign='center'>{'Expenses'}</Typography>
+            </Link>
           </MenuItem>
           <MenuItem key={'Sales-Report'} onClick={handleCloseNavMenu}>
-            <Typography textAlign='center' component='a' href='/reports/sales'>
+            {/* <Typography textAlign='center' component='a' href='/reports/sales'>
               {'Sales Report'}
-            </Typography>
+            </Typography> */}
+            <Link href='/reports/sales'>
+              <Typography textAlign='center'>{'Sales Report'}</Typography>
+            </Link>
           </MenuItem>
           {userInfo?.userType === UserTypes.ADMIN && [
             <MenuItem key={'Category'} onClick={handleCloseNavMenu}>
-              <Typography textAlign='center' component='a' href='/category'>
+              {/* <Typography textAlign='center' component='a' href='/category'>
                 {'Category'}
-              </Typography>
+              </Typography> */}
+              <Link href='/category'>
+                <Typography textAlign='center'>{'Category'}</Typography>
+              </Link>
             </MenuItem>,
 
             <MenuItem key={'Stores'} onClick={handleCloseNavMenu}>
-              <Typography textAlign='center' component='a' href='/stores'>
+              {/* <Typography textAlign='center' component='a' href='/stores'>
                 {'Stores'}
-              </Typography>
+              </Typography> */}
+              <Link href='/stores'>
+                <Typography textAlign='center'>{'Stores'}</Typography>
+              </Link>
             </MenuItem>,
 
             <MenuItem key={'Accounts'} onClick={handleCloseNavMenu}>
-              <Typography textAlign='center' component='a' href='/accounts'>
+              {/* <Typography textAlign='center' component='a' href='/accounts'>
                 {'Accounts'}
-              </Typography>
+              </Typography> */}
+              <Link href='/accounts'>
+                <Typography textAlign='center'>{'Accounts'}</Typography>
+              </Link>
             </MenuItem>,
           ]}
 
