@@ -2,8 +2,8 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
- * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: August 5th 2023, 1:06:48 am
+ * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
+ * Last Modified time: August 13th 2023, 7:49:57 pm
  * ---------------------------------------------
  */
 
@@ -55,6 +55,7 @@ export interface ICreateOrder {
   cartItems: TCartItems[];
   data?: TOrderData;
   payment?: TOrderPayment;
+  orderCompleted?: boolean;
 }
 
 export interface IUpdateOrder extends ICreateOrder {
@@ -213,13 +214,13 @@ const useOrder = (args?: InitialState) => {
         customerNotes: payload?.customerNotes || '',
         type: payload.type,
         cartItems: payload.cartItems,
-        status: OrderStatusEnum.CONFIRMED,
+        status: payload?.orderCompleted ? OrderStatusEnum.COMPLETED : OrderStatusEnum.CONFIRMED,
         payment: payload.payment,
         discount: payload?.discount || [],
         data: payload.data || {},
         history: [
           {
-            action: 'order_received_and_confirmed',
+            action: payload?.orderCompleted ? 'order-received-and-completed' : 'order-received-and-confirmed',
             actor: userInfo?.name,
             actorId: userInfo?.id,
             timestamp: moment().toDate().getTime(),

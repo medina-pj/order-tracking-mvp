@@ -4,8 +4,8 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Sunday July 9th 2023
- * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: August 5th 2023, 2:48:58 am
+ * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
+ * Last Modified time: August 13th 2023, 7:42:02 pm
  * ---------------------------------------------
  */
 
@@ -71,6 +71,7 @@ export default function Order() {
   const [cartEntries, setCartEntries] = useState<TCartItems[]>([]);
   const [cartItems, setCartItems] = useState<TCartItems[]>([]);
   const [storeOptions, setStoreOptions] = useState<{ value: string; label: string }[]>([]);
+  const [orderCompleted, setOrderCompleted] = useState(false);
 
   useEffect(() => {
     if (storeDocs && storeDocs.length) {
@@ -156,6 +157,7 @@ export default function Order() {
           modeOfPayment: paymentMethod as OrderPaymentMethodEnum,
           status: (orderPaid ? OrderPaymentStatusEnum.PAID : '') as OrderPaymentStatusEnum,
         },
+        orderCompleted,
       };
 
       await createOrder(payload);
@@ -166,6 +168,7 @@ export default function Order() {
       setOrderPaid(false);
       setCartEntries([]);
       setCartItems([]);
+      setOrderCompleted(false);
 
       alert('Order created.');
     } catch (err: any) {
@@ -302,6 +305,13 @@ export default function Order() {
                   <FormControlLabel
                     control={<Checkbox checked={orderPaid} onChange={() => setOrderPaid(prev => !prev)} />}
                     label='Paid Order'
+                  />
+
+                  <FormControlLabel
+                    control={
+                      <Checkbox checked={orderCompleted} onChange={() => setOrderCompleted(prev => !prev)} />
+                    }
+                    label='Completed Order'
                   />
                 </Box>
 
