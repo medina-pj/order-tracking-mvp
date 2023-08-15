@@ -3,12 +3,15 @@
  * Author: Rovelin Enriquez
  * Date:   Saturday July 15th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: August 5th 2023, 1:02:45 am
+ * Last Modified time: August 15th 2023, 10:35:04 am
  * ---------------------------------------------
  */
 'use client';
 
-import { Box, Button, ButtonGroup, Container, Typography } from '@mui/material';
+import moment from 'moment-timezone';
+moment.tz.setDefault('Asia/Manila');
+
+import { Box, Button, ButtonGroup, Container, Grid, Typography } from '@mui/material';
 import numeral from 'numeral';
 import { CSSProperties, useMemo, useState } from 'react';
 
@@ -36,6 +39,7 @@ const globalStyles: { [key: string]: CSSProperties } = {
 };
 
 const OrderCard = ({
+  orderNumber,
   orderCode,
   orderId,
   table,
@@ -44,8 +48,10 @@ const OrderCard = ({
   products,
   notes,
   paymentStatus,
+  createdAt,
   onEdit,
 }: {
+  orderNumber: number;
   orderCode: string;
   orderId: string;
   table: string;
@@ -54,6 +60,7 @@ const OrderCard = ({
   products: any;
   notes: string;
   paymentStatus: string;
+  createdAt: any;
   onEdit: () => void;
 }) => {
   const { updateOrderStatus, updateOrderPaymentStatus } = useOrder();
@@ -106,39 +113,77 @@ const OrderCard = ({
         borderRadius: 5,
         // boxShadow: '2px 2px 8px rgb(0 0 0 / 0.2)',
       }}>
-      <Typography
-        color={'text.secondary'}
-        sx={{
-          ...globalStyles.typography,
-          fontSize: 16,
-          fontWeight: 600,
-          marginRight: '5px',
-        }}>
-        {orderCode.toUpperCase()}
-      </Typography>
-
-      <Box display='flex' onClick={onEdit}>
-        <Typography
+      <Grid container justifyContent='space-between' alignItems='center' marginTop='0' marginBottom='20px'>
+        <Grid
+          container
           sx={{
-            ...globalStyles.typography,
-            fontSize: 16,
-            fontWeight: 600,
+            marginBottom: '15px',
           }}>
-          {table.toUpperCase()} ({type === 'dine_in' ? 'Dine-in' : 'Take-out'})
-        </Typography>
+          <Grid item xs={6} sm={6}>
+            <Typography
+              sx={{
+                ...globalStyles.typography,
+                fontSize: 16,
+                fontWeight: 600,
+              }}>
+              #{orderNumber}
+            </Typography>
+          </Grid>
 
-        <Box flexGrow={1} display={'flex'} justifyContent={'flex-end'}>
-          <ModeEditIcon style={{ width: '20px' }} />
-        </Box>
-      </Box>
+          <Grid item xs={6} sm={6}>
+            <Box display={'flex'} justifyContent={'flex-end'}>
+              <ModeEditIcon style={{ fontSize: 18, width: '20px' }} onClick={onEdit} />
+            </Box>
+          </Grid>
+        </Grid>
 
-      <Typography
-        // color={'text.secondary'}
-        sx={{
-          ...globalStyles.typography,
-        }}>
-        {status.toUpperCase()}
-      </Typography>
+        <Grid item xs={6} sm={6}>
+          <Typography
+            color={'text.secondary'}
+            sx={{
+              ...globalStyles.typography,
+              fontSize: 14,
+              fontWeight: 600,
+            }}>
+            {table.toUpperCase()}
+          </Typography>
+          <Typography
+            color={'text.secondary'}
+            sx={{
+              ...globalStyles.typography,
+              fontSize: 12,
+              fontWeight: 600,
+            }}>
+            {moment(createdAt).format('MMM DD, YYYY hh:mmA').toString().toUpperCase()}
+          </Typography>
+        </Grid>
+        <Grid item xs={6} sm={6}>
+          <Box display={'flex'} justifyContent={'flex-end'}>
+            <Typography
+              color={'text.secondary'}
+              sx={{
+                ...globalStyles.typography,
+                fontSize: 14,
+                fontWeight: 600,
+              }}>
+              {type === 'dine_in' ? 'DINE-IN' : 'TAKE-OUT'}
+            </Typography>
+          </Box>
+
+          <Box display={'flex'} justifyContent={'flex-end'}>
+            <Typography
+              color={'text.secondary'}
+              sx={{
+                ...globalStyles.typography,
+                fontSize: 12,
+                fontWeight: 600,
+              }}>
+              {status.toUpperCase()}
+            </Typography>
+          </Box>
+        </Grid>
+      </Grid>
+
       <hr />
 
       <Box style={{ marginBottom: '1rem', marginTop: '1rem' }}>

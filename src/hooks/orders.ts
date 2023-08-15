@@ -2,8 +2,8 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
- * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
- * Last Modified time: August 13th 2023, 7:49:57 pm
+ * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
+ * Last Modified time: August 15th 2023, 10:26:00 am
  * ---------------------------------------------
  */
 
@@ -44,6 +44,7 @@ import useAuth from './auth';
 import StoreService from '@/services/stores';
 import TableService from '@/services/table';
 import OrderService from '@/services/orders';
+import _ from 'lodash';
 
 export interface ICreateOrder {
   storeId: string;
@@ -140,20 +141,23 @@ const useOrder = (args?: InitialState) => {
       }
 
       let ref = collection(db, constants.DB_ORDERS);
-      let qry = query(ref, ...queries, orderBy('createdAt', 'desc'));
+      let qry = query(ref, ...queries);
 
       //will invoke everytime database is updated in the cloud
       const unsub = onSnapshot(qry, async snapshot => {
-        let results: IOrder[] = [];
-
-        for (const doc of snapshot.docs) {
+        const promises = snapshot.docs.map(async (doc: any) => {
           const data = doc.data();
 
-          results.push({
+          const [store, table] = await Promise.all([
+            await StoreService.fetchStore(data?.storeId),
+            await TableService.fetchTable(data?.tableId),
+          ]);
+
+          return {
             id: doc.id,
             orderId: data?.orderId,
-            store: await StoreService.fetchStore(data?.storeId),
-            table: await TableService.fetchTable(data?.tableId),
+            store,
+            table,
             notes: data?.notes,
             customerNotes: data?.customerNotes,
             type: data?.type,
@@ -163,12 +167,14 @@ const useOrder = (args?: InitialState) => {
             payment: data?.payment,
             discount: data?.discount,
             data: data?.data,
-            createdAt: moment(data?.createdAt).format('MMM DD, YYYY hh:mma'),
-            updatedAt: moment(data?.updatedAt).format('MMM DD, YYYY hh:mma'),
-          });
-        }
+            createdAt: data?.createdAt,
+            updatedAt: data?.updatedAt,
+          };
+        });
 
-        setDocuments(results);
+        const results = await Promise.all(promises);
+
+        setDocuments(_.orderBy(results, ['createdAt'], ['desc']));
       });
 
       return () => unsub();
@@ -215,7 +221,13 @@ const useOrder = (args?: InitialState) => {
         type: payload.type,
         cartItems: payload.cartItems,
         status: payload?.orderCompleted ? OrderStatusEnum.COMPLETED : OrderStatusEnum.CONFIRMED,
-        payment: payload.payment,
+        payment:
+          payload?.orderCompleted && !payload.payment
+            ? {
+                modeOfPayment: OrderPaymentMethodEnum.CASH,
+                status: OrderPaymentStatusEnum.PAID,
+              }
+            : payload.payment,
         discount: payload?.discount || [],
         data: payload.data || {},
         history: [

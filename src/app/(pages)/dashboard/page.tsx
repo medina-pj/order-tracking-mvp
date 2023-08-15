@@ -5,7 +5,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: August 5th 2023, 1:09:08 am
+ * Last Modified time: August 15th 2023, 10:27:17 am
  * ---------------------------------------------
  */
 
@@ -38,6 +38,7 @@ export default function Dashboard() {
   const [status, setStatus] = useState<OrderStatusEnum | 'active' | 'all'>('active');
   const [store, setStore] = useState('');
   const [storeOptions, setStoreOptions] = useState<{ value: string; label: string }[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (storeDocs && storeDocs.length) {
@@ -125,9 +126,10 @@ export default function Dashboard() {
       </Grid>
 
       {orderDocs.length > 0 ? (
-        orderDocs.map((order, i) => (
+        orderDocs.map((order: any, i: number) => (
           <div key={i}>
             <OrderCard
+              orderNumber={orderDocs.length - i}
               orderCode={order.orderId}
               orderId={order.id}
               table={order.table.name}
@@ -136,6 +138,7 @@ export default function Dashboard() {
               notes={order.notes}
               paymentStatus={order.payment?.status || ''}
               status={order.status}
+              createdAt={order.createdAt}
               onEdit={() => router.push('/orders/' + order.id)}
             />
           </div>
