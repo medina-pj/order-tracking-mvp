@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Monday July 17th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: August 15th 2023, 11:36:58 am
+ * Last Modified time: August 15th 2023, 11:48:35 am
  * ---------------------------------------------
  */
 
@@ -34,7 +34,7 @@ import CategoryService from '@/services/categories';
 import _ from 'lodash';
 
 export interface ISaveExpenses {
-  recordDate: string;
+  recordDate?: string;
   storeId: string;
   categoryId?: string;
   otherCategory?: string;
@@ -177,6 +177,8 @@ const useExpenses = (args?: InitialState) => {
         throw new Error('Unauthorized user cannot create expenses history.');
       }
 
+      const dateRecorded = payload.recordDate ? new Date(payload.recordDate) : new Date();
+
       const expensesPayload: ExpensesSchema = {
         expensesCode: generateNanoId(),
         storeId: payload.storeId,
@@ -190,8 +192,8 @@ const useExpenses = (args?: InitialState) => {
         status: payload.status,
         createdBy: userInfo.id as string,
         paymentDue: moment(payload.paymentDue).toDate().getTime(),
-        createdAt: moment(new Date(payload.recordDate)).toDate().getTime(),
-        updatedAt: moment(new Date(payload.recordDate)).toDate().getTime(),
+        createdAt: moment(dateRecorded).toDate().getTime(),
+        updatedAt: moment(dateRecorded).toDate().getTime(),
         isArchived: false,
       };
 

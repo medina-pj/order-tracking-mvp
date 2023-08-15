@@ -5,7 +5,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: August 15th 2023, 11:31:18 am
+ * Last Modified time: August 15th 2023, 11:58:27 am
  * ---------------------------------------------
  */
 import moment from 'moment-timezone';
@@ -319,11 +319,19 @@ export default function RecordExpenses() {
                 </TableCell>
               </TableRow>
               <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                <TableCell colSpan={2} sx={{ fontFamily: 'inherit', fontWeight: 600, fontSize: 16 }}>
+                <TableCell colSpan={2} sx={{ fontFamily: 'inherit', fontWeight: 600, fontSize: 14 }}>
                   Net
                 </TableCell>
-                <TableCell align='right' sx={{ fontFamily: 'inherit', fontWeight: 600, fontSize: 16 }}>
+                <TableCell align='right' sx={{ fontFamily: 'inherit', fontWeight: 600, fontSize: 14 }}>
                   P{numeral(totalSales - totalExpenses).format('0,0.00')}
+                </TableCell>
+              </TableRow>
+              <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                <TableCell colSpan={2} sx={{ fontFamily: 'inherit', fontWeight: 600, fontSize: 16 }}>
+                  Profit Margin
+                </TableCell>
+                <TableCell align='right' sx={{ fontFamily: 'inherit', fontWeight: 600, fontSize: 16 }}>
+                  {numeral(((totalSales - totalExpenses) / totalSales) * 100).format('0.00')}%
                 </TableCell>
               </TableRow>
             </TableBody>
