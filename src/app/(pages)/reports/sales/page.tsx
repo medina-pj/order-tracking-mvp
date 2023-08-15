@@ -5,14 +5,14 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 31st 2023, 3:28:11 pm
+ * Last Modified time: August 15th 2023, 11:31:18 am
  * ---------------------------------------------
  */
+import moment from 'moment-timezone';
+moment.tz.setDefault('Asia/Manila');
 
 import { useEffect, useMemo, useState } from 'react';
 import _ from 'lodash';
-import moment from 'moment-timezone';
-moment.tz.setDefault('Asia/Manila');
 import {
   Container,
   Grid,
@@ -304,7 +304,7 @@ export default function RecordExpenses() {
               ))}
               <TableRow>
                 <TableCell colSpan={2} sx={{ fontFamily: 'inherit', fontWeight: 600, fontSize: 14 }}>
-                  Total
+                  Expenses
                 </TableCell>
                 <TableCell align='right' sx={{ fontFamily: 'inherit', fontWeight: 600, fontSize: 14 }}>
                   P{numeral(totalExpenses).format('0,0.00')}
@@ -312,7 +312,7 @@ export default function RecordExpenses() {
               </TableRow>
               <TableRow>
                 <TableCell colSpan={2} sx={{ fontFamily: 'inherit', fontWeight: 600, fontSize: 14 }}>
-                  Gross
+                  Revenue
                 </TableCell>
                 <TableCell align='right' sx={{ fontFamily: 'inherit', fontWeight: 600, fontSize: 14 }}>
                   P{numeral(totalSales).format('0,0.00')}

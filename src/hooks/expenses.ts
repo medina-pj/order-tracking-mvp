@@ -2,8 +2,8 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Monday July 17th 2023
- * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
- * Last Modified time: August 2nd 2023, 3:19:27 pm
+ * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
+ * Last Modified time: August 15th 2023, 11:36:58 am
  * ---------------------------------------------
  */
 
@@ -31,8 +31,10 @@ import useAuth from './auth';
 import UserService from '@/services/user';
 import StoreService from '@/services/stores';
 import CategoryService from '@/services/categories';
+import _ from 'lodash';
 
 export interface ISaveExpenses {
+  recordDate: string;
   storeId: string;
   categoryId?: string;
   otherCategory?: string;
@@ -110,15 +112,14 @@ const useExpenses = (args?: InitialState) => {
       }
 
       let ref = collection(db, constants.DB_EXPENSES);
-      let qry = query(ref, ...queries, orderBy('createdAt'));
+      let qry = query(ref, ...queries);
 
       //will invoke everytime database is updated in the cloud
       const unsub = onSnapshot(qry, async snapshot => {
-        let results: IExpenses[] = [];
-        for (const doc of snapshot.docs) {
+        const promises = snapshot.docs.map(async (doc: any) => {
           const data = doc.data();
 
-          results.push({
+          return {
             id: doc.id,
             store: await StoreService.fetchStore(data?.storeId),
             category: data?.categoryId ? await CategoryService.fetchCategory(data?.categoryId) : {},
@@ -133,9 +134,12 @@ const useExpenses = (args?: InitialState) => {
             paymentDue: data?.paymentDue ? moment(data?.paymentDue).format('MMM DD, YYYY') : '',
             createdAt: moment(data?.createdAt).format('MMM DD, YYYY hh:mma'),
             updatedAt: moment(data?.updatedAt).format('MMM DD, YYYY hh:mma'),
-          });
-        }
-        setDocuments(results);
+          };
+        });
+
+        const results: IExpenses[] = await Promise.all(promises);
+
+        setDocuments(_.orderBy(results, ['createdAt'], ['desc']));
       });
 
       return () => unsub();
@@ -186,8 +190,8 @@ const useExpenses = (args?: InitialState) => {
         status: payload.status,
         createdBy: userInfo.id as string,
         paymentDue: moment(payload.paymentDue).toDate().getTime(),
-        createdAt: moment().toDate().getTime(),
-        updatedAt: moment().toDate().getTime(),
+        createdAt: moment(new Date(payload.recordDate)).toDate().getTime(),
+        updatedAt: moment(new Date(payload.recordDate)).toDate().getTime(),
         isArchived: false,
       };
 

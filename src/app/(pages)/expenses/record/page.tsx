@@ -4,14 +4,14 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
- * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
- * Last Modified time: August 2nd 2023, 3:33:15 pm
+ * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
+ * Last Modified time: August 15th 2023, 11:13:17 am
  * ---------------------------------------------
  */
-
-import { useEffect, useState } from 'react';
 import moment from 'moment-timezone';
 moment.tz.setDefault('Asia/Manila');
+
+import { useEffect, useState } from 'react';
 import { Container, Grid, Typography } from '@mui/material';
 
 import DropdownField from '@/components/Dropdown';
@@ -39,6 +39,7 @@ export default function Dashboard() {
   const [unit, setUnit] = useState('');
   const [quantity, setQuantity] = useState(0);
   const [unitPrice, setUnitPrice] = useState(0);
+  const [recordDate, setRecordDate] = useState(moment(new Date()).format('YYYY-MM-DDThh:mm').toString());
   const [status, setStatus] = useState<ExpenseStatusEnum>(ExpenseStatusEnum.SETTLED);
   const [paymentDue, setPaymentDue] = useState(moment().format('YYYY-MM-DD'));
   const [error, setError] = useState('');
@@ -83,6 +84,7 @@ export default function Dashboard() {
       }
 
       const payload: ISaveExpenses = {
+        recordDate,
         storeId: store,
         categoryId: ['others', ''].includes(category) ? '' : category,
         otherCategory,
@@ -114,6 +116,10 @@ export default function Dashboard() {
   return (
     <Container style={{ marginTop: '2rem', marginBottom: '2rem' }}>
       <Grid container direction='column'>
+        <Grid item xs={12}>
+          <InputField type='datetime-local' label='Date' value={recordDate} onChange={setRecordDate} />
+        </Grid>
+
         <Grid item xs={12}>
           <DropdownField
             label='Store'
