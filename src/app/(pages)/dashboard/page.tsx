@@ -5,7 +5,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: August 15th 2023, 10:27:17 am
+ * Last Modified time: August 15th 2023, 10:38:10 am
  * ---------------------------------------------
  */
 
@@ -35,7 +35,7 @@ export default function Dashboard() {
 
   const [startDate, setStartDate] = useState(moment().format('YYYY-MM-DD'));
   const [endDate, setEndDate] = useState(moment().format('YYYY-MM-DD'));
-  const [status, setStatus] = useState<OrderStatusEnum | 'active' | 'all'>('active');
+  const [status, setStatus] = useState<OrderStatusEnum | 'active' | 'all'>(OrderStatusEnum.COMPLETED);
   const [store, setStore] = useState('');
   const [storeOptions, setStoreOptions] = useState<{ value: string; label: string }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
