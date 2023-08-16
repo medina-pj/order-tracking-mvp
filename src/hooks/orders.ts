@@ -3,7 +3,7 @@
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
  * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: August 15th 2023, 10:26:00 am
+ * Last Modified time: August 16th 2023, 2:54:33 pm
  * ---------------------------------------------
  */
 
@@ -222,12 +222,12 @@ const useOrder = (args?: InitialState) => {
         cartItems: payload.cartItems,
         status: payload?.orderCompleted ? OrderStatusEnum.COMPLETED : OrderStatusEnum.CONFIRMED,
         payment:
-          payload?.orderCompleted && !payload.payment
+          payload?.orderCompleted && (!payload?.payment?.modeOfPayment || !payload?.payment?.status)
             ? {
                 modeOfPayment: OrderPaymentMethodEnum.CASH,
                 status: OrderPaymentStatusEnum.PAID,
               }
-            : payload.payment,
+            : payload?.payment,
         discount: payload?.discount || [],
         data: payload.data || {},
         history: [
