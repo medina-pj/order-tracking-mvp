@@ -162,13 +162,9 @@ export default function Order() {
 
       await createOrder(payload);
 
-      setPaymentMethod('');
-      setTable('');
       setNotes('');
-      setOrderPaid(false);
       setCartEntries([]);
       setCartItems([]);
-      setOrderCompleted(false);
 
       alert('Order created.');
     } catch (err: any) {
