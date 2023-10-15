@@ -4,8 +4,8 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
- * Last Modified by: Rovelin Enriquez - <enriquezrovelin@gmail.com>
- * Last Modified time: August 2nd 2023, 3:45:39 pm
+ * Last Modified by: PJ Medina - <paulo@healthnow.ph>
+ * Last Modified time: October 15th 2023, 6:18:37 pm
  * ---------------------------------------------
  */
 
@@ -172,7 +172,21 @@ export default function RecordExpenses() {
                         fontFamily: 'inherit',
                         fontSize: 14,
                       }}>
-                      {d.particulars.toUpperCase()}
+                      {d?.category?.name?.toUpperCase() || 'OTHERS (OLD)'}
+                    </Typography>
+                    <Typography
+                      sx={{
+                        fontFamily: 'inherit',
+                        fontSize: 10,
+                      }}>
+                      {d?.particulars?.toUpperCase()}
+                    </Typography>
+                    <Typography
+                      sx={{
+                        fontFamily: 'inherit',
+                        fontSize: 10,
+                      }}>
+                      {d?.description?.toUpperCase()}
                     </Typography>
                     <Typography
                       color={'text.secondary'}

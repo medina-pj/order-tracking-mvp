@@ -4,8 +4,8 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
- * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: August 15th 2023, 11:58:27 am
+ * Last Modified by: PJ Medina - <paulo@healthnow.ph>
+ * Last Modified time: October 15th 2023, 6:15:14 pm
  * ---------------------------------------------
  */
 import moment from 'moment-timezone';
@@ -13,32 +13,18 @@ moment.tz.setDefault('Asia/Manila');
 
 import { useEffect, useMemo, useState } from 'react';
 import _ from 'lodash';
-import {
-  Container,
-  Grid,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Typography,
-} from '@mui/material';
+import { Container, Grid, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material';
 
 import DropdownField from '@/components/Dropdown';
 import InputField from '@/components/TextField';
 import ButtonField from '@/components/Button';
 
 import useStore from '@/hooks/store';
-import useCategory from '@/hooks/categories';
-import { ExpenseStatusEnum } from '@/types/schema/expenses';
-import useExpenses from '@/hooks/expenses';
+import useExpenses, { IExpenses } from '@/hooks/expenses';
 import useAuth from '@/hooks/auth';
 import numeral from 'numeral';
 import useOrder, { IOrder } from '@/hooks/orders';
 import { OrderStatusEnum, TCartAddOns, TCartItems } from '@/types/schema/order';
-import { TAddOnProduct } from '@/types/schema/product';
 import { UserTypes } from '@/types/schema/user';
 
 const TableContent = ({ name, price, quantity, total }: any) => {
@@ -132,46 +118,105 @@ export default function RecordExpenses() {
     await filterOrders({ startDate, endDate, store, status: OrderStatusEnum.COMPLETED });
   };
 
-  const totalExpenses = useMemo(() => {
-    return expensesDocs.reduce((acc, curr) => acc + +curr.unitPrice * +curr.quantity, 0);
+  const [totalExpenses, expensesTally] = useMemo(() => {
+    let totalExpenses = 0;
+    let expensesTally: {
+      categoryId: string;
+      categoryName: string;
+      quantity: number;
+      price: number;
+      total: number;
+    }[] = [];
+
+    expensesDocs.forEach((expenses: IExpenses) => {
+      const price = Number(expenses.unitPrice);
+      const quantity = Number(expenses.quantity);
+      const total = price * quantity;
+
+      //for backward compatibility with empty selected category
+      if (Object.keys(expenses?.category || {}).length === 0!) {
+        const otherExpensesIndex = expensesTally.findIndex((d: any) => d?.categoryId === 'OTHERS');
+
+        if (otherExpensesIndex >= 0) {
+          expensesTally[otherExpensesIndex]['quantity'] += quantity;
+          expensesTally[otherExpensesIndex]['total'] += total;
+        } else {
+          expensesTally.push({
+            categoryId: 'OTHERS',
+            categoryName: 'OTHERS (OLD)',
+            quantity,
+            price,
+            total,
+          });
+        }
+      } else {
+        const expensesIndex = expensesTally.findIndex((d: any) => d?.categoryId === expenses?.category?.id);
+
+        if (expensesIndex >= 0) {
+          expensesTally[expensesIndex]['quantity'] += quantity;
+          expensesTally[expensesIndex]['total'] += total;
+        } else {
+          expensesTally.push({
+            categoryId: expenses?.category?.id as string,
+            categoryName: expenses?.category?.name as string,
+            quantity,
+            price,
+            total,
+          });
+        }
+      }
+
+      totalExpenses += total;
+    });
+
+    return [totalExpenses, _.orderBy(expensesTally, ['total'], ['desc'])];
   }, [expensesDocs]);
 
   const [totalSales, productTally] = useMemo(() => {
     let totalSales = 0;
-    let productTally: { abbrev: string; name: string; quantity: number; price: number }[] = [];
+    let productTally: {
+      productId: string;
+      abbrev: string;
+      name: string;
+      quantity: number;
+      price: number;
+      total: number;
+    }[] = [];
 
     orderDocs.forEach((doc: IOrder) => {
       const gross = doc.cartItems.reduce((cartItemAcc: number, cartItem: TCartItems) => {
-        const itemIndex = productTally.findIndex(
-          (d: any) => d.abbrev === cartItem.productAbbrev && d.price === cartItem.price
-        );
+        const itemIndex = productTally.findIndex((d: any) => d.productId === cartItem.productId);
 
         if (itemIndex >= 0) {
           productTally[itemIndex]['quantity'] += cartItem.quantity;
+          productTally[itemIndex]['total'] += Number(cartItem.price) * cartItem.quantity;
         } else {
           productTally.push({
+            productId: cartItem.productId,
             abbrev: cartItem.productAbbrev,
             name: cartItem.productName,
             quantity: cartItem.quantity,
-            price: cartItem.price,
+            price: Number(cartItem.price),
+            total: Number(cartItem.price) * cartItem.quantity,
           });
         }
 
         let totalAddOns = 0;
         if (cartItem?.addOns && cartItem?.addOns.length) {
           totalAddOns = cartItem.addOns.reduce((addOnAcc: number, addOn: TCartAddOns) => {
-            const addOnIndex = productTally.findIndex(
-              (d: any) => d.abbrev === addOn.productAbbrev && d.price === addOn.price
-            );
+            const addOnIndex = productTally.findIndex((d: any) => d.productId === addOn.productId);
 
             if (addOnIndex >= 0) {
               productTally[addOnIndex]['quantity'] += addOn.quantity;
+              productTally[addOnIndex]['total'] += Number(cartItem.price) * addOn.quantity;
             } else {
               productTally.push({
+                productId: addOn.productId,
                 abbrev: addOn.productAbbrev,
                 name: addOn.productName,
                 quantity: addOn.quantity,
-                price: addOn.price,
+                price: Number(addOn.price),
+                total: Number(addOn.price) * addOn.quantity,
               });
             }
 
@@ -185,7 +230,7 @@ export default function RecordExpenses() {
       totalSales += gross;
     });
 
-    return [totalSales, _.orderBy(productTally, ['quantity'], ['desc'])];
+    return [totalSales, _.orderBy(productTally, ['total'], ['desc'])];
   }, [orderDocs]);
 
   return (
@@ -248,7 +293,7 @@ export default function RecordExpenses() {
                   name={`${d.name.toUpperCase()} (${d.abbrev})`}
                   price={`P${numeral(d.price).format('0,0.00')}`}
                   quantity={numeral(d.quantity).format('0,0')}
-                  total={`P${numeral(+d.quantity * +d.price).format('0,0.00')}`}
+                  total={`P${numeral(d.total).format('0,0.00')}`}
                 />
               ))}
               <TableRow sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
@@ -293,13 +338,13 @@ export default function RecordExpenses() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {expensesDocs.map((d: any, i: number) => (
+              {expensesTally.map((d: any, i: number) => (
                 <TableContent
                   key={i}
-                  name={d.particulars.toUpperCase()}
-                  price={`P${numeral(d.unitPrice).format('0,0.00')} / ${d.unit}`}
-                  quantity={numeral(d.quantity).format('0,0')}
-                  total={`P${numeral(+d.quantity * +d.unitPrice).format('0,0.00')}`}
+                  name={d?.categoryName?.toUpperCase()}
+                  price={''}
+                  quantity={''}
+                  total={`P${numeral(d.total).format('0,0.00')}`}
                 />
               ))}
               <TableRow>

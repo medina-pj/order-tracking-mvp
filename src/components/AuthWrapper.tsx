@@ -4,8 +4,8 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Sunday July 2nd 2023
- * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 31st 2023, 5:37:52 pm
+ * Last Modified by: PJ Medina - <paulo@healthnow.ph>
+ * Last Modified time: October 15th 2023, 1:20:25 pm
  * ---------------------------------------------
  */
 
@@ -25,6 +25,10 @@ export default function AuthWrapper({ children }: { children: React.ReactNode })
 
   const router = useRouter();
   const path = usePathname();
+
+  console.log({
+    userInfo,
+  });
 
   useEffect(() => {
     if (!loading && !user) {

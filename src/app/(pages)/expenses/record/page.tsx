@@ -4,8 +4,8 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Saturday June 10th 2023
- * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: August 15th 2023, 11:13:17 am
+ * Last Modified by: PJ Medina - <paulo@healthnow.ph>
+ * Last Modified time: October 15th 2023, 6:11:43 pm
  * ---------------------------------------------
  */
 import moment from 'moment-timezone';
@@ -24,6 +24,7 @@ import { ExpenseStatusEnum } from '@/types/schema/expenses';
 import useExpenses, { ISaveExpenses } from '@/hooks/expenses';
 import useAuth from '@/hooks/auth';
 import { UserTypes } from '@/types/schema/user';
+import _ from 'lodash';
 
 export default function Dashboard() {
   const { userInfo } = useAuth();
@@ -134,15 +135,10 @@ export default function Dashboard() {
             label='Category'
             value={category}
             onChange={(e: any) => setCategory(e.target.value)}
-            options={categoryDocs
-              .map((category: any) => ({
-                value: category.id,
-                label: category.name,
-              }))
-              .concat({
-                value: 'others',
-                label: 'Others',
-              })}
+            options={_.orderBy(categoryDocs, ['name'], ['asc']).map((category: any) => ({
+              value: category.id,
+              label: category.name,
+            }))}
           />
         </Grid>
 

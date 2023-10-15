@@ -2,8 +2,8 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Thursday July 6th 2023
- * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 9th 2023, 11:45:13 am
+ * Last Modified by: PJ Medina - <paulo@healthnow.ph>
+ * Last Modified time: October 15th 2023, 1:53:40 pm
  * ---------------------------------------------
  */
 import moment from 'moment-timezone';
@@ -46,7 +46,7 @@ const CategoryService = {
   fetchCategory: async (id: string): Promise<CategorySchema> => {
     try {
       const ref = collection(db, constants.DB_CATEGORIES);
-      const qry = query(ref, where('isArchived', '==', false), where(documentId(), '==', id));
+      const qry = query(ref, where(documentId(), '==', id));
 
       const qrySnapshot = await getDocs(qry);
 
