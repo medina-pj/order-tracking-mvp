@@ -2,8 +2,8 @@
  * ---------------------------------------------
  * Author: PJ Medina
  * Date:   Thursday July 6th 2023
- * Last Modified by: PJ Medina - <paulojohn.medina@gmail.com>
- * Last Modified time: July 9th 2023, 11:45:17 am
+ * Last Modified by: PJ Medina - <paulo@healthnow.ph>
+ * Last Modified time: February 5th 2024, 8:41:06 pm
  * ---------------------------------------------
  */
 import moment from 'moment-timezone';
@@ -22,7 +22,7 @@ const StoreService = {
       if (!ids.length) return result;
 
       const ref = collection(db, constants.DB_STORE);
-      const qry = query(ref, where('isArchived', '==', false), where(documentId(), 'in', ids));
+      const qry = query(ref, where(documentId(), 'in', ids));
 
       const qrySnapshot = await getDocs(qry);
 
@@ -47,7 +47,7 @@ const StoreService = {
   fetchStore: async (id: string): Promise<StoreSchema> => {
     try {
       const ref = collection(db, constants.DB_STORE);
-      const qry = query(ref, where('isArchived', '==', false), where(documentId(), '==', id));
+      const qry = query(ref, where(documentId(), '==', id));
 
       const qrySnapshot = await getDocs(qry);
 
