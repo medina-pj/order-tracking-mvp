@@ -5,7 +5,7 @@
  * Author: PJ Medina
  * Date:   Sunday July 2nd 2023
  * Last Modified by: PJ Medina - <paulo@healthnow.ph>
- * Last Modified time: October 15th 2023, 1:20:25 pm
+ * Last Modified time: February 5th 2024, 8:27:55 pm
  * ---------------------------------------------
  */
 
@@ -28,6 +28,7 @@ export default function AuthWrapper({ children }: { children: React.ReactNode })
 
   console.log({
     userInfo,
+    path: path.split('/'),
   });
 
   useEffect(() => {
@@ -42,6 +43,11 @@ export default function AuthWrapper({ children }: { children: React.ReactNode })
         router.replace('/');
       }
 
+      // Redirect to the dashboard if the user is authenticated
+      else if (path === '/' || path === '') {
+        router.push('/dashboard');
+      }
+
       // Redirect to the dashboard if the user is accessing unauthorized routes
       else if (
         userInfo &&
@@ -49,11 +55,6 @@ export default function AuthWrapper({ children }: { children: React.ReactNode })
         adminRoutes.includes(currentPath[1]) &&
         !exceptionRoutes.includes(currentPath[2])
       ) {
-        router.push('/dashboard');
-      }
-
-      // Redirect to the dashboard if the user is authenticated
-      else if (path === '/' || path === '') {
         router.push('/dashboard');
       }
 
