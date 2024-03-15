@@ -61,6 +61,8 @@ export default function Order() {
   const { documents: tables } = useStoreTable();
   const { createOrder } = useOrder();
 
+  const [filter, setFilter] = useState('');
+
   const [error, setError] = useState('');
   const [store, setStore] = useState('');
   const [table, setTable] = useState('');
@@ -201,6 +203,28 @@ export default function Order() {
     );
   }, [products, store]);
 
+  const filterSearch = (arr: IProduct[]) => {
+    const patt = new RegExp(filter.toLowerCase());
+
+    const res = arr.reduce((acc: IProduct[], curr) => {
+      const name = patt.test(curr.name.toLowerCase());
+      // const description = patt.test(curr.description.toLowerCase());
+      // const code = patt.test(curr.productCode.toLowerCase());
+      const abbrev = patt.test(curr.productAbbrev.toLowerCase());
+
+      if (
+        name === true ||
+        // || description === true || code === true
+        abbrev === true
+      )
+        acc.push(curr);
+
+      return acc;
+    }, []);
+
+    return res;
+  };
+
   return (
     <Container style={{ marginTop: '2rem', marginBottom: '5rem' }}>
       <DropdownField
@@ -241,8 +265,9 @@ export default function Order() {
             </Typography>
           </AccordionSummary>
           <AccordionDetails style={{ padding: 0 }}>
+            <InputField label='Search' value={filter} onChange={setFilter} />
             <Grid container spacing={2}>
-              {filteredProducs.map((d: IProduct, index: number) => (
+              {filterSearch(filteredProducs).map((d: IProduct, index: number) => (
                 <Grid item key={index} xs={6}>
                   <MenuCard product={d} cartItems={cartEntries} setCartItems={setCartEntries} />
                 </Grid>
