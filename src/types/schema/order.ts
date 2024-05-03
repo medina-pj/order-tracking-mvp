@@ -30,6 +30,7 @@ export enum OrderPaymentMethodEnum {
   CASH = 'cash',
   GCASH = 'gcash',
   ONLINE_BANK = 'online_banking',
+  CO_ADMIN = 'co_admin',
 }
 
 export type TCartAddOns = {

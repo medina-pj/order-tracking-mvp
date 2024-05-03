@@ -318,6 +318,7 @@ export default function Order() {
                       { value: OrderPaymentMethodEnum.CASH, label: 'Cash' },
                       { value: OrderPaymentMethodEnum.GCASH, label: 'G-Cash' },
                       { value: OrderPaymentMethodEnum.ONLINE_BANK, label: 'Online Bank' },
+                      { value: OrderPaymentMethodEnum.CO_ADMIN, label: 'CO Admin' },
                     ]}
                   />
                 </Box>
