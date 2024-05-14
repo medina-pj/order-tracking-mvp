@@ -313,11 +313,21 @@ export default function RecordExpenses() {
         </Grid>
 
         <Grid item xs={12}>
-          <InputField type='date' label='Start Date' value={startDate} onChange={setStartDate} />
+          <InputField
+            type='date'
+            label='Start Date (from 7am today)'
+            value={startDate}
+            onChange={setStartDate}
+          />
         </Grid>
 
         <Grid item xs={12}>
-          <InputField type='date' label='End Date' value={endDate} onChange={setEndDate} />
+          <InputField
+            type='date'
+            label='End Date (until 5am the next day)'
+            value={endDate}
+            onChange={setEndDate}
+          />
         </Grid>
 
         <Grid item xs={12}>

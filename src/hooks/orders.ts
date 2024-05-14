@@ -188,12 +188,12 @@ const useOrder = (args?: InitialState) => {
       }
 
       const filterStartDate = filters.startDate
-        ? moment(filters.startDate).startOf('day').valueOf()
-        : moment().startOf('day').valueOf();
+        ? moment(filters.startDate).startOf('day').add(7, 'hours').valueOf()
+        : moment().startOf('day').add(7, 'hours').valueOf();
 
       const filterEndDate = filters.endDate
-        ? moment(filters.endDate).endOf('day').valueOf()
-        : moment().startOf('day').valueOf();
+        ? moment(filters.endDate).endOf('day').add(5, 'hours').add(1, 'days').valueOf()
+        : moment().startOf('day').add(5, 'hours').add(1, 'days').valueOf();
 
       setFilters({
         startDate: filterStartDate,
