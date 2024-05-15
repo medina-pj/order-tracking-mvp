@@ -40,7 +40,7 @@ export default function Dashboard() {
   const [unit, setUnit] = useState('');
   const [quantity, setQuantity] = useState(0);
   const [unitPrice, setUnitPrice] = useState(0);
-  const [recordDate, setRecordDate] = useState(moment(new Date()).format('YYYY-MM-DDThh:mm').toString());
+  const [recordDate, setRecordDate] = useState(moment(new Date()).format('YYYY-MM-DDTHH:mm').toString());
   const [status, setStatus] = useState<ExpenseStatusEnum>(ExpenseStatusEnum.SETTLED);
   const [paymentDue, setPaymentDue] = useState(moment().format('YYYY-MM-DD'));
   const [error, setError] = useState('');
